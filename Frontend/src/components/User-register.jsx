@@ -16,13 +16,14 @@ import { Visibility, VisibilityOff } from "@mui/icons-material"
 import GoogleIcon from "@mui/icons-material/Google"
 import NewBackground from "../assets/user-bg.png"
 // import "./index.css"
-
+import axios from "axios"
 function Page() {
     const [showPassword, setShowPassword] = useState(false)
 
     const handleClickShowPassword = () => {
         setShowPassword(!showPassword)
     }
+ 
 
     return (
         <div className="h-screen w-full flex items-center justify-center bg-cover bg-center "

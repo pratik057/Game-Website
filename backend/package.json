@@ -13,6 +13,8 @@
     "bcrypt": "^5.1.1",
     "express": "^4.21.2",
     "game": "file:",
-    "jsonwebtoken": "^9.0.2"
+    "jsonwebtoken": "^9.0.2",
+    "nodemailer": "^6.10.0",
+    "otp-generator": "^4.0.1"
   }
 }
