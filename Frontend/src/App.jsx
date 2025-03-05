@@ -5,7 +5,7 @@ import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import LoadingScreen from "./components/LoadingScreen";
 import LoginScreen from "./components/LoginScreen";
 import UserRegister from "./components/User-register";
-// import UserLogin from "./components/User-Login";
+import UserLogin from "./components/User-Login";
 import Userdashbord from "./components/User-Dashbord";
 
 function App() {
@@ -31,7 +31,8 @@ function App() {
             <>
               <Route path="/" element={<LoginScreen />} />
               <Route path="/register" element={<UserRegister />} />
-              <Route path="/login" element={<Userdashbord />} />
+              <Route path="/login" element={<UserLogin />} />
+              <Route path="/dashboard" element={<Userdashbord />} />
 
             </>
           )}
