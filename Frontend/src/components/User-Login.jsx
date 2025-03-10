@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useContext } from "react";
 import {
     TextField,
     InputAdornment,
@@ -13,45 +13,26 @@ import {
     Paper,
 } from "@mui/material";
 import { Visibility, VisibilityOff } from "@mui/icons-material";
-import { useNavigate } from "react-router-dom"; // Navigation
-import axios from "axios";
-import NewBackground from "../assets/user-bg.png"; // Ensure path is correct
+import { useNavigate } from "react-router-dom";
+import { UserContext } from "../context/UserContext"; // Import UserContext
+import NewBackground from "../assets/user-bg.png";
 
 function LoginScreen() {
     const [showPassword, setShowPassword] = useState(false);
     const navigate = useNavigate();
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
-    const [message, setMessage] = useState("");
+    const { login } = useContext(UserContext); // Get login function from context
 
     const handleClickShowPassword = () => {
         setShowPassword(!showPassword);
     };
 
     const handleLogin = async (e) => {
-        e.preventDefault(); // Prevents form refresh
-
-        try {
-            const response = await axios.post("http://localhost:5000/api/auth/login", {
-                email,
-                password,
-            });
-
-          
-            setMessage(response.data.message);
-            console.log("Response:", response);
-            if (response.statusText === "OK") {
-                localStorage.setItem("token", response.data.token);
-                setEmail("");
-                setPassword("");
-                setMessage("");
-                navigate("/dashboard");
-                console.log("Response:", response);
-
-            }
-        } catch (error) {
-            console.log("Error:", error.response?.data || error.message);
-            setMessage(error.response?.data?.message || "Login failed");
+        e.preventDefault();
+        const success = await login(email, password); // Use context login function
+        if (success) {
+            navigate("/dashboard");
         }
     };
 
@@ -64,11 +45,11 @@ function LoginScreen() {
                 {/* Left Side - Title and description */}
                 <div className="text-white mb-10 md:mb-0 md:w-1/2 md:pr-8">
                     <h1 className="text-4xl md:text-5xl font-bold mb-6">
-                        <span className="text-yellow-400">ANDHAR</span>{" "}
+                        <span className="text-yellow-400">ANDAR</span>{" "}
                         <span className="text-white">BAHAR</span>
                     </h1>
                     <p className="text-lg mb-8 max-w-md">
-                        Sign in to ANDHAR BAHAAR and experience real-time AI-powered gameplay insights.
+                        Sign in to ANDAR BAHAR and experience real-time AI-powered gameplay insights.
                     </p>
                     <h2 className="text-2xl md:text-3xl font-semibold mb-4">We are happy to see you back...</h2>
                 </div>
@@ -158,8 +139,6 @@ function LoginScreen() {
                         >
                             Submit
                         </Button>
-
-                        {message && <Typography variant="body2" className="text-red-500 text-center">{message}</Typography>}
 
                         <div className="flex items-center justify-center my-4">
                             <Divider className="flex-grow bg-gray-400" />

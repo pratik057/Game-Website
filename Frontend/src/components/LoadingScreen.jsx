@@ -1,5 +1,5 @@
 "use client"
-import NewBackground from "../assets/user-bg.png"
+
 
 import { useState, useEffect } from "react"
 import { LinearProgress } from "@mui/material"

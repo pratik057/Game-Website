@@ -1,34 +1,38 @@
-const mongoose = require('mongoose');
+import mongoose from "mongoose";
 
 const userSchema = new mongoose.Schema({
-  username: 
-  {
+  username: {
     type: String,
     required: true,
     min: 3,
     max: 20,
-    unique: true
+    unique: true,
   },
   password: {
     type: String,
     min: 6,
-    required: true
+    required: true,
   },
-  email:{
+  email: {
     type: String,
     required: true,
     max: 50,
-    unique: true
+    unique: true,
   },
   date: {
     type: Date,
-    default: Date.now
+    default: Date.now,
   },
   role: {
     type: String,
-    default: 'user'
-    
-  }
+    default: "user",
+  },
+  balance: {
+    type: Number, // Balance as a number
+   
+    default:0,
+  },
 });
-const User = mongoose.model('User', userSchema);
-module.exports = User;
+
+const User = mongoose.model("User", userSchema);
+export default User;
