@@ -56,7 +56,7 @@ initializeSocketIO(io)
 
 // Connect to MongoDB
 mongoose
-  .connect(process.env.MONGODB_URI || "mongodb+srv://harshal:CsTg5w0upPnW5Ttq@cluster0.69rkq.mongodb.net/TEENPATI")
+  .connect(process.env.MONGODB_URI || "mongodb://127.0.0.1:27017/databas")
   .then(() => {
     console.log("MongoDB connected successfully")
     // Start server
