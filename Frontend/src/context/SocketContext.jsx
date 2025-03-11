@@ -31,6 +31,8 @@ export const SocketProvider = ({ children }) => {
     const socketInstance = io(import.meta.env.VITE_SOCKET_URL || "http://localhost:5000", {
       transports: ["websocket"],
       autoConnect: true,
+      reconnectionAttempts: 5, // Try to reconnect 5 times
+  reconnectionDelay: 2000,
     })
 
     setSocket(socketInstance)
@@ -144,8 +146,8 @@ export const SocketProvider = ({ children }) => {
 
       // Check if the current user won or lost
       const socketId = socket.id
-      const winner = winners.find((w) => w.id === socketId)
-      const loser = losers.find((l) => l.id === socketId)
+      const winner = winners?.find((w) => w.id === socketId)
+      const loser = losers?.find((l) => l.id === socketId)
 
       if (winner) {
         toast.success(`You won ₹${winner.winnings}!`)
