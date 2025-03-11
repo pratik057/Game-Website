@@ -51,6 +51,10 @@ if (process.env.NODE_ENV === "production") {
   })
 }
 
+app.get("/", (req, res) => {
+  res.send("server is running")
+})
+
 // Initialize Socket.IO
 initializeSocketIO(io)
 
