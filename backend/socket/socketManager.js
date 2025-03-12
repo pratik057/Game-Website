@@ -149,7 +149,7 @@ export const initializeSocketIO = (io) => {
       io.emit("gameOver", { winningSide });
     
       // Reset game state for next round
-      resetGameState();
+      resetGame();
     };
     
     // Call this function after the game determines a winner
