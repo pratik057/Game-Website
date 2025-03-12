@@ -85,18 +85,15 @@ export const initializeSocketIO = (io) => {
 
     socket.on("placeBet", async ({ side, amount }) => {
       const player = gameState.players[socket.id];
-    
       if (!player || gameState.status !== "betting" || amount <= 0 || player.balance < amount) {
         socket.emit("betError", { message: "Invalid bet" });
         return;
       }
-    
-      // Deduct bet amount
+
       player.bet = { side, amount };
       player.balance -= amount;
       gameState.totalBets[side] += amount;
-    
-      // Update user balance in DB
+
       if (player.userId) {
         try {
           await User.findByIdAndUpdate(player.userId, { $inc: { balance: -amount } });
@@ -104,7 +101,7 @@ export const initializeSocketIO = (io) => {
           console.error("Error updating user balance:", error);
         }
       }
-    
+
       io.emit("betPlaced", {
         playerId: socket.id,
         username: player.username,
@@ -112,49 +109,9 @@ export const initializeSocketIO = (io) => {
         amount,
         totalBets: gameState.totalBets,
       });
-    
+
       socket.emit("balanceUpdated", { balance: player.balance });
     });
-    
-    // Determine winner and update balances
-    const determineWinner = async (winningSide) => {
-      gameState.status = "result";
-    
-      for (const socketId in gameState.players) {
-        const player = gameState.players[socketId];
-    
-        if (player.bet) {
-          if (player.bet.side === winningSide) {
-            // Player won, add winnings
-            const winnings = player.bet.amount * 2; // Example: 2x payout
-            player.balance += winnings;
-    
-            // Update balance in DB
-            if (player.userId) {
-              try {
-                await User.findByIdAndUpdate(player.userId, { $inc: { balance: winnings } });
-              } catch (error) {
-                console.error("Error updating user balance:", error);
-              }
-            }
-    
-            io.to(socketId).emit("gameResult", { result: "win", winnings, balance: player.balance });
-          } else {
-            // Player lost, notify them
-            io.to(socketId).emit("gameResult", { result: "lose", balance: player.balance });
-          }
-        }
-      }
-    
-      io.emit("gameOver", { winningSide });
-    
-      // Reset game state for next round
-      resetGame();
-    };
-    
-    // Call this function after the game determines a winner
-    determineWinner("andar"); // Example call with winning side
-    
 
     socket.on("disconnect", () => {
       if (gameState.players[socket.id]) {
