@@ -88,12 +88,12 @@ const Game = () => {
             <div className="flex justify-between mb-6">
               <div className="bg-red-900/30 px-4 py-2 rounded-lg">
                 <div className="text-sm text-gray-300">Total Andar Bets</div>
-                <div className="text-xl font-bold text-red-500">₹{gameState.totalBets.andar}</div>
+                <div className="text-xl font-bold text-red-500">{gameState.totalBets.andar}</div>
               </div>
 
               <div className="bg-blue-900/30 px-4 py-2 rounded-lg">
                 <div className="text-sm text-gray-300">Total Bahar Bets</div>
-                <div className="text-xl font-bold text-blue-500">₹{gameState.totalBets.bahar}</div>
+                <div className="text-xl font-bold text-blue-500">{gameState.totalBets.bahar}</div>
               </div>
             </div>
 

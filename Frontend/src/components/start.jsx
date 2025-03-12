@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { io } from "socket.io-client";
 
-const socket = io("https://game-website-yyuo.onrender.com"); // Update with your backend URL if needed
+const socket = io("http://localhost:5000"); // Update with your backend URL if needed
 
 const Game = () => {
   const [holeCard, setHoleCard] = useState(null);

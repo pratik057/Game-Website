@@ -456,7 +456,8 @@ const Register = () => {
         if (responseMessage.includes("OTP verified")) setStep(3);
     };
 
-    const handleRegister = async () => {
+    const handleRegister = async (e) => {
+        e.preventDefault();
         if (password !== confirmPassword) {
             setMessage("Passwords do not match");
             return;
@@ -490,19 +491,19 @@ const Register = () => {
 
                         {step === 1 && (
                             <>
-                                <TextField fullWidth label="Enter Your Email" variant="outlined" value={email} onChange={(e) => setEmail(e.target.value)} sx={{ marginBottom: 2 }} />
+                                <TextField fullWidth label="Enter Your Email" variant="outlined" value={email} onChange={(e) => setEmail(e.target.value)} sx={{ marginBottom: 2 }} InputProps={{ style: { color:"white" } }} />
                                 <Button fullWidth variant="contained" onClick={handleSendOtp} sx={{ backgroundColor: "#00e676" }}>Send OTP</Button>
                             </>
                         )}
                         {step === 2 && (
                             <>
-                                <TextField fullWidth label="Enter OTP" variant="outlined" value={otp} onChange={(e) => setOtp(e.target.value)} sx={{ marginBottom: 2 }} />
+                                <TextField fullWidth label="Enter OTP" variant="outlined" value={otp} onChange={(e) => setOtp(e.target.value)} sx={{ marginBottom: 2 ,color:"white"}} InputProps={{ style: { color:"white" } }} />
                                 <Button fullWidth variant="contained" onClick={handleVerifyOtp} sx={{ backgroundColor: "#28a745" }}>Verify OTP</Button>
                             </>
                         )}
                         {step === 3 && (
                             <>
-                                <TextField fullWidth label="Enter Username" variant="outlined" value={username} onChange={(e) => setUsername(e.target.value)} sx={{ marginBottom: 2 }} />
+                                <TextField fullWidth label="Enter Username" variant="outlined" value={username} onChange={(e) => setUsername(e.target.value)} sx={{ marginBottom: 2 ,color:"white" }} InputProps={{ style: { color:"white" } }} />
                                 <TextField fullWidth label="Enter Password" type={showPassword ? "text" : "password"} variant="outlined" value={password} onChange={(e) => setPassword(e.target.value)}
                                     InputProps={{
                                         endAdornment: (
@@ -513,9 +514,9 @@ const Register = () => {
                                             </InputAdornment>
                                         ),
                                     }}
-                                    sx={{ marginBottom: 2 }}
+                                    sx={{ marginBottom: 2,color:"white" }}
                                 />
-                                <TextField fullWidth label="Confirm Password" type="password" variant="outlined" value={confirmPassword} onChange={(e) => setConfirmPassword(e.target.value)} sx={{ marginBottom: 2 }} />
+                                <TextField fullWidth label="Confirm Password" type="password" variant="outlined" value={confirmPassword} onChange={(e) => setConfirmPassword(e.target.value)} sx={{ marginBottom: 2,color:"white" }} InputProps={{ style: { color:"white" } }} />
                                 <Button fullWidth variant="contained" onClick={handleRegister} sx={{ backgroundColor: "#6f42c1" }}>Register</Button>
                             </>
                         )}

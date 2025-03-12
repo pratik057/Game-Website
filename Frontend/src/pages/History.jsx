@@ -29,7 +29,7 @@ const History = () => {
       try {
         console.log("Fetching game history...");
   
-        const response = await axios.get("https://game-website-yyuo.onrender.com/api/games/history", {
+        const response = await axios.get("http://localhost:5000/api/games/history", {
           user:user,
           headers: {
             Authorization: `Bearer ${token}`, // Ensure user has a valid token
@@ -125,10 +125,10 @@ const History = () => {
         <div className="bg-gray-800 rounded-lg p-4">
           <h3 className="text-gray-400 mb-1">Net Profit</h3>
           <div className={`text-2xl font-bold ${stats.netProfit >= 0 ? "text-green-500" : "text-red-500"}`}>
-            ₹{stats.netProfit.toFixed(2)}
+            {stats.netProfit.toFixed(2)}
           </div>
           <div className="mt-2 text-sm text-gray-400">
-            <span>₹{stats.totalWagered.toFixed(2)} wagered</span>
+            <span>{stats.totalWagered.toFixed(2)} wagered</span>
           </div>
         </div>
       </div>
@@ -159,7 +159,7 @@ const History = () => {
                 {games.map((game) => (
                   <tr key={game._id} className="border-t border-gray-700 hover:bg-gray-700/50">
                     <td className="px-4 py-3 text-gray-300">{new Date(game.createdAt).toLocaleString()}</td>
-                    <td className="px-4 py-3">₹{game.betAmount.toFixed(2)}</td>
+                    <td className="px-4 py-3">{game.betAmount.toFixed(2)}</td>
                     <td className="px-4 py-3">
                       <span className={game.betSide === "andar" ? "text-red-500" : "text-blue-500"}>
                         {game.betSide === "andar" ? "Andar" : "Bahar"}
@@ -177,8 +177,8 @@ const History = () => {
                     <td className="px-4 py-3 text-right">
                       <span className={game.result === "win" ? "text-green-500" : "text-red-500"}>
                         {game.result === "win"
-                          ? `+₹${(game.winAmount - game.betAmount).toFixed(2)}`
-                          : `-₹${game.betAmount.toFixed(2)}`}
+                          ? `+${(game.winAmount - game.betAmount).toFixed(2)}`
+                          : `-${game.betAmount.toFixed(2)}`}
                       </span>
                     </td>
                   </tr>

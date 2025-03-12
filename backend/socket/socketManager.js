@@ -153,20 +153,18 @@ const startGameLoop = (io) => {
       }
     }, 1000);
   };
-
   const startDealing = async (io) => {
     gameState.status = "dealing";
     const deck = shuffleDeck(generateDeck());
     const joker = deck.pop();
-    console.log("joker:", joker)
     gameState.jokerCard = joker;
     io.emit("jokerRevealed", { jokerCard: joker });
     await new Promise((resolve) => setTimeout(resolve, 2000));
-
+  
     const andarBet = gameState.totalBets.andar;
     const baharBet = gameState.totalBets.bahar;
     let forcedWinningSide = andarBet < baharBet ? "andar" : "bahar";
-
+  
     let andar = [], bahar = [], foundMatch = false;
     while (!foundMatch && deck.length > 0) {
       const card = deck.pop();
@@ -176,10 +174,38 @@ const startGameLoop = (io) => {
       if (card.value === joker.value && currentSide === forcedWinningSide) foundMatch = true;
       await new Promise((resolve) => setTimeout(resolve, 1000));
     }
+  
     gameState.winningSide = forcedWinningSide;
     io.emit("gameResult", { winningSide: forcedWinningSide });
+  
+    // Calculate winnings
+    Object.values(gameState.players).forEach(async (player) => {
+      if (player.bet) {
+        if (player.bet.side === gameState.winningSide) {
+          // Player wins, gets 2x the bet amount back
+          const winnings = player.bet.amount * 2;
+          player.balance += winnings;
+          
+          if (player.userId) {
+            try {
+              await User.findByIdAndUpdate(player.userId, { $inc: { balance: winnings } });
+            } catch (error) {
+              console.error("Error updating user balance:", error);
+            }
+          }
+  
+          io.to(player.id).emit("balanceUpdated", { balance: player.balance });
+          io.to(player.id).emit("winMessage", { amountWon: winnings });
+        } else {
+          // Player lost, balance already deducted
+          io.to(player.id).emit("loseMessage", { amountLost: player.bet.amount });
+        }
+      }
+    });
+  
     await new Promise((resolve) => setTimeout(resolve, 10000));
     resetGame();
   };
+  
   resetGame();
 };

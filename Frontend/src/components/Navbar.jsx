@@ -46,8 +46,8 @@ const Navbar = () => {
               {user ? (
                 <>
                   <div className="mr-4 px-3 py-1 bg-gray-700 rounded-lg">
-                    <span className="text-gray-400 text-sm">Coins</span>
-                    <span className="ml-1 text-yellow-500 font-bold">₹{balance.toFixed(2)}</span>
+                    <span className="text-gray-400 text-sm">COINS :</span>
+                    <span className="ml-1 text-yellow-500 font-bold">{balance.toFixed(2)}</span>
                   </div>
                   <div className="mr-4 text-white">
                     Welcome, <span className="font-semibold">{user.username}</span>
@@ -112,7 +112,7 @@ const Navbar = () => {
               <>
                 <div className="px-3 py-2">
                   <span className="text-gray-400">Balance:</span>
-                  <span className="ml-1 text-yellow-500 font-bold">₹{balance.toFixed(2)}</span>
+                  <span className="ml-1 text-yellow-500 font-bold">{balance.toFixed(2)}</span>
                 </div>
                 <div className="px-3 py-2 text-white">
                   Welcome, <span className="font-semibold">{user.username}</span>

@@ -28,7 +28,7 @@ export const SocketProvider = ({ children }) => {
   // Initialize socket connection
   useEffect(() => {
     // Connect to the server
-    const socketInstance = io(import.meta.env.VITE_SOCKET_URL || "https://game-website-yyuo.onrender.com", {
+    const socketInstance = io(import.meta.env.VITE_SOCKET_URL || "http://localhost:5000", {
       transports: ["websocket"],
       autoConnect: true,
       reconnectionAttempts: 5, // Try to reconnect 5 times
@@ -150,9 +150,9 @@ export const SocketProvider = ({ children }) => {
       const loser = losers?.find((l) => l.id === socketId)
 
       if (winner) {
-        toast.success(`You won ₹${winner.winnings}!`)
+        toast.success(`You won ${winner.winnings}!`)
       } else if (loser) {
-        toast.error(`You lost ₹${loser.loss}`)
+        toast.error(`You lost ${loser.loss}`)
       }
     })
 

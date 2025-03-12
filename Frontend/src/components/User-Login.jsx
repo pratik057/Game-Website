@@ -101,11 +101,11 @@ function LoginScreen() {
                             variant="outlined"
                             value={password}
                             onChange={(e) => setPassword(e.target.value)}
-                            InputLabelProps={{ style: { color: "rgba(255, 255, 255, 0.7)" } }}
+                            InputLabelProps={{ style: { color:"white" } }}
                             InputProps={{
                                 endAdornment: (
                                     <InputAdornment position="end">
-                                        <IconButton onClick={handleClickShowPassword} edge="end" sx={{ color: "rgba(255, 255, 255, 0.7)" }}>
+                                        <IconButton onClick={handleClickShowPassword} edge="end" sx={{ color:"white" }}>
                                             {showPassword ? <VisibilityOff /> : <Visibility />}
                                         </IconButton>
                                     </InputAdornment>

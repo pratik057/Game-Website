@@ -38,7 +38,7 @@ const BetControls = ({ onPlaceBet, disabled, currentBet }) => {
         <div className="flex justify-center items-center p-4 bg-gray-700 rounded-lg">
           <div className={`text-center ${currentBet.side === "andar" ? "text-red-500" : "text-blue-500"}`}>
             <div className="text-lg font-bold mb-1">{currentBet.side === "andar" ? "ANDAR" : "BAHAR"}</div>
-            <div className="text-2xl font-bold">₹{currentBet.amount}</div>
+            <div className="text-2xl font-bold">{currentBet.amount}</div>
           </div>
         </div>
 
@@ -54,7 +54,7 @@ const BetControls = ({ onPlaceBet, disabled, currentBet }) => {
       <div className="mb-4">
         <div className="flex justify-between items-center mb-2">
           <label className="text-gray-300">Bet Amount:</label>
-          <span className="text-yellow-500 font-bold">₹{betAmount}</span>
+          <span className="text-yellow-500 font-bold">{betAmount}</span>
         </div>
 
         <div className="flex flex-wrap gap-2 mb-4">
@@ -65,7 +65,7 @@ const BetControls = ({ onPlaceBet, disabled, currentBet }) => {
               className={`px-3 py-1 rounded-md ${betAmount === amount ? "bg-yellow-500 text-black" : "bg-gray-700 text-white"}`}
               disabled={disabled}
             >
-              ₹{amount}
+              {amount}
             </button>
           ))}
         </div>

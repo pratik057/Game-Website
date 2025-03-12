@@ -4,7 +4,7 @@ import girlimage from "../assets/model.png";
 import backgroundImage from "../assets/bg.png";
 
 const GameUI = () => {
-  
+
   return (
     <div
       className="w-screen h-screen relative flex items-center justify-center bg-cover bg-center"
@@ -48,7 +48,7 @@ const GameUI = () => {
     </Link>
 
     {/* Exit Game Link */}
-    <Link to="/exit" className="w-64 text-white bg-gray-800 hover:bg-red-500 hover:text-white rounded-md transition-colors duration-300 py-3 text-xl text-center block">
+    <Link to="/walet" className="w-64 text-white bg-gray-800 hover:bg-red-500 hover:text-white rounded-md transition-colors duration-300 py-3 text-xl text-center block">
       Exit Game
     </Link>
 

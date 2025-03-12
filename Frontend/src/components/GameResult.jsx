@@ -72,7 +72,7 @@ const GameResult = ({ result, winAmount, onPlayAgain, autoClose = false }) => {
         {result === "win" && (
           <div className="mb-6">
             <p className="text-gray-300 text-lg">You've won</p>
-            <p className="text-yellow-500 text-4xl font-bold">₹{winAmount}</p>
+            <p className="text-yellow-500 text-4xl font-bold">{winAmount}</p>
           </div>
         )}
 
