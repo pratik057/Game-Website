@@ -2,9 +2,9 @@
 
 import { useState, useEffect, useContext } from "react"
 import { UserContext } from "../context/UserContext"
-import api from "../utils/api"
+// import api from "../utils/api"
 import { toast } from "react-toastify"
-
+import axios from "axios"
 const History = () => {
   const { user } = useContext(UserContext)
   const [games, setGames] = useState([])
@@ -22,23 +22,36 @@ const History = () => {
   useEffect(() => {
     const fetchGameHistory = async () => {
       if (!user) {
-        setLoading(false)
-        return
+        setLoading(false);
+        return;
       }
-
+  const token = localStorage.getItem("token");
       try {
-        const response = await api.get("http://localhost:5000/api/games/history")
-        setGames(response.data.games)
-
-        // Calculate stats
-        const totalGames = response.data.games.length
-        const wins = response.data.games.filter((game) => game.result === "win").length
-        const totalWagered = response.data.games.reduce((sum, game) => sum + game.betAmount, 0)
-        const totalWon = response.data.games.reduce(
-          (sum, game) => (game.result === "win" ? sum + game.winAmount : sum),
-          0,
-        )
-
+        console.log("Fetching game history...");
+  
+        const response = await axios.get("https://game-website-yyuo.onrender.com/api/games/history", {
+          user:user,
+          headers: {
+            Authorization: `Bearer ${token}`, // Ensure user has a valid token
+          },
+        });
+  
+        console.log("API Response:",response.data);
+  
+        if (!response.data || !response.data.games) {
+          console.error("Invalid API response format");
+          toast.error("Invalid game history data");
+          setLoading(false);
+          return;
+        }
+  
+        setGames(response.data.games);
+  
+        const totalGames = response.data.games.length;
+        const wins = response.data.games.filter((game) => game.result === "win").length;
+        const totalWagered = response.data.games.reduce((sum, game) => sum + (game.betAmount || 0), 0);
+        const totalWon = response.data.games.reduce((sum, game) => (game.result === "win" ? sum + (game.winAmount || 0) : sum), 0);
+  
         setStats({
           totalGames,
           wins,
@@ -47,18 +60,19 @@ const History = () => {
           totalWon,
           netProfit: totalWon - totalWagered,
           winRate: totalGames > 0 ? (wins / totalGames) * 100 : 0,
-        })
-
-        setLoading(false)
+        });
+  
+        setLoading(false);
       } catch (error) {
-        console.error("Error fetching game history:", error)
-        toast.error("Failed to load game history")
-        setLoading(false)
+        console.error("Error fetching game history:", error);
+        toast.error("Failed to load game history");
+        setLoading(false);
       }
-    }
-
-    fetchGameHistory()
-  }, [user])
+    };
+  
+    fetchGameHistory();
+  }, [user]);
+  
 
   if (loading) {
     return (

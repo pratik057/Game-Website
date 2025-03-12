@@ -53,7 +53,7 @@ const OnlinePlayers = ({ players = [] }) => {
                   : "bg-blue-900/30 text-blue-400"
               }`}
             >
-              {player?.bet.side === "andar" ? "A" : "B"} ₹{player?.bet.amount}
+              {player?.bet.side === "andar" ? "A" : "B"} {player?.bet.amount}
             </div>
           )}
         </div>

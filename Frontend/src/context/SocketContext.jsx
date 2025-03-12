@@ -28,7 +28,7 @@ export const SocketProvider = ({ children }) => {
   // Initialize socket connection
   useEffect(() => {
     // Connect to the server
-    const socketInstance = io(import.meta.env.VITE_SOCKET_URL || "http://localhost:5000", {
+    const socketInstance = io(import.meta.env.VITE_SOCKET_URL || "https://game-website-yyuo.onrender.com", {
       transports: ["websocket"],
       autoConnect: true,
       reconnectionAttempts: 5, // Try to reconnect 5 times
