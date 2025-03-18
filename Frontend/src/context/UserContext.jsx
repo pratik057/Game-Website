@@ -24,7 +24,7 @@ export const UserProvider = ({ children }) => {
 
   const fetchUserData = async (token) => {
     try {
-      const response = await axios.get("http://localhost:5000/api/auth/me", {
+      const response = await axios.get("https://game-website-yyuo.onrender.com/api/auth/me", {
         headers: { Authorization: `Bearer ${token}` },
       });
       setUser(response.data);
@@ -41,7 +41,7 @@ export const UserProvider = ({ children }) => {
   const login = async (email, password) => {
     try {
       const response = await axios.post(
-        "http://localhost:5000/api/auth/login",
+        "https://game-website-yyuo.onrender.com/api/auth/login",
         { email, password }
       );
       localStorage.setItem("token", response.data.token);
@@ -58,7 +58,7 @@ export const UserProvider = ({ children }) => {
   const register = async (username, email, password) => {
     try {
       const response = await axios.post(
-        "http://localhost:5000/api/auth/register",
+        "https://game-website-yyuo.onrender.com/api/auth/register",
         { username, email, password }
       );
       await login(email, password); 
@@ -80,7 +80,7 @@ export const UserProvider = ({ children }) => {
   const sendOtp = async (email) => {
     try {
       const response = await axios.post(
-        "http://localhost:5000/api/auth/send-otp",
+        "https://game-website-yyuo.onrender.com/api/auth/send-otp",
         { email }
       );
       return response.data.message;
@@ -92,7 +92,7 @@ export const UserProvider = ({ children }) => {
   const verifyOtp = async (email, otp) => {
     try {
       const response = await axios.post(
-        "http://localhost:5000/api/auth/verify-otp",
+        "https://game-website-yyuo.onrender.com/api/auth/verify-otp",
         { email, otp }
       );
       return response.data.message;
