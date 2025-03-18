@@ -1,5 +1,6 @@
 import { generateDeck, shuffleDeck } from "../utils/gameUtils.js";
 import User from "../models/User.js";
+import Game from "../models/game.js";
 import jwt from "jsonwebtoken";
 
 // Game state
@@ -9,14 +10,20 @@ const gameState = {
   andarCards: [],
   baharCards: [],
   winningSide: null,
-  bettingTimeLeft: 20, // seconds
+  winningCardIndex: null,
+  bettingTimeLeft: 30, // seconds
   players: {},
   totalBets: {
     andar: 0,
     bahar: 0,
   },
   gameId: generateGameId(),
+  lastGameResult: null,
 };
+
+// Timer references
+let bettingTimer = null;
+const gameLoopTimer = null;
 
 // Generate a random game ID
 function generateGameId() {
@@ -48,7 +55,6 @@ export const initializeSocketIO = (io) => {
       })),
     });
 
-    // Handle authentication and reconnection
     socket.on("authenticate", async ({ token }) => {
       const decoded = verifyToken(token);
 
@@ -56,27 +62,13 @@ export const initializeSocketIO = (io) => {
         try {
           const user = await User.findById(decoded.id);
           if (user) {
-            // Check if user is reconnecting
-            let existingPlayer = Object.values(gameState.players).find(
-              (p) => p.userId.toString() === user._id.toString()
-            );
-
-            if (existingPlayer) {
-              // Remove old socket ID and update with the new one
-              delete gameState.players[existingPlayer.id];
-              existingPlayer.id = socket.id;
-              gameState.players[socket.id] = existingPlayer;
-            } else {
-              // New player joining
-              gameState.players[socket.id] = {
-                id: socket.id,
-                userId: user._id,
-                username: user.username,
-                balance: user.balance,
-                bet: null,
-              };
-            }
-
+            gameState.players[socket.id] = {
+              id: socket.id,
+              userId: user._id,
+              username: user.username,
+              balance: user.balance,
+              bet: null,
+            };
             io.emit("playerJoined", { id: socket.id, username: user.username });
             socket.emit("authenticated", {
               userId: user._id,
@@ -91,7 +83,6 @@ export const initializeSocketIO = (io) => {
       }
     });
 
-    // Handle bet placement
     socket.on("placeBet", async ({ side, amount }) => {
       const player = gameState.players[socket.id];
       if (!player || gameState.status !== "betting" || amount <= 0 || player.balance < amount) {
@@ -122,14 +113,11 @@ export const initializeSocketIO = (io) => {
       socket.emit("balanceUpdated", { balance: player.balance });
     });
 
-    // Handle player disconnects
     socket.on("disconnect", () => {
-      setTimeout(() => {
-        if (gameState.players[socket.id]) {
-          io.emit("playerLeft", { id: socket.id, username: gameState.players[socket.id].username });
-          delete gameState.players[socket.id];
-        }
-      }, 5000); // Wait 5 seconds before removing player in case they reconnect
+      if (gameState.players[socket.id]) {
+        io.emit("playerLeft", { id: socket.id, username: gameState.players[socket.id].username });
+        delete gameState.players[socket.id];
+      }
     });
   });
 };
@@ -142,21 +130,21 @@ const startGameLoop = (io) => {
     gameState.andarCards = [];
     gameState.baharCards = [];
     gameState.winningSide = null;
-    gameState.bettingTimeLeft = 20;
+    gameState.winningCardIndex = null;
+    gameState.bettingTimeLeft = 30;
     gameState.totalBets = { andar: 0, bahar: 0 };
     gameState.gameId = generateGameId();
 
-    Object.values(gameState.players).forEach((player) => {
-      player.bet = null;
-    });
+    Object.values(gameState.players).forEach((player) => { player.bet = null; });
     io.emit("gameState", gameState);
     startBettingTimer(io);
   };
 
   const startBettingTimer = (io) => {
-    gameState.bettingTimeLeft = 20;
+    if (bettingTimer) clearInterval(bettingTimer);
+    gameState.bettingTimeLeft = 60;
     io.emit("bettingStarted", { timeLeft: gameState.bettingTimeLeft });
-    const bettingTimer = setInterval(() => {
+    bettingTimer = setInterval(() => {
       gameState.bettingTimeLeft -= 1;
       io.emit("bettingTimeUpdate", { timeLeft: gameState.bettingTimeLeft });
       if (gameState.bettingTimeLeft <= 0) {
@@ -165,7 +153,6 @@ const startGameLoop = (io) => {
       }
     }, 1000);
   };
-
   const startDealing = async (io) => {
     gameState.status = "dealing";
     const deck = shuffleDeck(generateDeck());
@@ -173,44 +160,32 @@ const startGameLoop = (io) => {
     gameState.jokerCard = joker;
     io.emit("jokerRevealed", { jokerCard: joker });
     await new Promise((resolve) => setTimeout(resolve, 2000));
-
-    let andar = [],
-      bahar = [],
-      foundMatch = false;
-
-    // Determine winning side before dealing
-    const { andar: andarBet, bahar: baharBet } = gameState.totalBets;
-    const winningSide = baharBet > andarBet ? "andar" : "bahar"; // Higher bet loses
-    gameState.winningSide = winningSide;
-
+  
+    const andarBet = gameState.totalBets.andar;
+    const baharBet = gameState.totalBets.bahar;
+    let forcedWinningSide = andarBet < baharBet ? "andar" : "bahar";
+  
+    let andar = [], bahar = [], foundMatch = false;
     while (!foundMatch && deck.length > 0) {
       const card = deck.pop();
       const currentSide = andar.length <= bahar.length ? "andar" : "bahar";
-
-      // Ensure Joker appears on the winning side
-      if (card.value === joker.value && currentSide !== winningSide) {
-        continue; // Skip this iteration and pick another card
-      }
-
       (currentSide === "andar" ? andar : bahar).push(card);
       io.emit("cardDealt", { side: currentSide, card });
-
-      if (card.value === joker.value && currentSide === winningSide) {
-        foundMatch = true; // Stop dealing once the Joker appears on the winning side
-      }
-
+      if (card.value === joker.value && currentSide === forcedWinningSide) foundMatch = true;
       await new Promise((resolve) => setTimeout(resolve, 1000));
     }
-
-    io.emit("gameResult", { winningSide });
-
-    // Pay winnings to players
+  
+    gameState.winningSide = forcedWinningSide;
+    io.emit("gameResult", { winningSide: forcedWinningSide });
+  
+    // Calculate winnings
     Object.values(gameState.players).forEach(async (player) => {
       if (player.bet) {
-        if (player.bet.side === winningSide) {
+        if (player.bet.side === gameState.winningSide) {
+          // Player wins, gets 2x the bet amount back
           const winnings = player.bet.amount * 2;
           player.balance += winnings;
-
+          
           if (player.userId) {
             try {
               await User.findByIdAndUpdate(player.userId, { $inc: { balance: winnings } });
@@ -218,18 +193,19 @@ const startGameLoop = (io) => {
               console.error("Error updating user balance:", error);
             }
           }
-
+  
           io.to(player.id).emit("balanceUpdated", { balance: player.balance });
           io.to(player.id).emit("winMessage", { amountWon: winnings });
         } else {
+          // Player lost, balance already deducted
           io.to(player.id).emit("loseMessage", { amountLost: player.bet.amount });
         }
       }
     });
-
+  
     await new Promise((resolve) => setTimeout(resolve, 10000));
     resetGame();
   };
-
+  
   resetGame();
 };
