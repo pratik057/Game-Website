@@ -387,8 +387,6 @@ const startGameLoop = (io) => {
       gameState.winningSide = "andar"; // If Bahar bet is higher, Andar wins
     } else if (andarBet > baharBet) {
       gameState.winningSide = "bahar"; // If Andar bet is higher, Bahar wins
-    } else {
-      gameState.winningSide = andar.length > bahar.length ? "bahar" : "andar"; // If bets are equal, fewer cards win
     }
 
     io.emit("gameResult", { winningSide: gameState.winningSide });
