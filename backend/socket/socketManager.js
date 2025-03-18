@@ -361,62 +361,66 @@ const startGameLoop = (io) => {
   const startDealing = async (io) => {
     gameState.status = "dealing";
     const deck = shuffleDeck(generateDeck());
-    const joker = deck.pop();
+    const joker = deck.pop(); // Get the Joker card
     gameState.jokerCard = joker;
     io.emit("jokerRevealed", { jokerCard: joker });
     await new Promise((resolve) => setTimeout(resolve, 2000));
 
     let andar = [], bahar = [], foundMatch = false;
 
-    while (!foundMatch && deck.length > 0) {
-      const card = deck.pop();
-      const currentSide = andar.length <= bahar.length ? "andar" : "bahar";
-      (currentSide === "andar" ? andar : bahar).push(card);
-      io.emit("cardDealt", { side: currentSide, card });
-
-      if (card.value === joker.value) {
-        foundMatch = true;
-      }
-
-      await new Promise((resolve) => setTimeout(resolve, 1000));
-    }
-
-    // **Determine the winning side based on bet amounts**
+    // **Determine the Winning Side Before Dealing**
     const { andar: andarBet, bahar: baharBet } = gameState.totalBets;
-    if (baharBet > andarBet) {
-      gameState.winningSide = "andar"; // If Bahar bet is higher, Andar wins
-    } else if (andarBet > baharBet) {
-      gameState.winningSide = "bahar"; // If Andar bet is higher, Bahar wins
+    const winningSide = baharBet > andarBet ? "andar" : "bahar"; // Higher bet loses
+    gameState.winningSide = winningSide;
+
+    while (!foundMatch && deck.length > 0) {
+        const card = deck.pop();
+        const currentSide = andar.length <= bahar.length ? "andar" : "bahar";
+
+        // **Ensure Joker Appears on the Winning Side**
+        if (card.value === joker.value && currentSide !== winningSide) {
+            continue; // Skip this iteration and pick another card to ensure Joker lands on the winning side
+        }
+
+        (currentSide === "andar" ? andar : bahar).push(card);
+        io.emit("cardDealt", { side: currentSide, card });
+
+        if (card.value === joker.value && currentSide === winningSide) {
+            foundMatch = true; // Stop dealing once the Joker appears on the winning side
+        }
+
+        await new Promise((resolve) => setTimeout(resolve, 1000));
     }
 
-    io.emit("gameResult", { winningSide: gameState.winningSide });
+    io.emit("gameResult", { winningSide });
 
-    // **Calculate winnings**
+    // **Pay Winnings to Players**
     Object.values(gameState.players).forEach(async (player) => {
-      if (player.bet) {
-        if (player.bet.side === gameState.winningSide) {
-          const winnings = player.bet.amount * 2;
-          player.balance += winnings;
+        if (player.bet) {
+            if (player.bet.side === winningSide) {
+                const winnings = player.bet.amount * 2; // Double the bet amount for winners
+                player.balance += winnings;
 
-          if (player.userId) {
-            try {
-              await User.findByIdAndUpdate(player.userId, { $inc: { balance: winnings } });
-            } catch (error) {
-              console.error("Error updating user balance:", error);
+                if (player.userId) {
+                    try {
+                        await User.findByIdAndUpdate(player.userId, { $inc: { balance: winnings } });
+                    } catch (error) {
+                        console.error("Error updating user balance:", error);
+                    }
+                }
+
+                io.to(player.id).emit("balanceUpdated", { balance: player.balance });
+                io.to(player.id).emit("winMessage", { amountWon: winnings });
+            } else {
+                io.to(player.id).emit("loseMessage", { amountLost: player.bet.amount });
             }
-          }
-
-          io.to(player.id).emit("balanceUpdated", { balance: player.balance });
-          io.to(player.id).emit("winMessage", { amountWon: winnings });
-        } else {
-          io.to(player.id).emit("loseMessage", { amountLost: player.bet.amount });
         }
-      }
     });
 
     await new Promise((resolve) => setTimeout(resolve, 10000));
     resetGame();
-  };
+};
+
 
   resetGame();
 };
