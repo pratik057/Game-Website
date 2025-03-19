@@ -53,7 +53,7 @@ console.log("users:",user)
     setLoading(true)
     try {
       const endpoint = type === "deposit" ? "add-funds" : "withdraw"
-      const response = await fetch(`https://game-website-yyuo.onrender.com /api/games/${endpoint}`, {
+      const response = await fetch(`https://game-website-yyuo.onrender.com/api/games/${endpoint}`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

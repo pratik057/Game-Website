@@ -30,7 +30,7 @@
 
 //     const handleSendOtp = async () => {
 //         try {
-//             const response = await axios.post(`https://game-website-yyuo.onrender.com /api/auth/send-otp`, { email });
+//             const response = await axios.post(`https://game-website-yyuo.onrender.com/api/auth/send-otp`, { email });
 //             setMessage(response.data.message);
 //             setStep(2); // Move to OTP verification step
 //         } catch (error) {
@@ -40,7 +40,7 @@
 
 //     const handleVerifyOtp = async () => {
 //         try {
-//             const response = await axios.post(`https://game-website-yyuo.onrender.com /api/auth/verify-otp`, { email, otp });
+//             const response = await axios.post(`https://game-website-yyuo.onrender.com/api/auth/verify-otp`, { email, otp });
 //             setMessage(response.data.message);
 //             if (response.data.message === "OTP verified successfully") {
 //                 setStep(3); // Move to user details step
@@ -52,7 +52,7 @@
 
 //     const handleRegister = async () => {
 //         try {
-//             const response = await axios.post(`https://game-website-yyuo.onrender.com /api/auth/register`, {
+//             const response = await axios.post(`https://game-website-yyuo.onrender.com/api/auth/register`, {
 //                 username, email, password
 //             });
 //             setMessage(response.data.message);
@@ -223,7 +223,7 @@
 //     const navigate = useNavigate();
 //     const handleSendOtp = async () => {
 //         try {
-//             const response = await axios.post(`https://game-website-yyuo.onrender.com /api/auth/send-otp`, { email });
+//             const response = await axios.post(`https://game-website-yyuo.onrender.com/api/auth/send-otp`, { email });
 //             setMessage(response.data.message);
 //             setStep(2); // Move to OTP verification step
 //         } catch (error) {
@@ -233,7 +233,7 @@
 
 //     const handleVerifyOtp = async () => {
 //         try {
-//             const response = await axios.post(`https://game-website-yyuo.onrender.com /api/auth/verify-otp`, { email, otp });
+//             const response = await axios.post(`https://game-website-yyuo.onrender.com/api/auth/verify-otp`, { email, otp });
 //             setMessage(response.data.message);
 //             if (response.data.message === "OTP verified successfully. You can now register.") {
 //                 setStep(3); // Move to user details step
@@ -245,7 +245,7 @@
 
 //     const handleRegister = async () => {
 //         try {
-//             const response = await axios.post(`https://game-website-yyuo.onrender.com /api/auth/register`, {
+//             const response = await axios.post(`https://game-website-yyuo.onrender.com/api/auth/register`, {
 //                 username, email, password
 //             });
 //             setMessage(response.data.message);
