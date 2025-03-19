@@ -1,6 +1,6 @@
 "use client"
 
-import { createContext, useState, useEffect, useContext } from "react"
+import { createContext, useState, useEffect, useContext, useRef } from "react"
 import { io } from "socket.io-client"
 import { toast } from "react-toastify"
 import { UserContext } from "./UserContext"
@@ -24,22 +24,83 @@ export const SocketProvider = ({ children }) => {
   })
   const [onlinePlayers, setOnlinePlayers] = useState([])
   const [currentBet, setCurrentBet] = useState(null)
+  const [gameHistory, setGameHistory] = useState([])
+  const [isPlacingBet, setIsPlacingBet] = useState(false)
+
+  // Use refs to track connection attempts and prevent multiple reconnections
+  const reconnectAttempts = useRef(0)
+  const maxReconnectAttempts = 5
+  const reconnectTimer = useRef(null)
+  const socketRef = useRef(null)
 
   // Initialize socket connection
   useEffect(() => {
     // Connect to the server
-    const socketInstance = io(import.meta.env.VITE_SOCKET_URL || "https://game-website-yyuo.onrender.com", {
-      transports: ["websocket"],
-      autoConnect: true,
-      reconnectionAttempts: 5, // Try to reconnect 5 times
-  reconnectionDelay: 2000,
-    })
+    const connectSocket = () => {
+      try {
+        // Clear any existing reconnect timer
+        if (reconnectTimer.current) {
+          clearTimeout(reconnectTimer.current)
+          reconnectTimer.current = null
+        }
 
-    setSocket(socketInstance)
+        // Create new socket connection
+        const socketInstance = io(import.meta.env.VITE_SOCKET_URL || "https://game-website-yyuo.onrender.com ", {
+          transports: ["websocket"],
+          autoConnect: true,
+          reconnectionAttempts: 5,
+          reconnectionDelay: 2000,
+          timeout: 10000, // Increase timeout to 10 seconds
+        })
+
+        socketRef.current = socketInstance
+        setSocket(socketInstance)
+
+        // Reset reconnect attempts on successful connection
+        socketInstance.on("connect", () => {
+          reconnectAttempts.current = 0
+        })
+
+        // Handle disconnect with custom reconnect logic
+        socketInstance.on("disconnect", () => {
+          setConnected(false)
+
+          // Try to reconnect if under max attempts
+          if (reconnectAttempts.current < maxReconnectAttempts) {
+            reconnectAttempts.current += 1
+            console.log(`Attempting to reconnect (${reconnectAttempts.current}/${maxReconnectAttempts})...`)
+
+            // Set a timer to reconnect
+            reconnectTimer.current = setTimeout(() => {
+              if (socketRef.current) {
+                socketRef.current.connect()
+              } else {
+                connectSocket()
+              }
+            }, 2000 * reconnectAttempts.current) // Exponential backoff
+          } else {
+            toast.error("Connection lost. Please refresh the page to reconnect.")
+          }
+        })
+      } catch (error) {
+        console.error("Error creating socket connection:", error)
+        toast.error("Failed to connect to game server. Please refresh the page.")
+      }
+    }
+
+    connectSocket()
 
     // Clean up on unmount
     return () => {
-      if (socketInstance) socketInstance.disconnect()
+      if (socketRef.current) {
+        socketRef.current.disconnect()
+        socketRef.current = null
+      }
+
+      if (reconnectTimer.current) {
+        clearTimeout(reconnectTimer.current)
+        reconnectTimer.current = null
+      }
     }
   }, [])
 
@@ -48,77 +109,103 @@ export const SocketProvider = ({ children }) => {
     if (!socket) return
 
     // Connection events
-    socket.on("connect", () => {
+    const handleConnect = () => {
       console.log("Connected to server")
       setConnected(true)
 
       // Authenticate with the server
       const token = localStorage.getItem("token")
-      socket.emit("authenticate", { token })
-    })
+      if (token) {
+        socket.emit("authenticate", { token })
+      }
+    }
 
-    socket.on("disconnect", () => {
+    const handleDisconnect = () => {
       console.log("Disconnected from server")
       setConnected(false)
-    })
+    }
 
-    socket.on("connect_error", (error) => {
+    const handleConnectError = (error) => {
       console.error("Connection error:", error)
-      toast.error("Failed to connect to the game server")
-    })
+      // Don't show toast for every connection error to avoid spamming
+      if (reconnectAttempts.current === 0) {
+        toast.error("Failed to connect to the game server")
+      }
+    }
 
     // Authentication events
-    socket.on("authenticated", (userData) => {
+    const handleAuthenticated = (userData) => {
       console.log("Authenticated:", userData)
       // If the user is a guest, update the balance
       if (!user && userData.balance) {
         updateBalance(userData.balance)
       }
-    })
+    }
 
-    socket.on("authError", (error) => {
+    const handleAuthError = (error) => {
       console.error("Authentication error:", error)
       toast.error(error.message || "Authentication failed")
-    })
+    }
 
     // Game state events
-    socket.on("gameState", (state) => {
+    const handleGameState = (state) => {
       console.log("Game state updated:", state)
-      setGameState(state)
-      setOnlinePlayers(state.players || [])
-    })
 
-    socket.on("bettingStarted", ({ timeLeft }) => {
+      // Validate state before updating
+      if (state && typeof state === "object") {
+        setGameState(state)
+
+        if (Array.isArray(state.players)) {
+          setOnlinePlayers(state.players)
+        }
+
+        // If there's a last game result, add it to history
+        if (
+          state.lastGameResult &&
+          state.lastGameResult.winningSide &&
+          !gameHistory.some((g) => g.gameId === state.gameId)
+        ) {
+          setGameHistory((prev) => [state.lastGameResult, ...prev].slice(0, 10))
+        }
+      }
+    }
+
+    const handleBettingStarted = ({ timeLeft }) => {
       toast.info(`Betting phase started! ${timeLeft} seconds to place your bets.`)
       setGameState((prev) => ({ ...prev, status: "betting", bettingTimeLeft: timeLeft }))
       // Reset current bet
       setCurrentBet(null)
-    })
+      setIsPlacingBet(false)
+    }
 
-    socket.on("bettingTimeUpdate", ({ timeLeft }) => {
+    const handleBettingTimeUpdate = ({ timeLeft }) => {
       setGameState((prev) => ({ ...prev, bettingTimeLeft: timeLeft }))
 
-      if (timeLeft <= 5) {
+      if (timeLeft <= 5 && timeLeft > 0) {
         toast.warning(`${timeLeft} seconds left to place your bet!`, {
           autoClose: 1000,
           hideProgressBar: true,
         })
       }
-    })
+    }
 
-    socket.on("jokerRevealed", ({ jokerCard }) => {
+    const handleJokerRevealed = ({ jokerCard }) => {
       console.log("Joker revealed:", jokerCard)
-      setGameState((prev) => ({
-        ...prev,
-        status: "dealing",
-        jokerCard,
-        andarCards: [],
-        baharCards: [],
-      }))
-    })
+      if (jokerCard) {
+        setGameState((prev) => ({
+          ...prev,
+          status: "dealing",
+          jokerCard,
+          andarCards: [],
+          baharCards: [],
+        }))
+      }
+    }
 
-    socket.on("cardDealt", ({ side, card, index }) => {
-      console.log(`Card dealt to ${side}:`, card)
+    const handleCardDealt = ({ side, card, index }) => {
+      if (!side || !card) return
+
+      console.log(`Card dealt to ${side}:`, card, index)
       setGameState((prev) => {
         if (side === "andar") {
           return {
@@ -132,9 +219,9 @@ export const SocketProvider = ({ children }) => {
           }
         }
       })
-    })
+    }
 
-    socket.on("gameResult", ({ winningSide, winningCardIndex, winners, losers }) => {
+    const handleGameResult = ({ winningSide, winningCardIndex, winners, losers }) => {
       console.log("Game result:", { winningSide, winningCardIndex, winners, losers })
 
       setGameState((prev) => ({
@@ -145,19 +232,28 @@ export const SocketProvider = ({ children }) => {
       }))
 
       // Check if the current user won or lost
-      const socketId = socket.id
-      const winner = winners?.find((w) => w.id === socketId)
-      const loser = losers?.find((l) => l.id === socketId)
+      if (socket && Array.isArray(winners) && Array.isArray(losers)) {
+        const socketId = socket.id
+        const winner = winners.find((w) => w.id === socketId)
+        const loser = losers.find((l) => l.id === socketId)
 
-      if (winner) {
-        toast.success(`You won ${winner.winnings}!`)
-      } else if (loser) {
-        toast.error(`You lost ${loser.loss}`)
+        if (winner) {
+          toast.success(`You won ${winner.winnings}!`, {
+            icon: "🎉",
+            autoClose: 5000,
+          })
+        } else if (loser) {
+          toast.error(`You lost ${loser.loss}`, {
+            autoClose: 5000,
+          })
+        }
       }
-    })
+    }
 
     // Player events
-    socket.on("playerJoined", ({ id, username }) => {
+    const handlePlayerJoined = ({ id, username }) => {
+      if (!id || !username) return
+
       console.log(`Player joined: ${username} (${id})`)
       toast.info(`${username} joined the game`)
 
@@ -165,23 +261,31 @@ export const SocketProvider = ({ children }) => {
         if (prev.find((p) => p.id === id)) return prev
         return [...prev, { id, username, bet: null }]
       })
-    })
+    }
 
-    socket.on("playerLeft", ({ id, username }) => {
+    const handlePlayerLeft = ({ id, username }) => {
+      if (!id) return
+
       console.log(`Player left: ${username} (${id})`)
-      toast.info(`${username} left the game`)
+      if (username) {
+        toast.info(`${username} left the game`)
+      }
 
       setOnlinePlayers((prev) => prev.filter((p) => p.id !== id))
-    })
+    }
 
-    socket.on("betPlaced", ({ playerId, username, side, amount, totalBets }) => {
+    const handleBetPlaced = ({ playerId, username, side, amount, totalBets }) => {
+      if (!playerId || !side || !amount) return
+
       console.log(`Bet placed by ${username}: ${amount} on ${side}`)
 
       // Update total bets
-      setGameState((prev) => ({
-        ...prev,
-        totalBets,
-      }))
+      if (totalBets) {
+        setGameState((prev) => ({
+          ...prev,
+          totalBets,
+        }))
+      }
 
       // Update player's bet
       setOnlinePlayers((prev) => {
@@ -196,53 +300,125 @@ export const SocketProvider = ({ children }) => {
       // If it's the current user, update current bet
       if (playerId === socket.id) {
         setCurrentBet({ side, amount })
+        setIsPlacingBet(false)
+        toast.success(`Bet placed: ${amount} on ${side.toUpperCase()}`)
       }
-    })
+    }
 
-    socket.on("betError", ({ message }) => {
+    const handleBetError = ({ message }) => {
       console.error("Bet error:", message)
-      toast.error(message)
-    })
+      toast.error(message || "Error placing bet")
+      setIsPlacingBet(false)
+    }
 
-    socket.on("balanceUpdated", ({ balance }) => {
-      console.log("Balance updated:", balance)
-      updateBalance(balance)
-    })
+    const handleBalanceUpdated = ({ balance }) => {
+      if (balance !== undefined) {
+        console.log("Balance updated:", balance)
+        updateBalance(balance)
+      }
+    }
+
+    const handleWinMessage = ({ amountWon }) => {
+      // Additional win animation or sound could be triggered here
+      console.log(`You won ${amountWon}!`)
+    }
+
+    const handleLoseMessage = ({ amountLost }) => {
+      // Additional lose animation or sound could be triggered here
+      console.log(`You lost ${amountLost}`)
+    }
+
+    // Register event listeners
+    socket.on("connect", handleConnect)
+    socket.on("disconnect", handleDisconnect)
+    socket.on("connect_error", handleConnectError)
+    socket.on("authenticated", handleAuthenticated)
+    socket.on("authError", handleAuthError)
+    socket.on("gameState", handleGameState)
+    socket.on("bettingStarted", handleBettingStarted)
+    socket.on("bettingTimeUpdate", handleBettingTimeUpdate)
+    socket.on("jokerRevealed", handleJokerRevealed)
+    socket.on("cardDealt", handleCardDealt)
+    socket.on("gameResult", handleGameResult)
+    socket.on("playerJoined", handlePlayerJoined)
+    socket.on("playerLeft", handlePlayerLeft)
+    socket.on("betPlaced", handleBetPlaced)
+    socket.on("betError", handleBetError)
+    socket.on("balanceUpdated", handleBalanceUpdated)
+    socket.on("winMessage", handleWinMessage)
+    socket.on("loseMessage", handleLoseMessage)
 
     // Clean up event listeners on unmount
     return () => {
-      socket.off("connect")
-      socket.off("disconnect")
-      socket.off("connect_error")
-      socket.off("authenticated")
-      socket.off("authError")
-      socket.off("gameState")
-      socket.off("bettingStarted")
-      socket.off("bettingTimeUpdate")
-      socket.off("jokerRevealed")
-      socket.off("cardDealt")
-      socket.off("gameResult")
-      socket.off("playerJoined")
-      socket.off("playerLeft")
-      socket.off("betPlaced")
-      socket.off("betError")
-      socket.off("balanceUpdated")
+      socket.off("connect", handleConnect)
+      socket.off("disconnect", handleDisconnect)
+      socket.off("connect_error", handleConnectError)
+      socket.off("authenticated", handleAuthenticated)
+      socket.off("authError", handleAuthError)
+      socket.off("gameState", handleGameState)
+      socket.off("bettingStarted", handleBettingStarted)
+      socket.off("bettingTimeUpdate", handleBettingTimeUpdate)
+      socket.off("jokerRevealed", handleJokerRevealed)
+      socket.off("cardDealt", handleCardDealt)
+      socket.off("gameResult", handleGameResult)
+      socket.off("playerJoined", handlePlayerJoined)
+      socket.off("playerLeft", handlePlayerLeft)
+      socket.off("betPlaced", handleBetPlaced)
+      socket.off("betError", handleBetError)
+      socket.off("balanceUpdated", handleBalanceUpdated)
+      socket.off("winMessage", handleWinMessage)
+      socket.off("loseMessage", handleLoseMessage)
     }
-  }, [socket, user, updateBalance])
+  }, [socket, user, updateBalance, gameHistory])
 
-  // Function to place a bet
+  // Function to place a bet with debounce to prevent multiple submissions
   const placeBet = (side, amount) => {
+    // Validate inputs
+    if (!side || !["andar", "bahar"].includes(side) || !amount || isNaN(amount) || amount <= 0) {
+      toast.error("Invalid bet parameters")
+      return
+    }
+
+    // Check connection
     if (!socket || !connected) {
       toast.error("Not connected to the game server")
       return
     }
 
+    // Check game state
     if (gameState.status !== "betting") {
       toast.error("Betting is not open right now")
       return
     }
 
-    socket.emit("placeBet", { side, amount })
+    // Check if already placing a bet
+    if (isPlacingBet) {
+      toast.info("Your bet is being processed...")
+      return
+    }
+
+    // Check if already placed a bet
+    if (currentBet) {
+      toast.warning("You've already placed a bet for this round")
+      return
+    }
+
+    // Set flag to prevent multiple submissions
+    setIsPlacingBet(true)
+
+    try {
+      // Emit bet to server
+      socket.emit("placeBet", { side, amount })
+
+      // Set a timeout to reset the flag in case the server doesn't respond
+      setTimeout(() => {
+        setIsPlacingBet(false)
+      }, 5000)
+    } catch (error) {
+      console.error("Error placing bet:", error)
+      toast.error("Failed to place bet. Please try again.")
+      setIsPlacingBet(false)
+    }
   }
 
   return (
@@ -254,6 +430,8 @@ export const SocketProvider = ({ children }) => {
         onlinePlayers,
         currentBet,
         placeBet,
+        gameHistory,
+        isPlacingBet,
       }}
     >
       {children}

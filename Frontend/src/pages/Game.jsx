@@ -9,8 +9,9 @@ import GameResult from "../components/GameResult"
 import OnlinePlayers from "../components/OnlinePlayers"
 import BettingTimer from "../components/BettingTimer"
 import Navebar from "../components/Navbar"
-import backgroundImage from "../assets/bg.png"
+
 const Game = () => {
+  // eslint-disable-next-line no-unused-vars
   const { user, balance } = useContext(UserContext)
   const { connected, gameState, onlinePlayers, currentBet, placeBet } = useContext(SocketContext)
 

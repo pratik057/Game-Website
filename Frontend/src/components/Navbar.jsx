@@ -25,7 +25,7 @@ const Navbar = () => {
           <div className="flex items-center">
             <Link to="/dashboard" className="flex items-center">
               <img src="/logo.png" alt="Andar Bahar" className="h-8 w-auto mr-2" />
-              <span className="text-xl font-bold text-yellow-500">Andar Bahar</span>
+              
             </Link>
             <div className="hidden md:block ml-10">
               <div className="flex items-center space-x-4">

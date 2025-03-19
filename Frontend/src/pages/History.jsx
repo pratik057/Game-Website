@@ -29,7 +29,7 @@ const History = () => {
       try {
         console.log("Fetching game history...");
   
-        const response = await axios.get("https://game-website-yyuo.onrender.com/api/games/history", {
+        const response = await axios.get("https://game-website-yyuo.onrender.com /api/games/history", {
           user:user,
           headers: {
             Authorization: `Bearer ${token}`, // Ensure user has a valid token

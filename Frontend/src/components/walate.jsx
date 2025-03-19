@@ -13,7 +13,7 @@ const WalletControls = () => {
   const [notification, setNotification] = useState({ show: false, message: "", type: "" })
   const [activeTab, setActiveTab] = useState("deposit")
   const token = localStorage.getItem("token")
-
+console.log("users:",user)
   // Animate balance changes
   useEffect(() => {
     if (balance !== displayBalance) {
@@ -53,7 +53,7 @@ const WalletControls = () => {
     setLoading(true)
     try {
       const endpoint = type === "deposit" ? "add-funds" : "withdraw"
-      const response = await fetch(`https://game-website-yyuo.onrender.com/api/games/${endpoint}`, {
+      const response = await fetch(`https://game-website-yyuo.onrender.com /api/games/${endpoint}`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -79,7 +79,14 @@ const WalletControls = () => {
     setLoading(false)
     setAmount("")
   }
-
+ function handleDeposit(){
+    const whatsappMessage = `Name: ${user.username}%0AEmail: ${user.email}%0AAmount to deposite: ${amount}`;
+    const whatsappLink = `https://wa.me/918975461685?text=${whatsappMessage}`;
+    window.open(whatsappLink, "_blank");
+console.log('====================================');
+console.log(whatsappMessage);
+console.log('====================================');
+  }
   return (
     <div className="h-full w-full flex justify-center items-center">
     <div className="bg-gradient-to-br from-gray-800 to-gray-600 p-6 rounded-xl shadow-lg text-white max-w-md w-full mx-auto border border-gray-700 ">
@@ -162,7 +169,7 @@ const WalletControls = () => {
             ? "bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700" 
             : "bg-gradient-to-r from-red-500 to-red-600 hover:from-red-600 hover:to-red-700"
         }`}
-        onClick={() => handleTransaction(activeTab)}
+        onClick={handleDeposit}
         disabled={loading}
         whileHover={{ scale: 1.02 }}
         whileTap={{ scale: 0.98 }}
