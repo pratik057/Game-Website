@@ -24,7 +24,7 @@ const Footer = () => {
         </div>
 
         <div className="mt-6 border-t border-gray-700 pt-6 text-center text-gray-400">
-          <p>© {currentYear} Andar Bahar Game. All rights reserved.</p>
+          <p>© {currentYear} . All rights reserved.</p>
           <p className="mt-2 text-sm">This game is for entertainment purposes only. No real money is involved.</p>
         </div>
       </div>

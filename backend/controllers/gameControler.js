@@ -94,17 +94,18 @@ export const getGameResult = async (req, res) => {
 // @access  Private
 export const getGameHistory = async (req, res) => {
   try {
-    const userId = req.user?.id;
-    console.log(req.user?.id)
+    const userId = req.user?.id; // Get user ID from request
+    console.log("User ID:", userId);
+
     if (!userId) {
       return res.status(401).json({ success: false, message: "Unauthorized access." });
     }
 
-    // Find games where the user participated
-    const games = await Game.find({ user: userId });
+    // Retrieve games based on the userId
+    const games = await Game.find({ user: userId }).sort({ createdAt: -1 });
 
     console.log("Retrieved game history:", games);
-console.log(games)
+
     res.status(200).json({
       success: true,
       games: games.length ? games : [],
@@ -115,6 +116,7 @@ console.log(games)
     res.status(500).json({ success: false, message: "Server error" });
   }
 };
+
 
 
 // @desc    Add funds to user account

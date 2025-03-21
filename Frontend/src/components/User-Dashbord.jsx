@@ -48,7 +48,7 @@ const GameUI = () => {
     </Link>
 
     {/* Exit Game Link */}
-    <Link to="/walet" className="w-64 text-white bg-gray-800 hover:bg-red-500 hover:text-white rounded-md transition-colors duration-300 py-3 text-xl text-center block">
+    <Link to="/logout" className="w-64 text-white bg-gray-800 hover:bg-red-500 hover:text-white rounded-md transition-colors duration-300 py-3 text-xl text-center block">
       Exit Game
     </Link>
 

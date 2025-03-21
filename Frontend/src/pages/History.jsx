@@ -1,14 +1,14 @@
-"use client"
+"use client";
 
-import { useState, useEffect, useContext } from "react"
-import { UserContext } from "../context/UserContext"
-// import api from "../utils/api"
-import { toast } from "react-toastify"
-import axios from "axios"
+import { useState, useEffect, useContext } from "react";
+import { UserContext } from "../context/UserContext";
+import axios from "axios";
+import { toast } from "react-toastify";
+
 const History = () => {
-  const { user } = useContext(UserContext)
-  const [games, setGames] = useState([])
-  const [loading, setLoading] = useState(true)
+  const { user } = useContext(UserContext);
+  const [games, setGames] = useState([]);
+  const [loading, setLoading] = useState(true);
   const [stats, setStats] = useState({
     totalGames: 0,
     wins: 0,
@@ -17,7 +17,7 @@ const History = () => {
     totalWon: 0,
     netProfit: 0,
     winRate: 0,
-  })
+  });
 
   useEffect(() => {
     const fetchGameHistory = async () => {
@@ -25,33 +25,33 @@ const History = () => {
         setLoading(false);
         return;
       }
-  const token = localStorage.getItem("token");
+
+      const token = localStorage.getItem("token");
       try {
         console.log("Fetching game history...");
-  
         const response = await axios.get("https://game-website-yyuo.onrender.com/api/games/history", {
-          user:user,
           headers: {
-            Authorization: `Bearer ${token}`, // Ensure user has a valid token
+            Authorization: `Bearer ${token}`,
           },
         });
-  
-        console.log("API Response:",response.data);
-  
+
+        console.log("API Response:", response.data);
+
         if (!response.data || !response.data.games) {
           console.error("Invalid API response format");
           toast.error("Invalid game history data");
           setLoading(false);
           return;
         }
-  
+
         setGames(response.data.games);
-  
+
+        // Calculate statistics
         const totalGames = response.data.games.length;
         const wins = response.data.games.filter((game) => game.result === "win").length;
         const totalWagered = response.data.games.reduce((sum, game) => sum + (game.betAmount || 0), 0);
         const totalWon = response.data.games.reduce((sum, game) => (game.result === "win" ? sum + (game.winAmount || 0) : sum), 0);
-  
+
         setStats({
           totalGames,
           wins,
@@ -61,7 +61,7 @@ const History = () => {
           netProfit: totalWon - totalWagered,
           winRate: totalGames > 0 ? (wins / totalGames) * 100 : 0,
         });
-  
+
         setLoading(false);
       } catch (error) {
         console.error("Error fetching game history:", error);
@@ -69,17 +69,16 @@ const History = () => {
         setLoading(false);
       }
     };
-  
+
     fetchGameHistory();
   }, [user]);
-  
 
   if (loading) {
     return (
       <div className="flex justify-center items-center h-64">
         <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-yellow-500"></div>
       </div>
-    )
+    );
   }
 
   if (!user) {
@@ -96,12 +95,12 @@ const History = () => {
           </button>
         </div>
       </div>
-    )
+    );
   }
 
   return (
-    <div className="max-w-5xl mx-auto">
-      <h1 className="text-3xl font-bold mb-8">Game History</h1>
+    <div className="max-w-5xl mx-auto p-4">
+      <h1 className="text-3xl font-bold mb-8 text-center">Game History</h1>
 
       {/* Stats Cards */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
@@ -160,27 +159,13 @@ const History = () => {
                   <tr key={game._id} className="border-t border-gray-700 hover:bg-gray-700/50">
                     <td className="px-4 py-3 text-gray-300">{new Date(game.createdAt).toLocaleString()}</td>
                     <td className="px-4 py-3">{game.betAmount.toFixed(2)}</td>
+                    <td className="px-4 py-3 text-blue-500">{game.betSide}</td>
                     <td className="px-4 py-3">
-                      <span className={game.betSide === "andar" ? "text-red-500" : "text-blue-500"}>
-                        {game.betSide === "andar" ? "Andar" : "Bahar"}
+                      <span className={`px-2 py-1 rounded-full text-xs ${game.result === "win" ? "text-green-500" : "text-red-500"}`}>
+                        {game.result}
                       </span>
                     </td>
-                    <td className="px-4 py-3">
-                      <span
-                        className={`px-2 py-1 rounded-full text-xs ${
-                          game.result === "win" ? "bg-green-900/30 text-green-500" : "bg-red-900/30 text-red-500"
-                        }`}
-                      >
-                        {game.result === "win" ? "Win" : "Loss"}
-                      </span>
-                    </td>
-                    <td className="px-4 py-3 text-right">
-                      <span className={game.result === "win" ? "text-green-500" : "text-red-500"}>
-                        {game.result === "win"
-                          ? `+${(game.winAmount - game.betAmount).toFixed(2)}`
-                          : `-${game.betAmount.toFixed(2)}`}
-                      </span>
-                    </td>
+                    <td className="px-4 py-3 text-right">{game.result === "win" ? `+${game.winAmount.toFixed(2)}` : `-${game.betAmount.toFixed(2)}`}</td>
                   </tr>
                 ))}
               </tbody>
@@ -189,8 +174,7 @@ const History = () => {
         )}
       </div>
     </div>
-  )
-}
+  );
+};
 
-export default History
-
+export default History;

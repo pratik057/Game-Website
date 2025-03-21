@@ -5,7 +5,7 @@ import { Link, useNavigate } from "react-router-dom"
 import { UserContext } from "../context/UserContext"
 import LoginModal from "./User-Login"
 import RegisterModal from "./User-register"
-
+import Logo from "../assets/logo.png"
 const Navbar = () => {
   const { user, balance, logout } = useContext(UserContext)
   const [showLoginModal, setShowLoginModal] = useState(false)
@@ -24,7 +24,7 @@ const Navbar = () => {
         <div className="flex justify-between items-center h-16">
           <div className="flex items-center">
             <Link to="/dashboard" className="flex items-center">
-              <img src="/logo.png" alt="Andar Bahar" className="h-8 w-auto mr-2" />
+              <img src={Logo} alt="Andar Bahar" className="h-15 w-18 mr-2" />
               
             </Link>
             <div className="hidden md:block ml-10">
@@ -46,8 +46,8 @@ const Navbar = () => {
               {user ? (
                 <>
                   <div className="mr-4 px-3 py-1 bg-gray-700 rounded-lg">
-                    <span className="text-gray-400 text-sm">COINS :</span>
-                    <span className="ml-1 text-yellow-500 font-bold">{balance.toFixed(2)}</span>
+                    <span className="text-gray-400 text-sm ">COINS :</span>
+                    <span className="ml-1 text-yellow-200 font-bold">{balance.toFixed(2)}</span>
                   </div>
                   <div className="mr-4 text-white">
                     Welcome, <span className="font-semibold">{user.username}</span>
@@ -104,9 +104,9 @@ const Navbar = () => {
             <Link to="/game" className="text-gray-300 hover:text-white px-3 py-2 rounded-md">
               Play Game
             </Link>
-            <Link to="/history" className="text-gray-300 hover:text-white px-3 py-2 rounded-md">
+            {/* <Link to="/history" className="text-gray-300 hover:text-white px-3 py-2 rounded-md">
               History
-            </Link>
+            </Link> */}
 
             {user ? (
               <>
