@@ -66,10 +66,10 @@ const Card = ({ card, flipped, delay = 0, highlighted = false }) => {
       default:
         return value.toString()
     }
-  }
+  } 
 
   return (
-    <div className={`card-container w-24 h-36 md:w-32 md:h-48 ${highlighted ? "animate-pulse" : ""}`}>
+    <div className={`card-container w-20 h-30 md:w-29 md:h-40 ${highlighted ? "animate-pulse" : ""}`}>
       <div className={`card-inner relative w-full h-full ${isFlipped ? "flipped" : ""}`}>
         <div className="card-back absolute w-full h-full rounded-lg bg-blue-900 border-2 border-blue-700 flex items-center justify-center">
           <div className="bg-blue-800 w-16 h-24 md:w-20 md:h-32 rounded-lg flex items-center justify-center">

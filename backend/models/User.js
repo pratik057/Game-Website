@@ -7,6 +7,7 @@ const userSchema = new mongoose.Schema({
     min: 3,
     max: 20,
     unique: true,
+  
   },
   password: {
     type: String,
@@ -31,6 +32,10 @@ const userSchema = new mongoose.Schema({
     type: Number, // Balance as a number
    
     default:0,
+  },
+  isActive: {
+    type: Boolean,
+    default: false,
   },
 });
 

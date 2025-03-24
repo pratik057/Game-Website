@@ -112,7 +112,7 @@ export const registerUser = async (req, res) => {
 // @access  Public
 export const loginUser = async (req, res) => {
   try {
-    const { email, password } = req.body;
+    const { email, password} = req.body;
     if (!email || !password) {
       return res.status(400).json({ success: false, message: "Please fill in all fields" });
     }
@@ -139,6 +139,7 @@ export const loginUser = async (req, res) => {
         email: user.email,
         balance: user.balance,
         role: user.role,
+        isActive: true,
       },
     });
   } catch (error) {

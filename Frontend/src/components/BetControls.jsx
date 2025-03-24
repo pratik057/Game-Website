@@ -32,7 +32,7 @@ const BetControls = ({ onPlaceBet, disabled, currentBet }) => {
   // If user already placed a bet, show their current bet
   if (currentBet) {
     return (
-      <div className="bg-gray-800 rounded-lg p-4 shadow-lg">
+      <div className="lg:w-[60%] w-full bg-gray-800 rounded-lg p-4 shadow-lg">
         <h3 className="text-xl font-bold text-white mb-4">Your Bet</h3>
 
         <div className="flex justify-center items-center p-4 bg-gray-700 rounded-lg">
@@ -48,8 +48,8 @@ const BetControls = ({ onPlaceBet, disabled, currentBet }) => {
   }
 
   return (
-    <div className="bg-gray-800 rounded-lg p-4 shadow-lg">
-      <h3 className="text-xl font-bold text-white mb-4">Place Your Bet</h3>
+    <div className="lg:w-[60%] w-full bg-gray-800 rounded-lg p-4 shadow-lg mb-15">
+      <h3 className="text-xl font-bold text-white mb-4 ">Place Your Bet</h3>
 
       <div className="mb-4">
         <div className="flex justify-between items-center mb-2">
@@ -78,7 +78,8 @@ const BetControls = ({ onPlaceBet, disabled, currentBet }) => {
             className="w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-md text-white focus:outline-none focus:ring-2 focus:ring-yellow-500"
             min="1"
             max={balance}
-            disabled={disabled}
+            disabled={true}
+
           />
           <button
             onClick={() => setBetAmount(Math.floor(balance / 2))}

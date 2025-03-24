@@ -9,7 +9,7 @@ import gameRoutes from "./routes/gameRoutes.js"
 import path from "path"
 import { fileURLToPath } from "url"
 import { initializeSocketIO } from "./socket/socketManager.js"
-
+import adminRoutes from "./routes/adminRoutes.js"
 // Load environment variables
 dotenv.config()
 
@@ -21,7 +21,7 @@ const PORT = process.env.PORT || 5000
 const httpServer = createServer(app)
 const io = new Server(httpServer, {
   cors: {
-    origin: process.env.NODE_ENV === "production" ? false : ["https://game-website-yyuo.onrender.com", "http://127.0.0.1:5000"],
+    origin: process.env.NODE_ENV === "production" ? false : ["http://localhost:5173", "http://127.0.0.1:5173"],
     methods: ["GET", "POST"],
     credentials: true,
   },
@@ -39,7 +39,7 @@ app.use(express.urlencoded({ extended: true }))
 // API Routes
 app.use("/api/auth", userRoutes)
 app.use("/api/games", gameRoutes)
-
+app.use("/api/admin", adminRoutes)
 // Serve static assets in production
 if (process.env.NODE_ENV === "production") {
   // Set static folder

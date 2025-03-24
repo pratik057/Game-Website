@@ -103,7 +103,7 @@ const History = () => {
       <h1 className="text-3xl font-bold mb-8 text-center">Game History</h1>
 
       {/* Stats Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
+      {/* <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
         <div className="bg-gray-800 rounded-lg p-4">
           <h3 className="text-gray-400 mb-1">Games Played</h3>
           <div className="text-2xl font-bold">{stats.totalGames}</div>
@@ -130,7 +130,7 @@ const History = () => {
             <span>{stats.totalWagered.toFixed(2)} wagered</span>
           </div>
         </div>
-      </div>
+      </div> */}
 
       {/* Game History Table */}
       <div className="bg-gray-800 rounded-lg overflow-hidden">

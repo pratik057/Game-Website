@@ -4,6 +4,8 @@ import { useEffect } from "react"
 import confetti from "canvas-confetti"
 
 const GameResult = ({ result, winAmount, onPlayAgain, autoClose = false }) => {
+
+  console.log(result)
   useEffect(() => {
     if (result === "win") {
       // Trigger confetti animation for win
@@ -62,19 +64,17 @@ const GameResult = ({ result, winAmount, onPlayAgain, autoClose = false }) => {
         }`}
       >
         <h2 className="text-3xl font-bold mb-4">
-          {result === "win" ? (
-            <span className="text-yellow-500">You Won!</span>
-          ) : (
-            <span className="text-red-500">You Lost</span>
-          )}
+          
+            <span className="text-yellow-500">{result} Won!</span>
+          
         </h2>
 
-        {result === "win" && (
+        {/* {result === "win" && (
           <div className="mb-6">
             <p className="text-gray-300 text-lg">You've won</p>
             <p className="text-yellow-500 text-4xl font-bold">{winAmount}</p>
           </div>
-        )}
+        )} */}
 
         {!autoClose && (
           <button

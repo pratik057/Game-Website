@@ -44,3 +44,15 @@ export const authorize = (...roles) => {
     next();
   };
 };
+
+export const verifyAdmin = async (req, res, next) => {
+  try {
+    if (!req.user || req.user.role !== "admin") {
+      return res.status(403).json({ success: false, message: "Access denied: Admins only" });
+    }
+    next();
+  } catch (error) {
+    console.error("Admin authentication error:", error);
+    res.status(403).json({ success: false, message: "Access denied" });
+  }
+};
