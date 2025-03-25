@@ -1,6 +1,6 @@
 "use client";
 
-import { useContext } from "react";
+import { useContext, useEffect, useRef } from "react";
 import { UserContext } from "../context/UserContext";
 import { SocketContext } from "../context/SocketContext";
 import Card from "../components/Card";
@@ -14,6 +14,11 @@ const Game = () => {
   const { connected, gameState, currentBet, placeBet } = useContext(SocketContext);
 
   const userWon = gameState.status === "result" && currentBet && currentBet.side === gameState.winningSide;
+  const gameEndRef = useRef(null);
+
+  useEffect(() => {
+    gameEndRef.current?.scrollIntoView({ behavior: "smooth" });
+  }, [gameState.andarCards, gameState.baharCards, gameState.status]);
 
   const calculateWinAmount = () => {
     if (!userWon || !currentBet) return 0;
@@ -65,8 +70,8 @@ const Game = () => {
               <div className="bg-blue-900/30 px-4 py-2 rounded-lg text-center w-full sm:w-1/2">
                 <div className="text-sm text-gray-300">Total Bahar Bets</div>
                 <div className="text-xl font-bold text-blue-500">{gameState.totalBets.bahar}</div>
-              </div>
-            </div>
+               </div>
+             </div>
 
             {/* Joker Card */}
             <div className="flex flex-col items-center mb-6">
@@ -118,9 +123,11 @@ const Game = () => {
             </div>
           </div>
         </div>
+        <div ref={gameEndRef} />
 
         {/* Game Result Modal */}
         {gameState.status === "result" && currentBet && <GameResult result={gameState.winningSide} winAmount={winAmount} onPlayAgain={() => {}} autoClose={true} />}
+       
       </div>
     </>
   );

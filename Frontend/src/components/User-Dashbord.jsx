@@ -34,11 +34,11 @@ const GameUI = () => {
               <span className="relative z-10 text-white font-bold text-xl">New Game</span>
             </Link>
 
-            <Link to="/deposit" className="w-64 text-white bg-gray-800 hover:bg-amber-300 hover:text-black rounded-md transition-colors duration-300 py-3 text-xl mb-4 text-center">
+            <Link to="/wallet" className="w-64 text-white bg-gray-800 hover:bg-amber-300 hover:text-black rounded-md transition-colors duration-300 py-3 text-xl mb-4 text-center">
               Deposit
             </Link>
 
-            <Link to="/walet" className="w-64 text-white bg-gray-800 hover:bg-gray-700 hover:text-amber-300 rounded-md transition-colors duration-300 py-3 text-xl mb-4 text-center">
+            <Link to="/wallet" className="w-64 text-white bg-gray-800 hover:bg-gray-700 hover:text-amber-300 rounded-md transition-colors duration-300 py-3 text-xl mb-4 text-center">
               Withdraw
             </Link>
 

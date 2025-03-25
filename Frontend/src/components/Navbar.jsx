@@ -98,15 +98,15 @@ const Navbar = () => {
       {mobileMenuOpen && (
         <div className="md:hidden bg-gray-800 pb-3 px-4">
           <div className="flex flex-col space-y-2">
-            <Link to="/" className="text-gray-300 hover:text-white px-3 py-2 rounded-md">
+            <Link to="/dashboard" className="text-gray-300 hover:text-white px-3 py-2 rounded-md">
               Home
             </Link>
             <Link to="/game" className="text-gray-300 hover:text-white px-3 py-2 rounded-md">
               Play Game
             </Link>
-            {/* <Link to="/history" className="text-gray-300 hover:text-white px-3 py-2 rounded-md">
+            <Link to="/history" className="text-gray-300 hover:text-white px-3 py-2 rounded-md">
               History
-            </Link> */}
+            </Link>
 
             {user ? (
               <>

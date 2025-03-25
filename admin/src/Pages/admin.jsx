@@ -22,11 +22,13 @@ const Users = () => {
   const [searchEmail, setSearchEmail] = useState("");
   const [show, setShow] = useState(false);
   const [selectedUser, setSelectedUser] = useState(null);
+  const [addBalance, setAddBalance] = useState(0); // Separate state for additional balance
+  const [removeBalance, setRemoveBalance] = useState(0); // Separate state for additional balance
   const [formData, setFormData] = useState({
     userId: "",
     username: "",
     email: "",
-    balance: "",
+    balance: 0,
   });
 
   useEffect(() => {
@@ -38,7 +40,6 @@ const Users = () => {
       const res = await axios.get("https://game-website-yyuo.onrender.com/api/admin/users");
       setUsers(res.data.users);
       setFilteredUsers(res.data.users);
-      console.log(res.data.users);
     } catch (error) {
       console.error("Error fetching users:", error);
     }
@@ -48,12 +49,11 @@ const Users = () => {
   const handleSearch = (e) => {
     const query = e.target.value.toLowerCase();
     setSearchEmail(query);
-    const filtered = users.filter((user) =>
-      user.email.toLowerCase().includes(query)
-    );
+    const filtered = users.filter((user) => user.email.toLowerCase().includes(query));
     setFilteredUsers(filtered);
   };
 
+  // Handle edit button click
   const handleEdit = (user) => {
     setSelectedUser(user);
     setFormData({
@@ -62,23 +62,47 @@ const Users = () => {
       email: user.email,
       balance: user.balance,
     });
+    setAddBalance(""); // Reset additional balance input
     setShow(true);
   };
 
+  // Handle additional balance input
+  const handleBalanceChange = (e) => {
+    setAddBalance(e.target.value); // Store additional balance separately
+  };
+  const handleRemoveBalanceChange = (e) => {
+    setRemoveBalance(e.target.value); // Store remove balance separately
+  };
+  // Handle form input change
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
+  // Handle save button click
   const handleSave = async () => {
+    const additionalBalance = parseFloat(addBalance) || 0;
+    const deductionBalance = parseFloat(removeBalance) || 0;
+  
+    let updatedBalance = (parseFloat(formData.balance) || 0) + additionalBalance - deductionBalance;
+  
+    // Ensure balance doesn't go negative
+    if (updatedBalance < 0) {
+      alert("Balance cannot be negative!");
+      return;
+    }
+  
     try {
-      await axios.put(`https://game-website-yyuo.onrender.com/api/admin/users/${selectedUser._id}`, formData);
+      await axios.put(`https://game-website-yyuo.onrender.com/api/admin/users/${selectedUser._id}`, {
+        ...formData,
+        balance: updatedBalance,
+      });
+  
       fetchUsers();
       setShow(false);
     } catch (error) {
       console.error("Error updating user:", error);
     }
   };
-
   return (
     <div className="container mx-auto p-6 bg-gray-100 min-h-screen">
       <h2 className="text-3xl font-bold text-center mb-6 text-gray-800">Users List</h2>
@@ -96,6 +120,7 @@ const Users = () => {
         />
       </div>
 
+      {/* Users Table */}
       <TableContainer component={Paper} className="shadow-lg rounded-lg">
         <Table>
           <TableHead className="bg-blue-500">
@@ -140,9 +165,7 @@ const Users = () => {
 
       {/* Edit User Dialog */}
       <Dialog open={show} onClose={() => setShow(false)}>
-        <DialogTitle className="text-center text-blue-600 font-bold">
-          Edit User
-        </DialogTitle>
+        <DialogTitle className="text-center text-blue-600 font-bold">Edit User</DialogTitle>
         <DialogContent className="space-y-4 p-6">
           <TextField
             fullWidth
@@ -171,12 +194,30 @@ const Users = () => {
           />
           <TextField
             fullWidth
-            label="Balance"
+            label="Current Balance"
             name="balance"
-            value={formData.balance}
-            onChange={handleChange}
+            value={`COINS: ${formData.balance}`}
+            disabled
+            variant="outlined"
+            sx={{ backgroundColor: "#f3f4f6", borderRadius: "5px" }}
+          />
+          <TextField
+            fullWidth
+            label="Add Balance"
+            name="addBalance"
+            value={addBalance}
+            onChange={handleBalanceChange}
             variant="outlined"
           />
+         <TextField
+  fullWidth
+  label="Remove Balance"
+  name="removeBalance"
+  value={removeBalance}
+  onChange={handleRemoveBalanceChange}  // Use the correct function
+  variant="outlined"
+/>
+
         </DialogContent>
         <DialogActions className="p-4">
           <Button onClick={() => setShow(false)} color="secondary" className="hover:bg-gray-300 transition">

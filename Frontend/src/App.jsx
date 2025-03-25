@@ -1,9 +1,8 @@
-
 "use client";
 
-import { useState, useEffect } from "react";
-import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
-import { UserProvider } from "./context/UserContext";
+import { useState, useEffect, useContext } from "react";
+import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-dom";
+import { UserProvider, UserContext } from "./context/UserContext";
 import { SocketProvider } from "./context/SocketContext";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
@@ -36,30 +35,28 @@ function App() {
     <UserProvider>
       <SocketProvider>
         <Router>
-         
-        <div className="flex flex-col min-h-screen bg-gray-900 text-white"> 
-            <main className="h-full w-full flex-grow+9  ">
+          <div className="flex flex-col min-h-screen bg-gray-900 text-white">
+            <main className="h-full w-full flex-grow">
               {loading ? (
                 <LoadingScreen />
               ) : (
-                <Routes>
-                  {/* Authentication & User Dashboard */}
-                  <Route path="/" element={<LoginScreen />} />
-                  <Route path="/register" element={<UserRegister />} />
-                  <Route path="/login" element={<UserLogin />} />
-                  <Route path="/dashboard" element={<UserDashboard />} />
-                  <Route path="/walet" element={<Wallate />} />
-                  <Route path="/logout" element={<Logout />} />
-                  {/* Game Pages */}
-                
-                  <Route path="/game" element={<Game />} />
-                  <Route path="/history" element={<History />} />
-                </Routes>
+                <UserContext.Consumer>
+                {({ user }) => (
+                  <Routes>
+                    <Route path="/" element={user ? <Navigate to="/dashboard" /> : <LoginScreen />} />
+                    <Route path="/register" element={<UserRegister />} />
+                    <Route path="/login" element={<UserLogin />} />
+                    <Route path="/dashboard" element={user ? <UserDashboard /> : <Navigate to="/" />} />
+                    <Route path="/wallet" element={user ? <Wallate /> : <Navigate to="/" />} />
+                    <Route path="/logout" element={user ? <Logout /> : <Navigate to="/" />} />
+                    <Route path="/game" element={user ? <Game /> : <Navigate to="/" />} />
+                    <Route path="/history" element={user ? <History /> : <Navigate to="/" />} />
+                  </Routes>
+                )}
+              </UserContext.Consumer>
               )}
-               
             </main>
-       
-            </div>
+          </div>
           <ToastContainer position="bottom-right" theme="dark" />
         </Router>
       </SocketProvider>

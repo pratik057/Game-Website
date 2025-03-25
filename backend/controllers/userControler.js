@@ -168,3 +168,23 @@ export const getMe = async (req, res) => {
     res.status(500).json({ success: false, message: "Server error" });
   }
 };
+// @desc    Get transaction history
+// @route   GET /api/users/transactions
+// @access  Private
+
+
+export const getTransactionHistory = async (req, res) => {
+  try {
+    const transactions = await Transaction.find({ userId: req.user.id }).sort({ createdAt: -1 });
+
+    res.status(200).json({
+      success: true,
+      transactions,
+    });
+  } catch (error) {
+    console.error("Transaction history error:", error);
+    res.status(500).json({ success: false, message: "Server error" });
+  }
+};
+
+
