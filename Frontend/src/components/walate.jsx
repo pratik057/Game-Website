@@ -12,9 +12,10 @@ const WalletControls = () => {
   const [displayBalance, setDisplayBalance] = useState(balance)
   const [notification, setNotification] = useState({ show: false, message: "", type: "" })
   const [activeTab, setActiveTab] = useState("deposit")
+  const [transactions, setTransactions] = useState([]) // Store transaction history
+
   const token = localStorage.getItem("token")
-console.log("users:",user)
-  // Animate balance changes
+
   useEffect(() => {
     if (balance !== displayBalance) {
       const interval = setInterval(() => {
@@ -34,179 +35,135 @@ console.log("users:",user)
     }
   }, [balance, displayBalance])
 
+  useEffect(() => {
+    fetchTransactionHistory()
+  }, [])
+
+  const fetchTransactionHistory = async () => {
+    try {
+      const response = await fetch(`https://game-website-yyuo.onrender.com/api/games/transactions`, {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+      })
+      const data = await response.json()
+      if (data.success) {
+        setTransactions(data.transactions) // Store transactions
+      } else {
+        showNotification("Failed to load transactions", "error")
+      }
+    } catch (error) {
+      console.error("Error fetching transactions:", error)
+      showNotification("Could not fetch transactions", "error")
+    }
+  }
+
   const showNotification = (message, type) => {
     setNotification({ show: true, message, type })
     setTimeout(() => setNotification({ show: false, message: "", type: "" }), 3000)
   }
 
-  const handleTransaction = async (type) => {
-    if (!amount || isNaN(amount) || parseFloat(amount) <= 0) {
-      showNotification("Please enter a valid amount", "error")
-      return
-    }
-
-    if (!user) {
-      showNotification("User not authenticated!", "error")
-      return
-    }
-
-    setLoading(true)
-    try {
-      const endpoint = type === "deposit" ? "add-funds" : "withdraw"
-      const response = await fetch(`https://game-website-yyuo.onrender.com/api/games/${endpoint}`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-        body: JSON.stringify({ amount: parseFloat(amount) }),
-      })
-
-      const data = await response.json()
-      if (data.success) {
-        updateBalance && updateBalance(data.newBalance)
-        showNotification(
-          type === "deposit" ? "Funds added successfully!" : "Withdrawal successful!",
-          "success"
-        )
-      } else {
-        showNotification(data.message || "Transaction failed", "error")
-      }
-    } catch (error) {
-      console.error("Transaction error:", error)
-      showNotification("Transaction failed. Please try again.", "error")
-    }
-    setLoading(false)
-    setAmount("")
+  const handleDeposit = () => {
+    const whatsappMessage = `Name: ${user.username}%0AEmail: ${user.email}%0AAmount to deposit: ${amount}`
+    const whatsappLink = `https://wa.me/918975461685?text=${whatsappMessage}`
+    window.open(whatsappLink, "_blank")
   }
- function handleDeposit(){
-    const whatsappMessage = `Name: ${user.username}%0AEmail: ${user.email}%0AAmount to deposite: ${amount}`;
-    const whatsappLink = `https://wa.me/918975461685?text=${whatsappMessage}`;
-    window.open(whatsappLink, "_blank");
-console.log('====================================');
-console.log(whatsappMessage);
-console.log('====================================');
-  }
+
   return (
-    <div className="h-full w-full flex justify-center items-center">
-    <div className="bg-gradient-to-br from-gray-800 to-gray-600 p-6 rounded-xl shadow-lg text-white max-w-md w-full mx-auto border border-gray-700 ">
-      <h2 className="text-xl font-bold mb-4 text-center">My Wallet</h2>
-      
-      {/* Animated Balance Display */}
-      <motion.div 
-        className="mb-6 text-center top-30"
-        initial={{ scale: 1 }}
-        animate={{ scale: balance !== displayBalance ? [1, 1.05, 1] : 1 }}
-        transition={{ duration: 0.3 }}
-      >
-        <p className="text-gray-300 mb-1">Current Balance</p>
-        <p className="text-3xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-green-400 to-blue-500">
-          ${displayBalance.toFixed(2)}
-        </p>
-      </motion.div>
-      
-      {/* Transaction Type Tabs */}
-      <div className="flex mb-4 bg-gray-700/50 rounded-lg p-1">
-        <button
-          className={`flex-1 py-2 rounded-md flex items-center justify-center gap-2 transition-all duration-300 ${
-            activeTab === "deposit" 
-              ? "bg-gradient-to-r from-green-500 to-green-600 text-white shadow-md" 
-              : "text-gray-300 hover:bg-gray-700"
-          }`}
-          onClick={() => setActiveTab("deposit")}
+    <div className="h-full w-full flex flex-col items-center">
+      <div className="bg-gradient-to-br from-gray-800 to-gray-600 p-6 rounded-xl shadow-lg text-white max-w-md w-full mx-auto border border-gray-700">
+        <h2 className="text-xl font-bold mb-4 text-center">My Wallet</h2>
+        
+        <motion.div 
+          className="mb-6 text-center"
+          initial={{ scale: 1 }}
+          animate={{ scale: balance !== displayBalance ? [1, 1.05, 1] : 1 }}
+          transition={{ duration: 0.3 }}
         >
-          <ArrowDownCircle size={18} />
-          <span>Deposit</span>
-        </button>
-        <button
-          className={`flex-1 py-2 rounded-md flex items-center justify-center gap-2 transition-all duration-300 ${
-            activeTab === "withdraw" 
-              ? "bg-gradient-to-r from-red-500 to-red-600 text-white shadow-md" 
-              : "text-gray-300 hover:bg-gray-700"
+          <p className="text-gray-300 mb-1">Current Balance</p>
+          <p className="text-3xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-green-400 to-blue-500">
+            COINS: {displayBalance.toFixed(2)}
+          </p>
+        </motion.div>
+
+        <div className="flex mb-4 bg-gray-700/50 rounded-lg p-1">
+          <button
+            className={`flex-1 py-2 rounded-md flex items-center justify-center gap-2 transition-all duration-300 ${
+              activeTab === "deposit" ? "bg-green-600 text-white shadow-md" : "text-gray-300 hover:bg-gray-700"
+            }`}
+            onClick={() => setActiveTab("deposit")}
+          >
+            <ArrowDownCircle size={18} />
+            <span>Deposit</span>
+          </button>
+          <button
+            className={`flex-1 py-2 rounded-md flex items-center justify-center gap-2 transition-all duration-300 ${
+              activeTab === "withdraw" ? "bg-red-600 text-white shadow-md" : "text-gray-300 hover:bg-gray-700"
+            }`}
+            onClick={() => setActiveTab("withdraw")}
+          >
+            <ArrowUpCircle size={18} />
+            <span>Withdraw</span>
+          </button>
+        </div>
+
+        <div className="mb-4">
+          <motion.input
+            type="number"
+            className="w-full p-3 rounded-lg bg-gray-700/50 border border-gray-600 text-white focus:ring-2 focus:ring-blue-500"
+            placeholder="Enter amount"
+            value={amount}
+            onChange={(e) => setAmount(e.target.value)}
+            disabled={loading}
+            min="1"
+            whileFocus={{ scale: 1.02 }}
+          />
+        </div>
+
+        <motion.button 
+          className={`w-full py-3 rounded-lg font-medium flex items-center justify-center gap-2 transition-all ${
+            activeTab === "deposit" ? "bg-green-600 hover:bg-green-700" : "bg-red-600 hover:bg-red-700"
           }`}
-          onClick={() => setActiveTab("withdraw")}
-        >
-          <ArrowUpCircle size={18} />
-          <span>Withdraw</span>
-        </button>
-      </div>
-      
-      {/* Amount Input with Animation */}
-      <div className="mb-4 relative">
-        <div className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400">$</div>
-        <motion.input
-          type="number"
-          className="w-full p-3 pl-8 rounded-lg bg-gray-700/50 border border-gray-600 text-white focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all"
-          placeholder="Enter amount"
-          value={amount}
-          onChange={(e) => setAmount(e.target.value)}
+          onClick={handleDeposit}
           disabled={loading}
-          min="1"
-          whileFocus={{ scale: 1.02 }}
-          transition={{ type: "spring", stiffness: 400, damping: 10 }}
-        />
+        >
+          {loading ? <Loader2 className="animate-spin mr-2" size={20} /> : <ArrowDownCircle size={20} />}
+          <span>{loading ? "Processing..." : activeTab === "deposit" ? "Add Funds" : "Withdraw Funds"}</span>
+        </motion.button>
       </div>
-      
-      {/* Quick Amount Buttons */}
-      <div className="grid grid-cols-4 gap-2 mb-4">
-        {[10, 50, 100, 500].map((quickAmount) => (
-          <motion.button
-            key={quickAmount}
-            className="bg-gray-700 hover:bg-gray-600 rounded-md py-1 text-sm transition-colors"
-            onClick={() => setAmount(quickAmount.toString())}
-            whileHover={{ scale: 1.05 }}
-            whileTap={{ scale: 0.95 }}
-          >
-            ${quickAmount}
-          </motion.button>
-        ))}
+
+      {/* Transaction History Section */}
+      <div className="mt-6 w-full max-w-md bg-gray-800 p-4 rounded-lg shadow-lg border border-gray-700">
+        <h3 className="text-lg font-semibold text-white mb-3">Transaction History</h3>
+        <div className="h-48 overflow-y-auto">
+          {transactions.length > 0 ? (
+            <table className="w-full text-sm text-left text-gray-300">
+              <thead className="bg-gray-700 text-gray-200">
+                <tr>
+                  <th className="px-2 py-1">Type</th>
+                  <th className="px-2 py-1">Amount</th>
+                  <th className="px-2 py-1">Date</th>
+                </tr>
+              </thead>
+              <tbody>
+                {transactions.map((txn, index) => (
+                  <tr key={index} className="border-b border-gray-700">
+                    <td className={`px-2 py-1 ${txn.type === "deposit" ? "text-green-400" : "text-red-400"}`}>
+                      {txn.type.charAt(0).toUpperCase() + txn.type.slice(1)}
+                    </td>
+                    <td className="px-2 py-1">COINS {txn.amount.toFixed(2)}</td>
+                    <td className="px-2 py-1">{new Date(txn.date).toLocaleDateString()}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          ) : (
+            <p className="text-gray-400 text-center">No transactions found.</p>
+          )}
+        </div>
       </div>
-      
-      {/* Transaction Button */}
-      <motion.button 
-        className={`w-full py-3 rounded-lg font-medium flex items-center justify-center gap-2 transition-all ${
-          activeTab === "deposit" 
-            ? "bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700" 
-            : "bg-gradient-to-r from-red-500 to-red-600 hover:from-red-600 hover:to-red-700"
-        }`}
-        onClick={handleDeposit}
-        disabled={loading}
-        whileHover={{ scale: 1.02 }}
-        whileTap={{ scale: 0.98 }}
-      >
-        {loading ? (
-          <Loader2 className="animate-spin mr-2" size={20} />
-        ) : activeTab === "deposit" ? (
-          <ArrowDownCircle size={20} />
-        ) : (
-          <ArrowUpCircle size={20} />
-        )}
-        <span>
-          {loading 
-            ? "Processing..." 
-            : activeTab === "deposit" 
-              ? "Add Funds" 
-              : "Withdraw Funds"}
-        </span>
-      </motion.button>
-      
-      {/* Notification Toast */}
-      <AnimatePresence>
-        {notification.show && (
-          <motion.div
-            className={`fixed bottom-4 left-1/2 transform -translate-x-1/2 px-4 py-2 rounded-lg shadow-lg ${
-              notification.type === "success" ? "bg-green-500" : "bg-red-500"
-            } text-white font-medium z-50 min-w-[200px] text-center`}
-            initial={{ opacity: 0, y: 50 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: 20 }}
-            transition={{ type: "spring", stiffness: 500, damping: 30 }}
-          >
-            {notification.message}
-          </motion.div>
-        )}
-      </AnimatePresence>
-    </div>
     </div>
   )
 }

@@ -3,6 +3,7 @@
 import { useEffect } from "react"
 import confetti from "canvas-confetti"
 
+// eslint-disable-next-line react/prop-types
 const GameResult = ({ result, winAmount, onPlayAgain, autoClose = false }) => {
 
   console.log(result)

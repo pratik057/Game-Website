@@ -7,6 +7,7 @@ import axios from "axios";
 
 export const UserContext = createContext();
 
+// eslint-disable-next-line react/prop-types
 export const UserProvider = ({ children }) => {
   const [user, setUser] = useState(null);
   const [balance, setBalance] = useState(0);
@@ -57,6 +58,7 @@ export const UserProvider = ({ children }) => {
 
   const register = async (username, email, password) => {
     try {
+      // eslint-disable-next-line no-unused-vars
       const response = await axios.post(
         "https://game-website-yyuo.onrender.com/api/auth/register",
         { username, email, password }

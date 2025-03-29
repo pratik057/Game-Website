@@ -22,8 +22,8 @@ const Users = () => {
   const [searchEmail, setSearchEmail] = useState("");
   const [show, setShow] = useState(false);
   const [selectedUser, setSelectedUser] = useState(null);
-  const [addBalance, setAddBalance] = useState(0); // Separate state for additional balance
-  const [removeBalance, setRemoveBalance] = useState(0); // Separate state for additional balance
+  const [addBalance, setAddBalance] = useState("");
+  const [removeBalance, setRemoveBalance] = useState("");
   const [formData, setFormData] = useState({
     userId: "",
     username: "",
@@ -36,12 +36,24 @@ const Users = () => {
   }, []);
 
   const fetchUsers = async () => {
+    const token = localStorage.getItem("adminToken"); // Retrieve token
+    if (!token) {
+      alert("Authentication token not found. Please log in again.");
+      return;
+    }
+
     try {
-      const res = await axios.get("https://game-website-yyuo.onrender.com/api/admin/users");
+      const res = await axios.get("https://game-website-yyuo.onrender.com/api/admin/users", {
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json",
+        }  // Attach token
+      });
       setUsers(res.data.users);
       setFilteredUsers(res.data.users);
     } catch (error) {
       console.error("Error fetching users:", error);
+      alert("Failed to fetch users. Please try again.");
     }
   };
 
@@ -49,8 +61,7 @@ const Users = () => {
   const handleSearch = (e) => {
     const query = e.target.value.toLowerCase();
     setSearchEmail(query);
-    const filtered = users.filter((user) => user.email.toLowerCase().includes(query));
-    setFilteredUsers(filtered);
+    setFilteredUsers(users.filter((user) => user.email.toLowerCase().includes(query)));
   };
 
   // Handle edit button click
@@ -62,47 +73,63 @@ const Users = () => {
       email: user.email,
       balance: user.balance,
     });
-    setAddBalance(""); // Reset additional balance input
+    setAddBalance("");
+    setRemoveBalance("");
     setShow(true);
   };
 
-  // Handle additional balance input
-  const handleBalanceChange = (e) => {
-    setAddBalance(e.target.value); // Store additional balance separately
-  };
-  const handleRemoveBalanceChange = (e) => {
-    setRemoveBalance(e.target.value); // Store remove balance separately
-  };
-  // Handle form input change
+  // Handle input changes
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
+  const handleBalanceChange = (e) => {
+    const value = e.target.value;
+    if (/^\d*\.?\d*$/.test(value)) setAddBalance(value);
+  };
+
+  const handleRemoveBalanceChange = (e) => {
+    const value = e.target.value;
+    if (/^\d*\.?\d*$/.test(value)) setRemoveBalance(value);
+  };
+
   // Handle save button click
   const handleSave = async () => {
+    const token = localStorage.getItem("adminToken");
+    if (!token) {
+      alert("Authentication token not found. Please log in again.");
+      return;
+    }
+
     const additionalBalance = parseFloat(addBalance) || 0;
     const deductionBalance = parseFloat(removeBalance) || 0;
-  
     let updatedBalance = (parseFloat(formData.balance) || 0) + additionalBalance - deductionBalance;
-  
-    // Ensure balance doesn't go negative
+
     if (updatedBalance < 0) {
       alert("Balance cannot be negative!");
       return;
     }
-  
+
     try {
-      await axios.put(`https://game-website-yyuo.onrender.com/api/admin/users/${selectedUser._id}`, {
-        ...formData,
-        balance: updatedBalance,
-      });
-  
+      await axios.put(
+        `https://game-website-yyuo.onrender.com/api/admin/users/${selectedUser._id}`,
+        { ...formData, balance: updatedBalance },
+        { headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json",
+        } } // Attach token
+      );
+
       fetchUsers();
       setShow(false);
+      setAddBalance("");
+      setRemoveBalance("");
     } catch (error) {
       console.error("Error updating user:", error);
+      alert("Failed to update user. Please try again.");
     }
   };
+
   return (
     <div className="container mx-auto p-6 bg-gray-100 min-h-screen">
       <h2 className="text-3xl font-bold text-center mb-6 text-gray-800">Users List</h2>
@@ -167,65 +194,16 @@ const Users = () => {
       <Dialog open={show} onClose={() => setShow(false)}>
         <DialogTitle className="text-center text-blue-600 font-bold">Edit User</DialogTitle>
         <DialogContent className="space-y-4 p-6">
-          <TextField
-            fullWidth
-            label="User ID"
-            name="userId"
-            value={formData.userId}
-            disabled
-            variant="outlined"
-            sx={{ backgroundColor: "#f3f4f6", borderRadius: "5px" }}
-          />
-          <TextField
-            fullWidth
-            label="Username"
-            name="username"
-            value={formData.username}
-            onChange={handleChange}
-            variant="outlined"
-          />
-          <TextField
-            fullWidth
-            label="Email"
-            name="email"
-            value={formData.email}
-            onChange={handleChange}
-            variant="outlined"
-          />
-          <TextField
-            fullWidth
-            label="Current Balance"
-            name="balance"
-            value={`COINS: ${formData.balance}`}
-            disabled
-            variant="outlined"
-            sx={{ backgroundColor: "#f3f4f6", borderRadius: "5px" }}
-          />
-          <TextField
-            fullWidth
-            label="Add Balance"
-            name="addBalance"
-            value={addBalance}
-            onChange={handleBalanceChange}
-            variant="outlined"
-          />
-         <TextField
-  fullWidth
-  label="Remove Balance"
-  name="removeBalance"
-  value={removeBalance}
-  onChange={handleRemoveBalanceChange}  // Use the correct function
-  variant="outlined"
-/>
-
+          <TextField fullWidth label="User ID" value={formData.userId} disabled variant="outlined" />
+          <TextField fullWidth label="Username" name="username" value={formData.username} onChange={handleChange} variant="outlined" />
+          <TextField fullWidth label="Email" name="email" value={formData.email} onChange={handleChange} variant="outlined" />
+          <TextField fullWidth label="Current Balance" value={`COINS: ${formData.balance}`} disabled variant="outlined" />
+          <TextField fullWidth label="Add Balance" value={addBalance} onChange={handleBalanceChange} variant="outlined" />
+          <TextField fullWidth label="Remove Balance" value={removeBalance} onChange={handleRemoveBalanceChange} variant="outlined" />
         </DialogContent>
         <DialogActions className="p-4">
-          <Button onClick={() => setShow(false)} color="secondary" className="hover:bg-gray-300 transition">
-            Close
-          </Button>
-          <Button onClick={handleSave} color="primary" variant="contained" className="hover:bg-blue-700 transition">
-            Save Changes
-          </Button>
+          <Button onClick={() => setShow(false)} color="secondary">Close</Button>
+          <Button onClick={handleSave} color="primary" variant="contained">Save Changes</Button>
         </DialogActions>
       </Dialog>
     </div>

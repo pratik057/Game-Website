@@ -6,9 +6,9 @@ import { UserContext } from "../context/UserContext"
 // eslint-disable-next-line react/prop-types
 const BetControls = ({ onPlaceBet, disabled, currentBet }) => {
   const { balance } = useContext(UserContext)
-  const [betAmount, setBetAmount] = useState(10)
+  const [betAmount, setBetAmount] = useState(1000)
 
-  const predefinedBets = [10, 50, 100, 500, 1000]
+  const predefinedBets = [1000,2000,3000,4000,5000,6000,7000]
 
   const handleBetAmountChange = (amount) => {
     setBetAmount(amount)

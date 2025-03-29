@@ -33,13 +33,13 @@ const Game = () => {
       <Navbar />
       <div className="min-h-screen w-full flex flex-col justify-center items-center bg-gradient-to-b from-gray-900 to-black text-white px-4 md:px-8 lg:px-16">
         {/* Game Title */}
-        <h1 className="text-3xl md:text-5xl font-extrabold text-center mt-6">
+        <h1 className="text-2xl sm:text-3xl md:text-5xl font-extrabold text-center mt-6">
           <span className="text-red-500">Andar</span> <span className="text-white">or</span> <span className="text-blue-500">Bahar</span>
         </h1>
 
         {/* Game Status */}
-        <div className="w-full max-w-5xl mt-6 p-4 bg-gray-800 rounded-xl shadow-lg flex flex-col sm:flex-row justify-between items-center">
-          <div className="flex items-center mb-2 sm:mb-0">
+        <div className="w-full max-w-5xl mt-6 p-4 bg-gray-800 rounded-xl shadow-lg flex flex-col sm:flex-row justify-between items-center gap-4">
+          <div className="flex items-center">
             <div className={`w-3 h-3 rounded-full mr-2 ${connected ? "bg-green-500" : "bg-red-500"}`}></div>
             <span className="text-gray-300">{connected ? "Connected to Game Server" : "Disconnected"}</span>
           </div>
@@ -62,25 +62,25 @@ const Game = () => {
           {/* Game Table */}
           <div className="game-table bg-gray-900 p-6 rounded-xl shadow-lg w-full max-w-5xl">
             {/* Total Bets Display */}
-            <div className="w-full flex flex-col sm:flex-row justify-between mb-6">
-              <div className="bg-red-900/30 px-4 py-2 rounded-lg text-center w-full sm:w-1/2 mb-2 sm:mb-0">
+            <div className="w-full flex flex-col sm:flex-row justify-between mb-6 gap-4">
+              <div className="bg-red-900/30 px-4 py-2 rounded-lg text-center w-full sm:w-1/2">
                 <div className="text-sm text-gray-300">Total Andar Bets</div>
                 <div className="text-xl font-bold text-red-500">{gameState.totalBets.andar}</div>
               </div>
               <div className="bg-blue-900/30 px-4 py-2 rounded-lg text-center w-full sm:w-1/2">
                 <div className="text-sm text-gray-300">Total Bahar Bets</div>
                 <div className="text-xl font-bold text-blue-500">{gameState.totalBets.bahar}</div>
-               </div>
-             </div>
+              </div>
+            </div>
 
             {/* Joker Card */}
             <div className="flex flex-col items-center mb-6">
-              <h2 className="text-xl font-bold text-yellow-500 mb-4">Joker Card</h2>
+              <h2 className="text-lg sm:text-xl font-bold text-yellow-500 mb-4">Joker Card</h2>
               <div className="h-40 flex justify-center items-center">
                 {gameState.jokerCard ? (
                   <Card card={gameState.jokerCard} flipped={true} highlighted={true} />
                 ) : (
-                  <div className="w-29 h-40 rounded-lg border-2 border-dashed border-gray-600 flex items-center justify-center">
+                  <div className="w-28 h-40 rounded-lg border-2 border-dashed border-gray-600 flex items-center justify-center">
                     <span className="text-gray-500">Waiting...</span>
                   </div>
                 )}
@@ -88,33 +88,37 @@ const Game = () => {
             </div>
 
             {/* Card Areas */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              {/* Andar Cards */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              {/* ANDAR Section */}
               <div className="flex flex-col items-center">
-                <h2 className="text-xl font-bold text-red-500 mb-4">ANDAR</h2>
-                <div className="flex flex-wrap justify-center gap-2">
+                <h2 className="text-lg sm:text-xl font-bold text-red-500 mb-4">ANDAR</h2>
+                <div className="relative h-40 w-full flex justify-center">
                   {gameState.andarCards.length > 0 ? (
                     gameState.andarCards.map((card, index) => (
-                      <Card key={`andar-${index}`} card={card} flipped={true} delay={index * 100} highlighted={gameState.status === "result" && gameState.winningSide === "andar" && index === gameState.winningCardIndex} />
+                      <div key={`andar-${index}`} className="absolute" style={{ left: `${index * 20}px`, zIndex: index }}>
+                        <Card card={card} flipped={true} />
+                      </div>
                     ))
                   ) : (
-                    <div className="w-29 h-40 rounded-lg border-2 border-dashed border-gray-600 flex items-center justify-center">
+                    <div className="w-28 h-40 rounded-lg border-2 border-dashed border-gray-600 flex items-center justify-center">
                       <span className="text-gray-500">No cards yet</span>
                     </div>
                   )}
                 </div>
               </div>
 
-              {/* Bahar Cards */}
+              {/* BAHAR Section */}
               <div className="flex flex-col items-center">
-                <h2 className="text-xl font-bold text-blue-500 mb-4">BAHAR</h2>
-                <div className="flex flex-wrap justify-center gap-2">
+                <h2 className="text-lg sm:text-xl font-bold text-blue-500 mb-4">BAHAR</h2>
+                <div className="relative h-40 w-full flex justify-center">
                   {gameState.baharCards.length > 0 ? (
                     gameState.baharCards.map((card, index) => (
-                      <Card key={`bahar-${index}`} card={card} flipped={true} delay={index * 100} highlighted={gameState.status === "result" && gameState.winningSide === "bahar" && index === gameState.winningCardIndex} />
+                      <div key={`bahar-${index}`} className="absolute" style={{ left: `${index * 20}px`, zIndex: index }}>
+                        <Card card={card} flipped={true} />
+                      </div>
                     ))
                   ) : (
-                    <div className="w-29 h-40 rounded-lg border-2 border-dashed border-gray-600 flex items-center justify-center">
+                    <div className="w-28 h-40 rounded-lg border-2 border-dashed border-gray-600 flex items-center justify-center">
                       <span className="text-gray-500">No cards yet</span>
                     </div>
                   )}
@@ -123,11 +127,11 @@ const Game = () => {
             </div>
           </div>
         </div>
+
         <div ref={gameEndRef} />
 
         {/* Game Result Modal */}
         {gameState.status === "result" && currentBet && <GameResult result={gameState.winningSide} winAmount={winAmount} onPlayAgain={() => {}} autoClose={true} />}
-       
       </div>
     </>
   );
