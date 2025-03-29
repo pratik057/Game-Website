@@ -6,7 +6,7 @@ import confetti from "canvas-confetti"
 // eslint-disable-next-line react/prop-types
 const GameResult = ({ result, winAmount, onPlayAgain, autoClose = false }) => {
 
-  console.log(result)
+  
   useEffect(() => {
     if (result === "win") {
       // Trigger confetti animation for win

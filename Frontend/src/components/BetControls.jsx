@@ -8,7 +8,7 @@ const BetControls = ({ onPlaceBet, disabled, currentBet }) => {
   const { balance } = useContext(UserContext)
   const [betAmount, setBetAmount] = useState(1000)
 
-  const predefinedBets = [1000,2000,3000,4000,5000,6000,7000]
+  const predefinedBets = [10,20,50,100,200,500,1000]
 
   const handleBetAmountChange = (amount) => {
     setBetAmount(amount)

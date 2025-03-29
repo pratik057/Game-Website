@@ -68,7 +68,7 @@ export const SocketProvider = ({ children }) => {
           // Try to reconnect if under max attempts
           if (reconnectAttempts.current < maxReconnectAttempts) {
             reconnectAttempts.current += 1
-            console.log(`Attempting to reconnect (${reconnectAttempts.current}/${maxReconnectAttempts})...`)
+           
 
             // Set a timer to reconnect
             reconnectTimer.current = setTimeout(() => {
@@ -83,7 +83,7 @@ export const SocketProvider = ({ children }) => {
           }
         })
       } catch (error) {
-        console.error("Error creating socket connection:", error)
+       
         toast.error("Failed to connect to game server. Please refresh the page.")
       }
     }
@@ -135,7 +135,7 @@ export const SocketProvider = ({ children }) => {
 
     // Authentication events
     const handleAuthenticated = (userData) => {
-      console.log("Authenticated:", userData)
+     
       // If the user is a guest, update the balance
       if (!user && userData.balance) {
         updateBalance(userData.balance)
@@ -149,7 +149,7 @@ export const SocketProvider = ({ children }) => {
 
     // Game state events
     const handleGameState = (state) => {
-      console.log("Game state updated:", state)
+     
 
       // Validate state before updating
       if (state && typeof state === "object") {
@@ -190,7 +190,7 @@ export const SocketProvider = ({ children }) => {
     }
 
     const handleJokerRevealed = ({ jokerCard }) => {
-      console.log("Joker revealed:", jokerCard)
+     
       if (jokerCard) {
         setGameState((prev) => ({
           ...prev,
@@ -205,7 +205,7 @@ export const SocketProvider = ({ children }) => {
     const handleCardDealt = ({ side, card, index }) => {
       if (!side || !card) return
 
-      console.log(`Card dealt to ${side}:`, card, index)
+    
       setGameState((prev) => {
         if (side === "andar") {
           return {
@@ -222,7 +222,7 @@ export const SocketProvider = ({ children }) => {
     }
 
     const handleGameResult = ({ winningSide, winningCardIndex, winners, losers }) => {
-      console.log("Game result:", { winningSide, winningCardIndex, winners, losers })
+    
 
       setGameState((prev) => ({
         ...prev,
@@ -254,7 +254,7 @@ export const SocketProvider = ({ children }) => {
     const handlePlayerJoined = ({ id, username }) => {
       if (!id || !username) return
 
-      console.log(`Player joined: ${username} (${id})`)
+   
       toast.info(`${username} joined the game`)
 
       setOnlinePlayers((prev) => {
@@ -266,7 +266,7 @@ export const SocketProvider = ({ children }) => {
     const handlePlayerLeft = ({ id, username }) => {
       if (!id) return
 
-      console.log(`Player left: ${username} (${id})`)
+  
       if (username) {
         toast.info(`${username} left the game`)
       }
@@ -277,7 +277,7 @@ export const SocketProvider = ({ children }) => {
     const handleBetPlaced = ({ playerId, username, side, amount, totalBets }) => {
       if (!playerId || !side || !amount) return
 
-      console.log(`Bet placed by ${username}: ${amount} on ${side}`)
+    
 
       // Update total bets
       if (totalBets) {
@@ -313,19 +313,19 @@ export const SocketProvider = ({ children }) => {
 
     const handleBalanceUpdated = ({ balance }) => {
       if (balance !== undefined) {
-        console.log("Balance updated:", balance)
+       
         updateBalance(balance)
       }
     }
 
     const handleWinMessage = ({ amountWon }) => {
       // Additional win animation or sound could be triggered here
-      console.log(`You won ${amountWon}!`)
+   
     }
 
     const handleLoseMessage = ({ amountLost }) => {
       // Additional lose animation or sound could be triggered here
-      console.log(`You lost ${amountLost}`)
+   
     }
 
     // Register event listeners

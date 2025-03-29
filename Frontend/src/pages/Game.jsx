@@ -58,7 +58,7 @@ const Game = () => {
         </div>
 
         {/* Main Game Section */}
-        <div className="w-full flex flex-col items-center mt-6 flex-grow">
+        <div className="w-full h-auto flex flex-col items-center mt-6 flex-grow">
           {/* Game Table */}
           <div className="game-table bg-gray-900 p-6 rounded-xl shadow-lg w-full max-w-5xl">
             {/* Total Bets Display */}
@@ -86,45 +86,65 @@ const Game = () => {
                 )}
               </div>
             </div>
-
-            {/* Card Areas */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              {/* ANDAR Section */}
-              <div className="flex flex-col items-center">
-                <h2 className="text-lg sm:text-xl font-bold text-red-500 mb-4">ANDAR</h2>
-                <div className="relative h-40 w-full flex justify-center">
-                  {gameState.andarCards.length > 0 ? (
-                    gameState.andarCards.map((card, index) => (
-                      <div key={`andar-${index}`} className="absolute" style={{ left: `${index * 20}px`, zIndex: index }}>
-                        <Card card={card} flipped={true} />
-                      </div>
-                    ))
-                  ) : (
-                    <div className="w-28 h-40 rounded-lg border-2 border-dashed border-gray-600 flex items-center justify-center">
-                      <span className="text-gray-500">No cards yet</span>
-                    </div>
-                  )}
-                </div>
-              </div>
-
-              {/* BAHAR Section */}
-              <div className="flex flex-col items-center">
-                <h2 className="text-lg sm:text-xl font-bold text-blue-500 mb-4">BAHAR</h2>
-                <div className="relative h-40 w-full flex justify-center">
-                  {gameState.baharCards.length > 0 ? (
-                    gameState.baharCards.map((card, index) => (
-                      <div key={`bahar-${index}`} className="absolute" style={{ left: `${index * 20}px`, zIndex: index }}>
-                        <Card card={card} flipped={true} />
-                      </div>
-                    ))
-                  ) : (
-                    <div className="w-28 h-40 rounded-lg border-2 border-dashed border-gray-600 flex items-center justify-center">
-                      <span className="text-gray-500">No cards yet</span>
-                    </div>
-                  )}
-                </div>
-              </div>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 w-full">
+  {/* ANDAR Section */}
+  <div className="flex flex-col items-center w-full relative ">
+    <h2 className="text-lg sm:text-xl font-bold text-red-500 mb-4">ANDAR</h2>
+    <div className="relative w-full flex justify-center  ">
+      {gameState.andarCards.length > 0 ? (
+        <div className="relative w-full h-auto">
+          {gameState.andarCards.map((card, index) => (
+            <div
+              key={`andar-${index}`}
+              className="absolute"
+              style={{
+                left: `${(index % 10) * 20}px`,
+                top: `${Math.floor(index / 10) * 40}px`,
+                zIndex: index,
+              }}
+            >
+              <Card card={card} flipped={true} />
             </div>
+          ))}
+        </div>
+      ) : (
+        <div className="w-28 h-40 rounded-lg border-2 border-dashed border-gray-600 flex items-center justify-center">
+          <span className="text-gray-500">No cards yet</span>
+        </div>
+      )}
+    </div>
+  </div>
+
+  {/* BAHAR Section */}
+  <div className="flex flex-col items-center w-full relative ">
+    <h2 className="text-lg sm:text-xl font-bold text-blue-500 mb-4">BAHAR</h2>
+    <div className="relative w-full flex justify-center  ">
+      {gameState.baharCards.length > 0 ? (
+        <div className="relative w-full h-auto">
+          {gameState.baharCards.map((card, index) => (
+            <div
+              key={`bahar-${index}`}
+              className="absolute"
+              style={{
+                left: `${(index % 10) * 20}px`,
+                top: `${Math.floor(index / 10) * 40}px`,
+                zIndex: index,
+              }}
+            >
+              <Card card={card} flipped={true} />
+            </div>
+          ))}
+        </div>
+      ) : (
+        <div className="w-28 h-40 rounded-lg border-2 border-dashed border-gray-600 flex items-center justify-center">
+          <span className="text-gray-500">No cards yet</span>
+        </div>
+      )}
+    </div>
+  </div>
+</div>
+
+
           </div>
         </div>
 

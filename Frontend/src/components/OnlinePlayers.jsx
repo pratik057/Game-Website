@@ -4,7 +4,7 @@ import { useState } from "react"
 
 const OnlinePlayers = ({ players = [] }) => {
   const [expanded, setExpanded] = useState(true)
-  console.log("Players:", players) // Debugging output
+ 
 
   if (!players || players.length === 0) {
     return (
