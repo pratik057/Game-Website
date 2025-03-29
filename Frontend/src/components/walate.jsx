@@ -50,6 +50,7 @@ const WalletControls = () => {
       })
       const data = await response.json()
       if (data.success) {
+        console.log("Transaction history:", data.transactions)
         setTransactions(data.transactions) // Store transactions
       } else {
         showNotification("Failed to load transactions", "error")

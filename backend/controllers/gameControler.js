@@ -128,32 +128,25 @@ export const getGameHistory = async (req, res) => {
 };
 
 
-
 export const getTransactionHistory = async (req, res) => {
   try {
-    const userId = req.user?.id; // Get user ID from request
+    const userId = req.user?.id;
     console.log("User ID:", userId);
 
     if (!userId) {
       return res.status(401).json({ success: false, message: "Unauthorized access." });
     }
 
-    // Retrieve user's transaction history
-    const user = await User.findById(userId).select("transactions");
-    const transactions = user?.transactions || [];
+    // Populate transactions to get actual details
+    const user = await User.findById(userId).populate("transactions");
 
-    console.log("Retrieved transaction history:", transactions);
+    if (!user || !user.transactions || user.transactions.length === 0) {
+      return res.status(200).json({ success: true, transactions: [], message: "No transaction history found." });
+    }
 
-    res.status(200).json({
-      success: true,
-      transactions: transactions.length ? transactions : [],
-      message:
-        transactions.length
-          ? "Transaction history retrieved."
-          : "No transaction history found.",
-    });
+    res.status(200).json({ success: true, transactions: user.transactions });
   } catch (error) {
     console.error("Get transaction history error:", error);
     res.status(500).json({ success: false, message: "Server error" });
   }
-}
+};
