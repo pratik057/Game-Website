@@ -138,7 +138,7 @@ export const getTransactionHistory = async (req, res) => {
     }
 
     // Populate transactions to get actual details
-    const user = await Transaction.findById(userId).populate("transactions");
+    const user = await User.findById(userId).populate("transactions");
 
     if (!user || !user.transactions || user.transactions.length === 0) {
       return res.status(200).json({ success: true, transactions: [], message: "No transaction history found." });
