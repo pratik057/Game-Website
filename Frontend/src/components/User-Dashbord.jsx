@@ -1,8 +1,17 @@
-import { Link } from "react-router-dom";
+import { Link ,useNavigate} from "react-router-dom";
+import { useContext } from "react"
 import girlimage from "../assets/model.png";
 import backgroundImage from "../assets/bg.png";
-
+import { UserContext } from "../context/UserContext"
 const GameUI = () => {
+const {logout } = useContext(UserContext)
+  const navigate = useNavigate()
+
+  const handleLogout = () => {
+    logout()
+    navigate("/")
+  }
+
   return (
     <div
       className="w-screen h-screen flex flex-col lg:flex-row items-center justify-center bg-cover bg-center relative overflow-hidden"
@@ -11,17 +20,18 @@ const GameUI = () => {
       {/* Left Section */}
       <div className="w-full lg:w-1/2 flex flex-col items-center text-center lg:text-left px-6 md:px-12">
         {/* Game Title */}
-        <h1 className="text-4xl md:text-6xl font-bold mt-8 md:mt-0">
+        <h1 className="text-3xl font-bold tracking-wider text-white sm:text-6xl">
           <span
-            className="text-yellow-400 font-extrabold tracking-wider"
+            className="bg-gradient-to-r from-yellow-400 to-yellow-300 bg-clip-text text-transparent zen-tokyo-zoo-regular "
             style={{ textShadow: "0 0 10px rgba(255, 215, 0, 0.5)" }}
           >
             ANDHAR
-          </span>{" "}
+          </span>
           <span
-            className="text-white font-extrabold tracking-wider"
+            className="bg-gradient-to-r from-blue-100 to-white bg-clip-text text-transparent zen-tokyo-zoo-regular"
             style={{ textShadow: "0 0 10px rgba(255, 255, 255, 0.5)" }}
           >
+            {" "}
             BAHAR
           </span>
         </h1>
@@ -42,14 +52,14 @@ const GameUI = () => {
               Withdraw
             </Link>
 
-            <Link to="/logout" className="w-64 text-white bg-gray-800 hover:bg-red-500 hover:text-white rounded-md transition-colors duration-300 py-3 text-xl text-center">
+            <button onClick={handleLogout} className="w-64 text-white cursor-pointer bg-gray-800 hover:bg-red-500 hover:text-white rounded-md transition-colors duration-300 py-3 text-xl text-center">
               Exit Game
-            </Link>
+            </button>
           </div>
         </main>
       </div>
 
-      <div className="w-1/2 h-full flex flex-end">
+      <div className="w-1/2 h-full flex flex-end max-sm:hidden justify-center items-center relative">
       <img
         src={girlimage}
         alt="Game Assistant"
