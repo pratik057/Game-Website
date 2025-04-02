@@ -11,6 +11,15 @@ dotenv.config();
 // @desc    Send OTP to email
 // @route   POST /api/users/send-otp
 // @access  Public
+function generateNumericOtp(length) {
+  let otp = '';
+  for (let i = 0; i < length; i++) {
+      otp += Math.floor(Math.random() * 10);  // Generates a random digit between 0 and 9
+  }
+  return otp;
+}
+
+ 
 export const sendOtp = async (req, res) => {
   try {
     const { email } = req.body;
@@ -22,9 +31,9 @@ export const sendOtp = async (req, res) => {
     if (userExists) {
       return res.status(400).json({ success: false, message: "User already exists" });
     }
+    const generatedOtp = generateNumericOtp(6);
 
-    const generatedOtp = otpGenerator.generate(6, { digits: true, alphabets: false, specialChars: false });
-
+console.log("Generated OTP:", generatedOtp); // Log the generated OTP for debugging
     const otp = new OTP({ email, otp: generatedOtp });
     await otp.save();
 
