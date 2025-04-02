@@ -486,7 +486,7 @@ const Register = () => {
     elevation={3}
     className="p-6 rounded-xl"
     sx={{
-      background: "linear-gradient(145deg, #1a1a2e, #16213e)",
+      background:"rgba(200, 200, 255, 0.25)",
       backdropFilter: "blur(10px)",
       padding: "24px",
       color: "#ffcc00",

@@ -65,7 +65,7 @@ function LoginScreen() {
           elevation={3}
           className="md:w-5/12 w-full p-6 rounded-xl"
           sx={{
-            background: "linear-gradient(145deg, #1a1a2e, #16213e)",
+            background: "rgba(200, 200, 255, 0.25)",
             backdropFilter: "blur(10px)",
             color: "#ffcc00",
             padding: "24px",
