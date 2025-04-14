@@ -41,6 +41,12 @@ const Navbar = () => {
               </div>
             </div>
           </div>
+
+          <h1 className="text-xl sm:text-3xl md:text-5xl font-extrabold text-center ">
+          <span className="text-red-500">Andar</span>{" "}
+          <span className="text-white">or</span>{" "}
+          <span className="text-blue-500">Bahar</span>
+        </h1>
           <div className="hidden md:block">
             <div className="flex items-center">
               {user ? (

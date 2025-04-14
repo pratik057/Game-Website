@@ -49,7 +49,7 @@ const BetControls = ({ onPlaceBet, disabled, currentBet }) => {
   }
 
   return (
-    <div className="lg:w-[60%] w-full bg-gray-800 rounded-lg p-4 shadow-lg mb-15">
+    <div className="lg:w-[60%] w-full bg-gray-800 rounded-lg p-4 shadow-lg ">
       <h3 className="text-xl font-bold text-white mb-4 ">Place Your Bet</h3>
 
       <div className="mb-4">

@@ -57,7 +57,7 @@ function App() {
               )}
             </main>
           </div>
-          {/* <ToastContainer position="bottom-right" theme="dark" /> */}
+          <ToastContainer position="bottom-right" theme="dark" />
         </Router>
       </SocketProvider>
     </UserProvider>

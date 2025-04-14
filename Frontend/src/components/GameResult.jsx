@@ -1,15 +1,12 @@
 "use client"
 
 import { useEffect } from "react"
+import { motion, AnimatePresence } from "framer-motion"
 import confetti from "canvas-confetti"
 
-// eslint-disable-next-line react/prop-types
 const GameResult = ({ result, winAmount, onPlayAgain, autoClose = false }) => {
-
-  
   useEffect(() => {
     if (result === "win") {
-      // Trigger confetti animation for win
       const duration = 3000
       const animationEnd = Date.now() + duration
       const defaults = { startVelocity: 30, spread: 360, ticks: 60, zIndex: 0 }
@@ -20,14 +17,10 @@ const GameResult = ({ result, winAmount, onPlayAgain, autoClose = false }) => {
 
       const interval = setInterval(() => {
         const timeLeft = animationEnd - Date.now()
-
-        if (timeLeft <= 0) {
-          return clearInterval(interval)
-        }
+        if (timeLeft <= 0) return clearInterval(interval)
 
         const particleCount = 50 * (timeLeft / duration)
 
-        // Since particles fall down, start a bit higher than random
         confetti({
           ...defaults,
           particleCount,
@@ -44,7 +37,6 @@ const GameResult = ({ result, winAmount, onPlayAgain, autoClose = false }) => {
     }
   }, [result])
 
-  // Auto-close after 5 seconds if autoClose is true
   useEffect(() => {
     if (autoClose) {
       const timer = setTimeout(() => {
@@ -58,39 +50,51 @@ const GameResult = ({ result, winAmount, onPlayAgain, autoClose = false }) => {
   if (!result) return null
 
   return (
-    <div className={`fixed inset-0 flex items-center justify-center z-50 bg-black bg-opacity-70`}>
-      <div
-        className={`bg-gray-800 rounded-lg p-8 max-w-md w-full text-center border-4 ${
-          result === "win" ? "border-yellow-500" : "border-red-500"
-        }`}
+    <AnimatePresence>
+      <motion.div
+        className="fixed inset-0 flex items-center justify-center z-50 backdrop-blur-sm bg-black/60 p-4"
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        exit={{ opacity: 0 }}
       >
-        <h2 className="text-3xl font-bold mb-4">
-          
-            <span className="text-yellow-500">{result} Won!</span>
-          
-        </h2>
+        <motion.div
+          className={`bg-gray-900 text-white rounded-2xl shadow-2xl p-6 sm:p-10 w-full max-w-md text-center border-4 ${
+            result === "win" ? "border-yellow-500" : "border-red-500"
+          }`}
+          initial={{ scale: 0.8, opacity: 0 }}
+          animate={{ scale: 1, opacity: 1 }}
+          exit={{ scale: 0.8, opacity: 0 }}
+          transition={{ type: "spring", stiffness: 300, damping: 20 }}
+        >
+          <h2 className="text-2xl sm:text-4xl font-extrabold mb-4">
+            {result === "win" ? (
+              <span className="text-yellow-400 drop-shadow-glow">🎉 You Won! 🎉</span>
+            ) : (
+              <span className="text-red-500">You Lost 😢</span>
+            )}
+          </h2>
 
-        {/* {result === "win" && (
-          <div className="mb-6">
-            <p className="text-gray-300 text-lg">You've won</p>
-            <p className="text-yellow-500 text-4xl font-bold">{winAmount}</p>
-          </div>
-        )} */}
+          {result === "win" && (
+            <div className="mb-6">
+              <p className="text-gray-300 text-lg">You’ve won</p>
+              <p className="text-yellow-400 text-4xl font-bold animate-pulse">₹{winAmount}</p>
+            </div>
+          )}
 
-        {!autoClose && (
-          <button
-            onClick={onPlayAgain}
-            className="bg-yellow-500 hover:bg-yellow-600 text-black font-bold py-3 px-6 rounded-lg text-lg transition-colors duration-300"
-          >
-            Play Again
-          </button>
-        )}
-
-        {autoClose && <div className="text-gray-400 mt-4">Next round starting soon...</div>}
-      </div>
-    </div>
+          {!autoClose ? (
+            <button
+              onClick={onPlayAgain}
+              className="bg-gradient-to-r from-yellow-400 to-yellow-600 hover:from-yellow-500 hover:to-yellow-700 text-black font-bold py-3 px-6 rounded-full text-lg shadow-md transition-all duration-300"
+            >
+              🔄 Play Again
+            </button>
+          ) : (
+            <div className="text-gray-400 mt-4 animate-pulse">⏳ Next round starting soon...</div>
+          )}
+        </motion.div>
+      </motion.div>
+    </AnimatePresence>
   )
 }
 
 export default GameResult
-

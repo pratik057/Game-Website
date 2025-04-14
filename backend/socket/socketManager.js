@@ -1171,6 +1171,173 @@ const startGameLoop = (io) => {
     }
   }
 
+
+
+  // //new logic
+  // const startDealing = async (io) => {
+  //   try {
+  //     gameState.status = "dealing";
+  
+  //     const deck = gameState.deck;
+  //     const joker = gameState.jokerCard;
+  
+  //     const andarCards = [];
+  //     const baharCards = [];
+  //     let matchFound = false;
+  //     let currentSide = "andar";
+  
+  //     while (!matchFound && deck.length > 0) {
+  //       const card = deck.pop();
+  
+  //       if (currentSide === "andar") {
+  //         andarCards.push(card);
+  //         gameState.andarCards = [...andarCards];
+  
+  //         if (card.value === joker.value) {
+  //           matchFound = true;
+  //           gameState.winningSide = "andar";
+  //           gameState.winningCardIndex = andarCards.length - 1;
+  //         }
+  //       } else {
+  //         baharCards.push(card);
+  //         gameState.baharCards = [...baharCards];
+  
+  //         if (card.value === joker.value) {
+  //           matchFound = true;
+  //           gameState.winningSide = "bahar";
+  //           gameState.winningCardIndex = baharCards.length - 1;
+  //         }
+  //       }
+  
+  //       // Emit card to clients
+  //       try {
+  //         io.emit("cardDealt", {
+  //           side: currentSide,
+  //           card,
+  //           index: currentSide === "andar" ? andarCards.length - 1 : baharCards.length - 1,
+  //         });
+  //       } catch (error) {
+  //         console.error("Error emitting card dealt:", error);
+  //       }
+  
+  //       // Alternate side
+  //       currentSide = currentSide === "andar" ? "bahar" : "andar";
+  
+  //       await new Promise((resolve) => setTimeout(resolve, 1000));
+  //     }
+  
+  //     // If no match found, randomly pick winner (very rare fallback)
+  //     if (!matchFound) {
+  //       const fallbackSide = Math.random() < 0.3 ? "andar" : "bahar";
+  //       gameState.winningSide = fallbackSide;
+  //       gameState.winningCardIndex = fallbackSide === "andar" ? andarCards.length - 1 : baharCards.length - 1;
+  //     }
+  
+  //     gameState.lastGameResult = {
+  //       jokerCard: joker,
+  //       winningSide: gameState.winningSide,
+  //       andarCards,
+  //       baharCards,
+  //       timestamp: new Date(),
+  //     };
+  
+  //     const winners = [];
+  //     const losers = [];
+  //     const updatePromises = [];
+  
+  //     Object.values(gameState.players).forEach((player) => {
+  //       if (player.bet) {
+  //         if (player.bet.side === gameState.winningSide) {
+  //           const winnings = player.bet.amount * 2;
+  //           player.balance += winnings;
+  
+  //           winners.push({
+  //             id: player.id,
+  //             username: player.username,
+  //             winnings: player.bet.amount,
+  //           });
+  
+  //           if (player.userId) {
+  //             updatePromises.push(
+  //               User.findByIdAndUpdate(player.userId, { $inc: { balance: winnings } }).catch((error) =>
+  //                 console.error(`Error updating balance for user ${player.userId}:`, error)
+  //               )
+  //             );
+  //           }
+  
+  //           try {
+  //             io.to(player.id).emit("balanceUpdated", { balance: player.balance });
+  //             io.to(player.id).emit("winMessage", { amountWon: player.bet.amount });
+  //           } catch (error) {
+  //             console.error("Error emitting win message:", error);
+  //           }
+  //         } else {
+  //           losers.push({
+  //             id: player.id,
+  //             username: player.username,
+  //             loss: player.bet.amount,
+  //           });
+  
+  //           try {
+  //             io.to(player.id).emit("loseMessage", { amountLost: player.bet.amount });
+  //           } catch (error) {
+  //             console.error("Error emitting lose message:", error);
+  //           }
+  //         }
+  //       }
+  //     });
+  
+  //     try {
+  //       await Promise.allSettled(updatePromises);
+  //     } catch (error) {
+  //       console.error("Error updating user balances:", error);
+  //     }
+  
+  //     try {
+  //       const gameRecords = Object.values(gameState.players)
+  //         .map((player) => {
+  //           if (!player.bet) return null;
+  
+  //           return {
+  //             user: player.userId,
+  //             betAmount: player.bet.amount,
+  //             betSide: player.bet.side,
+  //             jokerCard: gameState.jokerCard,
+  //             andarCards: gameState.andarCards,
+  //             baharCards: gameState.baharCards,
+  //             winningSide: gameState.winningSide,
+  //             winningCardIndex: gameState.winningCardIndex,
+  //             result: player.bet.side === gameState.winningSide ? "win" : "lose",
+  //             winAmount: player.bet.side === gameState.winningSide ? player.bet.amount * 2 : 0,
+  //           };
+  //         })
+  //         .filter((record) => record !== null);
+  
+  //       await Game.insertMany(gameRecords);
+  //     } catch (error) {
+  //       console.error("Error saving game record:", error);
+  //     }
+  
+  //     try {
+  //       io.emit("gameResult", {
+  //         winningSide: gameState.winningSide,
+  //         winningCardIndex: gameState.winningCardIndex,
+  //         winners,
+  //         losers,
+  //       });
+  //     } catch (error) {
+  //       console.error("Error emitting game result:", error);
+  //     }
+  
+  //     await new Promise((resolve) => setTimeout(resolve, 10000));
+  //     resetGame();
+  //   } catch (error) {
+  //     console.error("Error in dealing phase:", error);
+  //     setTimeout(() => resetGame(), 5000);
+  //   }
+  // };
+  
+
   // Start the game loop
   resetGame()
 }

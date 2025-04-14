@@ -41,7 +41,7 @@ const {logout } = useContext(UserContext)
           <div className="bg-[#0c1228] rounded-lg shadow-2xl p-6 w-full max-w-md flex flex-col items-center">
             <Link to="/game" className="w-64 h-14 mb-4 relative overflow-hidden rounded-md group flex items-center justify-center">
               <div className="absolute inset-0 bg-gradient-to-b from-yellow-300 via-yellow-400 to-orange-500 opacity-80 transition-opacity duration-300 group-hover:opacity-100"></div>
-              <span className="relative z-10 text-white font-bold text-xl">New Game</span>
+              <span className="relative z-10 text-white font-bold text-xl">Play With AI</span>
             </Link>
 
             <Link to="/wallet" className="w-64 text-white bg-gray-800 hover:bg-amber-300 hover:text-black rounded-md transition-colors duration-300 py-3 text-xl mb-4 text-center">
@@ -53,7 +53,7 @@ const {logout } = useContext(UserContext)
             </Link>
 
             <button onClick={handleLogout} className="w-64 text-white cursor-pointer bg-gray-800 hover:bg-red-500 hover:text-white rounded-md transition-colors duration-300 py-3 text-xl text-center">
-              Exit Game
+             Logout Game
             </button>
           </div>
         </main>

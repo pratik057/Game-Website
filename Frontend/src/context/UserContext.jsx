@@ -14,6 +14,8 @@ export const UserProvider = ({ children }) => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
+  const API_BASE = "http://localhost:5000/api/auth";
+
   useEffect(() => {
     const token = localStorage.getItem("token");
     if (token) {
@@ -25,11 +27,11 @@ export const UserProvider = ({ children }) => {
 
   const fetchUserData = async (token) => {
     try {
-      const response = await axios.get("https://game-website-yyuo.onrender.com/api/auth/me", {
+      const response = await axios.get(`${API_BASE}/me`, {
         headers: { Authorization: `Bearer ${token}` },
       });
       setUser(response.data);
-      setBalance(response.data.balance);
+      setBalance(response.data.balance || 0);
     } catch (err) {
       console.error("Error fetching user data:", err);
       localStorage.removeItem("token");
@@ -41,13 +43,13 @@ export const UserProvider = ({ children }) => {
 
   const login = async (email, password) => {
     try {
-      const response = await axios.post(
-        "https://game-website-yyuo.onrender.com/api/auth/login",
-        { email, password }
-      );
+      const response = await axios.post(`${API_BASE}/login`, {
+        email,
+        password,
+      });
       localStorage.setItem("token", response.data.token);
       setUser(response.data.user);
-      setBalance(response.data.user.balance);
+      setBalance(response.data.user.balance || 0);
       toast.success("Login successful!");
       return true;
     } catch (err) {
@@ -56,16 +58,16 @@ export const UserProvider = ({ children }) => {
     }
   };
 
-  const register = async (username, email, password) => {
+  const register = async (username, email, password, mobileNo) => {
     try {
-      // eslint-disable-next-line no-unused-vars
-      const response = await axios.post(
-        "https://game-website-yyuo.onrender.com/api/auth/register",
-        { username, email, password }
-      );
-      await login(email, password); 
-      toast.success("Registration successful! Please login.");
-      return true; // ✅ Removed the incorrect `na` and properly returned true
+      await axios.post(`${API_BASE}/register`, {
+        username,
+        email,
+        password,
+        mobileNo,
+      });
+      // Auto-login after registration
+      return await login(email, password);
     } catch (err) {
       toast.error(err.response?.data?.message || "Registration failed");
       return false;
@@ -77,30 +79,6 @@ export const UserProvider = ({ children }) => {
     setUser(null);
     setBalance(0);
     toast.info("Logged out successfully");
-  };
-
-  const sendOtp = async (email) => {
-    try {
-      const response = await axios.post(
-        "https://game-website-yyuo.onrender.com/api/auth/send-otp",
-        { email }
-      );
-      return response.data.message;
-    } catch (error) {
-      return error.response?.data?.message || "Error sending OTP";
-    }
-  };
-
-  const verifyOtp = async (email, otp) => {
-    try {
-      const response = await axios.post(
-        "https://game-website-yyuo.onrender.com/api/auth/verify-otp",
-        { email, otp }
-      );
-      return response.data.message;
-    } catch (error) {
-      return error.response?.data?.message || "Error verifying OTP";
-    }
   };
 
   const updateBalance = (newBalance) => {
@@ -117,8 +95,6 @@ export const UserProvider = ({ children }) => {
         login,
         register,
         logout,
-        sendOtp,
-        verifyOtp,
         updateBalance,
       }}
     >

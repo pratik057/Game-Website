@@ -18,15 +18,15 @@ const Game = () => {
     gameState.status === "result" &&
     currentBet &&
     currentBet.side === gameState.winningSide;
-  const gameEndRef = useRef(null);
+  // const gameEndRef = useRef(null);
 
-  useEffect(() => {
-    gameEndRef.current?.scrollIntoView({ behavior: "smooth" });
-  }, [gameState.andarCards, gameState.baharCards, gameState.status]);
+  // useEffect(() => {
+  //   gameEndRef.current?.scrollIntoView({ behavior: "smooth" });
+  // }, [gameState.andarCards, gameState.baharCards, gameState.status]);
 
   const calculateWinAmount = () => {
     if (!userWon || !currentBet) return 0;
-    const multiplier = currentBet.side === "andar" ? 1.9 : 2.0;
+    const multiplier = currentBet.side === "andar" ? 2.0 : 2.0;
     return Math.floor(currentBet.amount * multiplier);
   };
 
@@ -37,11 +37,11 @@ const Game = () => {
       <Navbar />
       <div className="min-h-screen w-full flex flex-col justify-center items-center bg-gradient-to-b from-gray-900 to-black text-white px-4 md:px-8 lg:px-16">
         {/* Game Title */}
-        <h1 className="text-2xl sm:text-3xl md:text-5xl font-extrabold text-center mt-6">
+        {/* <h1 className="text-2xl sm:text-3xl md:text-5xl font-extrabold text-center mt-6">
           <span className="text-red-500">Andar</span>{" "}
           <span className="text-white">or</span>{" "}
           <span className="text-blue-500">Bahar</span>
-        </h1>
+        </h1> */}
 
         {/* Game Status */}
         <div className="w-full max-w-5xl mt-6 p-4 bg-gray-800 rounded-xl shadow-lg flex flex-col sm:flex-row justify-between items-center gap-4">
@@ -68,13 +68,21 @@ const Game = () => {
                   : "text-gray-400"
               }`}
             >
-              {gameState.status === "betting"
-                ? "Betting Open"
-                : gameState.status === "dealing"
-                ? "Dealing Cards"
-                : gameState.status === "result"
-                ? "Round Complete"
-                : "Waiting"}
+              {gameState.status === "betting" ? (
+                gameState.bettingTimeLeft === 0 ? (
+                  <span className="text-red-500">
+                    Bets off. Wait for round.
+                  </span>
+                ) : (
+                  <span className="text-green-500">Betting Open</span>
+                )
+              ) : gameState.status === "dealing" ? (
+                <span>Dealing Cards</span>
+              ) : gameState.status === "result" ? (
+                <span>Round Complete</span>
+              ) : (
+                <span>Waiting</span>
+              )}
             </span>
           </div>
           {gameState.status === "betting" && (
@@ -92,15 +100,15 @@ const Game = () => {
         </div>
 
         {/* Main Game Section */}
-        <div className="w-full flex flex-col items-center mt-6 flex-grow">
+        <div className="w-full flex flex-col items-center mt-3 flex-grow">
           {/* Game Table */}
           <div className="game-table bg-gray-900 p-6 rounded-xl shadow-lg w-full max-w-5xl">
             {/* Total Bets Display */}
-            <div className="w-full flex flex-col sm:flex-row justify-between mb-6 gap-4">
+            {/* <div className="w-full flex flex-col sm:flex-row justify-between mb-6 gap-4">
               <div className="bg-red-900/30 px-4 py-2 rounded-lg text-center w-full sm:w-1/2">
                 <div className="text-sm text-gray-300">Total Andar Bets</div>
                 <div className="text-xl font-bold text-red-500">
-                  {gameState.totalBets.andar}
+      uu            {gameState.totalBets.andar}
                 </div>
               </div>
               <div className="bg-blue-900/30 px-4 py-2 rounded-lg text-center w-full sm:w-1/2">
@@ -109,7 +117,7 @@ const Game = () => {
                   {gameState.totalBets.bahar}
                 </div>
               </div>
-            </div>
+            </div> */}
 
             {/* Joker Card */}
             <div className="flex flex-col items-center mb-6">
@@ -179,7 +187,6 @@ const Game = () => {
                 <div className="relative w-full flex justify-center min-h-[200px] overflow-hidden">
                   {gameState.baharCards.length > 0 ? (
                     <div className="relative w-full h-auto">
-                      {console.log("game state", gameState)}
                       {gameState.baharCards.map((card, index) => (
                         <div
                           key={`bahar-${index}`}
@@ -213,11 +220,16 @@ const Game = () => {
           </div>
         </div>
 
-        <div ref={gameEndRef} />
-        {gameState.status === "result" && currentBet && <GameResult result={gameState.winningSide} winAmount={winAmount} onPlayAgain={() => {}} autoClose={true} />}
-   
+        {/* <div ref={gameEndRef} /> */}
 
-
+        {gameState.status === "result" && currentBet && (
+          <GameResult
+            result={userWon ? "win" : "lose"}
+            winAmount={winAmount}
+            onPlayAgain={() => {}} // No need to do anything, game restarts automatically
+            autoClose={true}
+          />
+        )}
       </div>
     </>
   );

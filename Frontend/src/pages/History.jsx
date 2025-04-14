@@ -29,11 +29,14 @@ const History = () => {
       const token = localStorage.getItem("token");
       try {
         console.log("Fetching game history...");
-        const response = await axios.get("https://game-website-yyuo.onrender.com/api/games/history", {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        });
+        const response = await axios.get(
+          "http://localhost:5000/api/games/history",
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          }
+        );
 
         console.log("API Response:", response.data);
 
@@ -48,9 +51,18 @@ const History = () => {
 
         // Calculate statistics
         const totalGames = response.data.games.length;
-        const wins = response.data.games.filter((game) => game.result === "win").length;
-        const totalWagered = response.data.games.reduce((sum, game) => sum + (game.betAmount || 0), 0);
-        const totalWon = response.data.games.reduce((sum, game) => (game.result === "win" ? sum + (game.winAmount || 0) : sum), 0);
+        const wins = response.data.games.filter(
+          (game) => game.result === "win"
+        ).length;
+        const totalWagered = response.data.games.reduce(
+          (sum, game) => sum + (game.betAmount || 0),
+          0
+        );
+        const totalWon = response.data.games.reduce(
+          (sum, game) =>
+            game.result === "win" ? sum + (game.winAmount || 0) : sum,
+          0
+        );
 
         setStats({
           totalGames,
@@ -86,7 +98,9 @@ const History = () => {
       <div className="text-center py-12">
         <h1 className="text-3xl font-bold mb-4">Game History</h1>
         <div className="bg-gray-800 rounded-lg p-8 max-w-md mx-auto">
-          <p className="text-xl mb-4">Please log in to view your game history.</p>
+          <p className="text-xl mb-4">
+            Please log in to view your game history.
+          </p>
           <button
             onClick={() => document.getElementById("login-btn").click()}
             className="bg-yellow-500 hover:bg-yellow-600 text-black font-bold py-2 px-6 rounded-lg"
@@ -155,17 +169,32 @@ const History = () => {
                 </tr>
               </thead>
               <tbody>
-                {games.map((game) => (
-                  <tr key={game._id} className="border-t border-gray-700 hover:bg-gray-700/50">
-                    <td className="px-4 py-3 text-gray-300">{new Date(game.createdAt).toLocaleString()}</td>
+                {games.slice(0, 10).map((game) => (
+                  <tr
+                    key={game._id}
+                    className="border-t border-gray-700 hover:bg-gray-700/50"
+                  >
+                    <td className="px-4 py-3 text-gray-300">
+                      {new Date(game.createdAt).toLocaleString()}
+                    </td>
                     <td className="px-4 py-3">{game.betAmount.toFixed(2)}</td>
                     <td className="px-4 py-3 text-blue-500">{game.betSide}</td>
                     <td className="px-4 py-3">
-                      <span className={`px-2 py-1 rounded-full text-xs ${game.result === "win" ? "text-green-500" : "text-red-500"}`}>
+                      <span
+                        className={`px-2 py-1 rounded-full text-xs ${
+                          game.result === "win"
+                            ? "text-green-500"
+                            : "text-red-500"
+                        }`}
+                      >
                         {game.result}
                       </span>
                     </td>
-                    <td className="px-4 py-3 text-right">{game.result === "win" ? `+${game.winAmount.toFixed(2)}` : `-${game.betAmount.toFixed(2)}`}</td>
+                    <td className="px-4 py-3 text-right">
+                      {game.result === "win"
+                        ? `+${game.winAmount.toFixed(2)}`
+                        : `-${game.betAmount.toFixed(2)}`}
+                    </td>
                   </tr>
                 ))}
               </tbody>
