@@ -14,7 +14,7 @@ export const UserProvider = ({ children }) => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
-  const API_BASE = "http://localhost:5000/api/auth";
+  const API_BASE = "https://game-website-yyuo.onrender.com/api/auth";
 
   useEffect(() => {
     const token = localStorage.getItem("token");

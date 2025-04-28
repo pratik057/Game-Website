@@ -43,7 +43,7 @@ const Users = () => {
     }
 
     try {
-      const res = await axios.get("http://localhost:5000/api/admin/users", {
+      const res = await axios.get("https://game-website-yyuo.onrender.com/api/admin/users", {
         headers: {
           Authorization: `Bearer ${token}`,
           "Content-Type": "application/json",
@@ -112,7 +112,7 @@ const Users = () => {
 
     try {
       await axios.put(
-        `http://localhost:5000/api/admin/users/${selectedUser._id}`,
+        `https://game-website-yyuo.onrender.com/api/admin/users/${selectedUser._id}`,
         { ...formData, balance: updatedBalance },
         { headers: {
           Authorization: `Bearer ${token}`,

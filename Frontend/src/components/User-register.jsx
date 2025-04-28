@@ -1,5 +1,4 @@
 import { useState, useContext } from "react";
-import NewBackground from "../assets/user-bg.png";
 import { useNavigate } from "react-router-dom";
 import {
   TextField,
@@ -14,6 +13,8 @@ import {
 } from "@mui/material";
 import { Visibility, VisibilityOff } from "@mui/icons-material";
 import { UserContext } from "../context/UserContext";
+import NewBackground from "../assets/user-bg.png";
+import Logo from "../assets/logo.png"; // Make sure the path is correct
 
 const Register = () => {
   const [email, setEmail] = useState("");
@@ -23,7 +24,7 @@ const Register = () => {
   const [message, setMessage] = useState("");
   const [mobileNo, setMobileNo] = useState("");
   const [showPassword, setShowPassword] = useState(false);
-  const { register, login } = useContext(UserContext);  // Assuming there's a login function in context
+  const { register } = useContext(UserContext);
   const navigate = useNavigate();
 
   const handleRegister = async (e) => {
@@ -32,25 +33,37 @@ const Register = () => {
       setMessage("Passwords do not match");
       return;
     }
-    const responseMessage = await register(username, email, password,mobileNo);
+    const responseMessage = await register(username, email, password, mobileNo);
     setMessage(responseMessage);
 
     if (responseMessage) {
       navigate("/dashboard");
     }
   };
+
   const handleClickShowPassword = () => {
     setShowPassword(!showPassword);
   };
 
   return (
     <div
-      className="h-screen w-full flex items-center justify-center bg-cover bg-center"
+      className="min-h-screen w-full flex flex-col items-center justify-start bg-cover bg-center px-4 py-8 relative"
       style={{ backgroundImage: `url(${NewBackground})` }}
     >
-      <Container maxWidth="lg" className="flex flex-col md:flex-row items-center justify-between">
+      {/* Logo */}
+      <div className="w-full flex justify-center md:justify-start md:pl-8 absolute top-4 md:top-6">
+        <img
+          src={Logo}
+          alt="Logo"
+          className="w-20 md:w-24 lg:w-28"
+          style={{ maxWidth: "150px", objectFit: "contain" }}
+        />
+      </div>
+
+      {/* Main Container */}
+      <Container maxWidth="lg" className="flex flex-col md:flex-row items-center justify-between w-full pt-28">
         {/* Left Side - Title and description */}
-        <div className="text-white mb-10 md:mb-0 md:w-1/2 md:pr-8">
+        <div className="text-white mb-10 md:mb-0 md:w-1/2 md:pr-8 text-center md:text-left">
           <h1 className="text-4xl md:text-5xl font-bold mb-6">
             <span className="text-yellow-400">ANDAR</span> <span className="text-white">BAHAR</span>
           </h1>
@@ -71,10 +84,10 @@ const Register = () => {
           }}
         >
           <Box className="text-center mb-4">
-            <Typography variant="subtitle1" className="font-medium" sx={{ color: "#ffcc00" }}>
+            <Typography variant="subtitle1" sx={{ color: "#ffcc00", fontWeight: 500 }}>
               WELCOME
             </Typography>
-            <Typography variant="h5" className="font-bold" sx={{ color: "#ffcc00" }}>
+            <Typography variant="h5" sx={{ color: "#ffcc00", fontWeight: "bold" }}>
               Create your Account
             </Typography>
           </Box>
@@ -91,14 +104,11 @@ const Register = () => {
                 "& .MuiOutlinedInput-root": {
                   "& fieldset": { borderColor: "rgba(255, 204, 0, 0.3)" },
                   "&:hover fieldset": { borderColor: "rgba(255, 204, 0, 0.5)" },
-                  "&.Mui-focused fieldset": {
-                    borderColor: "rgba(255, 204, 0, 0.7)",
-                  },
+                  "&.Mui-focused fieldset": { borderColor: "rgba(255, 204, 0, 0.7)" },
                   color: "#ffcc00",
                 },
                 backgroundColor: "rgba(255, 255, 255, 0.05)",
                 borderRadius: "8px",
-                marginBottom: "16px",
               }}
             />
             <TextField
@@ -113,14 +123,11 @@ const Register = () => {
                 "& .MuiOutlinedInput-root": {
                   "& fieldset": { borderColor: "rgba(255, 204, 0, 0.3)" },
                   "&:hover fieldset": { borderColor: "rgba(255, 204, 0, 0.5)" },
-                  "&.Mui-focused fieldset": {
-                    borderColor: "rgba(255, 204, 0, 0.7)",
-                  },
+                  "&.Mui-focused fieldset": { borderColor: "rgba(255, 204, 0, 0.7)" },
                   color: "#ffcc00",
                 },
                 backgroundColor: "rgba(255, 255, 255, 0.05)",
                 borderRadius: "8px",
-                marginBottom: "16px",
               }}
             />
             <TextField
@@ -135,14 +142,11 @@ const Register = () => {
                 "& .MuiOutlinedInput-root": {
                   "& fieldset": { borderColor: "rgba(255, 204, 0, 0.3)" },
                   "&:hover fieldset": { borderColor: "rgba(255, 204, 0, 0.5)" },
-                  "&.Mui-focused fieldset": {
-                    borderColor: "rgba(255, 204, 0, 0.7)",
-                  },
+                  "&.Mui-focused fieldset": { borderColor: "rgba(255, 204, 0, 0.7)" },
                   color: "#ffcc00",
                 },
                 backgroundColor: "rgba(255, 255, 255, 0.05)",
                 borderRadius: "8px",
-                marginBottom: "16px",
               }}
             />
             <TextField
@@ -156,11 +160,7 @@ const Register = () => {
               InputProps={{
                 endAdornment: (
                   <InputAdornment position="end">
-                    <IconButton
-                      onClick={handleClickShowPassword}
-                      edge="end"
-                      sx={{ color: "#ffcc00" }}
-                    >
+                    <IconButton onClick={handleClickShowPassword} edge="end" sx={{ color: "#ffcc00" }}>
                       {showPassword ? <VisibilityOff /> : <Visibility />}
                     </IconButton>
                   </InputAdornment>
@@ -170,14 +170,11 @@ const Register = () => {
                 "& .MuiOutlinedInput-root": {
                   "& fieldset": { borderColor: "rgba(255, 204, 0, 0.3)" },
                   "&:hover fieldset": { borderColor: "rgba(255, 204, 0, 0.5)" },
-                  "&.Mui-focused fieldset": {
-                    borderColor: "rgba(255, 204, 0, 0.7)",
-                  },
+                  "&.Mui-focused fieldset": { borderColor: "rgba(255, 204, 0, 0.7)" },
                   color: "#ffcc00",
                 },
                 backgroundColor: "rgba(255, 255, 255, 0.05)",
                 borderRadius: "8px",
-                marginBottom: "16px",
               }}
             />
             <TextField
@@ -192,14 +189,11 @@ const Register = () => {
                 "& .MuiOutlinedInput-root": {
                   "& fieldset": { borderColor: "rgba(255, 204, 0, 0.3)" },
                   "&:hover fieldset": { borderColor: "rgba(255, 204, 0, 0.5)" },
-                  "&.Mui-focused fieldset": {
-                    borderColor: "rgba(255, 204, 0, 0.7)",
-                  },
+                  "&.Mui-focused fieldset": { borderColor: "rgba(255, 204, 0, 0.7)" },
                   color: "#ffcc00",
                 },
                 backgroundColor: "rgba(255, 255, 255, 0.05)",
                 borderRadius: "8px",
-                marginBottom: "16px",
               }}
             />
 

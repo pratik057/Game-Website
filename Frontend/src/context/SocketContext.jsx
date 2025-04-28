@@ -47,7 +47,7 @@
 //         // Create new socket connection
 //         const socketInstance = io(
 //           import.meta.env.VITE_SOCKET_URL ||
-//             "http://localhost:5000",
+//             "https://game-website-yyuo.onrender.com",
 //           {
 //             transports: ["websocket"],
 //             autoConnect: true,
@@ -502,7 +502,7 @@ export const SocketProvider = ({ children }) => {
         // Create new socket connection
         const socketInstance = io(
           import.meta.env.VITE_SOCKET_URL ||
-            "http://localhost:5000",
+            "https://game-website-yyuo.onrender.com",
           {
             transports: ["websocket"],
             autoConnect: true,

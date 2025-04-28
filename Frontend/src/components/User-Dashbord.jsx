@@ -3,6 +3,7 @@ import { useContext } from "react"
 import girlimage from "../assets/model.png";
 import backgroundImage from "../assets/bg.png";
 import { UserContext } from "../context/UserContext"
+import Logo from "../assets/logo.png"
 const GameUI = () => {
 const {logout } = useContext(UserContext)
   const navigate = useNavigate()
@@ -17,6 +18,15 @@ const {logout } = useContext(UserContext)
       className="w-screen h-screen flex flex-col lg:flex-row items-center justify-center bg-cover bg-center relative overflow-hidden"
       style={{ backgroundImage: `url(${backgroundImage})` }}
     >
+       <img
+        src={Logo}
+       height={100}
+        width={100}
+        className="absolute top-4 right-4 text-red-700 hover:text-white transition-colors duration-200 text-5xl font-bold z-50 "
+        aria-label="Close"
+      >
+       
+      </img>
       {/* Left Section */}
       <div className="w-full lg:w-1/2 flex flex-col items-center text-center lg:text-left px-6 md:px-12">
         {/* Game Title */}
@@ -41,7 +51,7 @@ const {logout } = useContext(UserContext)
           <div className="bg-[#0c1228] rounded-lg shadow-2xl p-6 w-full max-w-md flex flex-col items-center">
             <Link to="/game" className="w-64 h-14 mb-4 relative overflow-hidden rounded-md group flex items-center justify-center">
               <div className="absolute inset-0 bg-gradient-to-b from-yellow-300 via-yellow-400 to-orange-500 opacity-80 transition-opacity duration-300 group-hover:opacity-100"></div>
-              <span className="relative z-10 text-white font-bold text-xl">Play With AI</span>
+              <span className="relative z-10 text-white font-bold text-xl">Play the Game</span>
             </Link>
 
             <Link to="/wallet" className="w-64 text-white bg-gray-800 hover:bg-amber-300 hover:text-black rounded-md transition-colors duration-300 py-3 text-xl mb-4 text-center">

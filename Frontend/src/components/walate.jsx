@@ -5,7 +5,7 @@ import { UserContext } from "../context/UserContext";
 import { motion } from "framer-motion";
 import { ArrowDownCircle, ArrowUpCircle, Loader2 } from "lucide-react";
 import { Link } from "react-router-dom";
-
+import Logo from "../assets/logo.png"; // Import your logo
 const WalletControls = ({ onClose }) => {
   const { user, balance, updateBalance } = useContext(UserContext);
   const [amount, setAmount] = useState("");
@@ -40,7 +40,7 @@ const WalletControls = ({ onClose }) => {
 
   const fetchTransactionHistory = async () => {
     try {
-      const response = await fetch(`http://localhost:5000/api/games/transactions`, {
+      const response = await fetch(`https://game-website-yyuo.onrender.com/api/games/transactions`, {
         method: "GET",
         headers: {
           "Content-Type": "application/json",
@@ -69,18 +69,40 @@ const WalletControls = ({ onClose }) => {
     const whatsappLink = `https://wa.me/918975461685?text=${whatsappMessage}`;
     window.open(whatsappLink, "_blank");
   };
+  const handleWithdraw = () => {
+    const whatsappMessage = `UserId:${user.id} %0AName: ${user.username}%0AEmail: ${user.email}%0AAmount to Withdraw: ${amount}`;
+    const whatsappLink = `https://wa.me/918975461685?text=${whatsappMessage}`;
+    window.open(whatsappLink, "_blank");
+  };
 
   return (
-    <div className="relative min-h-screen w-full flex flex-col items-center justify-center bg-gray-900 p-4 sm:p-6">
-      
-      {/* ❌ Close Button */}
-      <Link
+
+    <>
+   <nav className="h-[100px] p-4 shadow-md">
+      <div className="flex justify-between items-center max-w-5xl mx-auto">
+         <img
+              src={Logo}
+             height={100}
+              width={100}
+              className="absolute top-0 left-4 text-red-700 hover:text-white transition-colors duration-200 text-5xl font-bold z-50 "
+              aria-label="Close"
+            >
+              </img>
+              <Link
         to="/"
         className="absolute top-4 right-4 text-red-700 hover:text-white transition-colors duration-200 text-5xl font-bold z-50 "
         aria-label="Close"
       >
         &times;
       </Link>
+      </div>
+
+
+   </nav>
+    <div className="relative min-h-screen w-full flex flex-col items-center justify-center bg-gray-900 p-4 sm:p-6">
+    
+      {/* ❌ Close Button */}
+     
 
       <div className="w-full max-w-5xl bg-gradient-to-br from-gray-800 to-gray-700 p-6 sm:p-8 rounded-2xl shadow-2xl text-white border border-gray-700 flex flex-col lg:flex-row gap-6">
         
@@ -102,7 +124,7 @@ const WalletControls = ({ onClose }) => {
             </button>
           </div>
           <motion.input type="number" className="w-full p-3 mt-4 rounded-lg bg-gray-700/50 border border-gray-600 text-white focus:ring-2 focus:ring-blue-500" placeholder="Enter amount" value={amount} onChange={(e) => setAmount(e.target.value)} disabled={loading} min="1" whileFocus={{ scale: 1.02 }} />
-          <motion.button className={`w-full mt-4 py-3 rounded-lg font-medium flex items-center justify-center gap-2 transition-all ${activeTab === "deposit" ? "bg-green-600 hover:bg-green-700" : "bg-red-600 hover:bg-red-700"}`} onClick={handleDeposit} disabled={loading}>
+          <motion.button className={`w-full mt-4 py-3 rounded-lg font-medium flex items-center justify-center gap-2 transition-all ${activeTab === "deposit" ? "bg-green-600 hover:bg-green-700" : "bg-red-600 hover:bg-red-700"}`} onClick={activeTab === 'deposit' ? handleDeposit : handleWithdraw} disabled={loading}>
             {loading ? <Loader2 className="animate-spin mr-2" size={20} /> : <ArrowDownCircle size={20} />} 
             <span>{loading ? "Processing..." : activeTab === "deposit" ? "Add Funds" : "Withdraw Funds"}</span>
           </motion.button>
@@ -131,7 +153,7 @@ const WalletControls = ({ onClose }) => {
           </div>
         </div>
       </div>
-    </div>
+    </div></>
   );
 };
 

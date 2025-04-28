@@ -14,23 +14,23 @@ import {
 } from "@mui/material";
 import { Visibility, VisibilityOff } from "@mui/icons-material";
 import { useNavigate } from "react-router-dom";
-import { UserContext } from "../context/UserContext"; // Import UserContext
+import { UserContext } from "../context/UserContext";
 import NewBackground from "../assets/user-bg.png";
+import Logo from "../assets/logo.png";
 
 function LoginScreen() {
   const [showPassword, setShowPassword] = useState(false);
-  const navigate = useNavigate();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const { login } = useContext(UserContext); // Get login function from context
 
-  const handleClickShowPassword = () => {
-    setShowPassword(!showPassword);
-  };
+  const { login } = useContext(UserContext);
+  const navigate = useNavigate();
+
+  const handleClickShowPassword = () => setShowPassword(!showPassword);
 
   const handleLogin = async (e) => {
     e.preventDefault();
-    const success = await login(email, password); // Use context login function
+    const success = await login(email, password);
     if (success) {
       navigate("/dashboard");
     }
@@ -38,24 +38,34 @@ function LoginScreen() {
 
   return (
     <div
-      className="h-screen w-full flex items-center justify-center bg-cover bg-center"
+      className="min-h-screen w-full flex flex-col items-center justify-start bg-cover bg-center px-4 py-8 relative"
       style={{ backgroundImage: `url(${NewBackground})` }}
     >
+      {/* Logo - Top Left on Desktop, Centered on Mobile */}
+      <div className="w-full flex justify-center md:justify-start md:pl-8 absolute top-4 md:top-6">
+        <img
+          src={Logo}
+          alt="Logo"
+          className="w-20 md:w-24 lg:w-28"
+          style={{ maxWidth: "150px", objectFit: "contain" }}
+        />
+      </div>
+
+      {/* Main Container */}
       <Container
         maxWidth="lg"
-        className="flex flex-col md:flex-row items-center justify-between"
+        className="flex flex-col md:flex-row items-center justify-between w-full pt-28"
       >
-        {/* Left Side - Title and description */}
-        <div className="text-white mb-10 md:mb-0 md:w-1/2 md:pr-8">
+        {/* Left Side - Title and Description */}
+        <div className="text-white mb-10 md:mb-0 md:w-1/2 md:pr-8 text-center md:text-left">
           <h1 className="text-4xl md:text-5xl font-bold mb-6">
             <span className="text-yellow-400">ANDAR</span>{" "}
             <span className="text-white">BAHAR</span>
           </h1>
-          <p className="text-lg mb-8 max-w-md">
-            Sign in to ANDAR BAHAR and experience real-time AI-powered gameplay
-            insights.
+          <p className="text-lg mb-6 max-w-md mx-auto md:mx-0">
+            Sign in to ANDAR BAHAR and experience real-time AI-powered gameplay insights.
           </p>
-          <h2 className="text-2xl md:text-3xl font-semibold mb-4">
+          <h2 className="text-2xl md:text-3xl font-semibold">
             We are happy to see you back...
           </h2>
         </div>
@@ -72,27 +82,16 @@ function LoginScreen() {
           }}
         >
           <Box className="text-center mb-4">
-            <Typography
-              variant="subtitle1"
-              className="font-medium"
-              sx={{ color: "#ffcc00" }}
-            >
+            <Typography variant="subtitle1" sx={{ color: "#ffcc00" }}>
               WELCOME BACK
             </Typography>
-            <Typography
-              variant="h5"
-              className="font-bold"
-              sx={{ color: "#ffcc00" }}
-            >
+            <Typography variant="h5" sx={{ color: "#ffcc00", fontWeight: "bold" }}>
               Sign in to your Account
             </Typography>
           </Box>
 
-          <Box
-            component="form"
-            className="space-y-4 mt-6"
-            onSubmit={handleLogin}
-          >
+          <Box component="form" className="space-y-4 mt-6" onSubmit={handleLogin}>
+            {/* Email */}
             <TextField
               fullWidth
               label="Email"
@@ -100,21 +99,10 @@ function LoginScreen() {
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               InputLabelProps={{ style: { color: "rgba(255, 204, 0, 0.7)" } }}
-              sx={{
-                "& .MuiOutlinedInput-root": {
-                  "& fieldset": { borderColor: "rgba(255, 204, 0, 0.3)" },
-                  "&:hover fieldset": { borderColor: "rgba(255, 204, 0, 0.5)" },
-                  "&.Mui-focused fieldset": {
-                    borderColor: "rgba(255, 204, 0, 0.7)",
-                  },
-                  color: "#ffcc00",
-                },
-                backgroundColor: "rgba(255, 255, 255, 0.05)",
-                borderRadius: "8px",
-                marginBottom: "16px",
-              }}
+              sx={textFieldStyles}
             />
 
+            {/* Password */}
             <TextField
               fullWidth
               label="Password"
@@ -126,31 +114,16 @@ function LoginScreen() {
               InputProps={{
                 endAdornment: (
                   <InputAdornment position="end">
-                    <IconButton
-                      onClick={handleClickShowPassword}
-                      edge="end"
-                      sx={{ color: "#ffcc00" }}
-                    >
+                    <IconButton onClick={handleClickShowPassword} edge="end" sx={{ color: "#ffcc00" }}>
                       {showPassword ? <VisibilityOff /> : <Visibility />}
                     </IconButton>
                   </InputAdornment>
                 ),
               }}
-              sx={{
-                "& .MuiOutlinedInput-root": {
-                  "& fieldset": { borderColor: "rgba(255, 204, 0, 0.3)" },
-                  "&:hover fieldset": { borderColor: "rgba(255, 204, 0, 0.5)" },
-                  "&.Mui-focused fieldset": {
-                    borderColor: "rgba(255, 204, 0, 0.7)",
-                  },
-                  color: "#ffcc00",
-                },
-                backgroundColor: "rgba(255, 255, 255, 0.05)",
-                borderRadius: "8px",
-                marginBottom: "16px",
-              }}
+              sx={textFieldStyles}
             />
 
+            {/* Submit Button */}
             <Button
               fullWidth
               type="submit"
@@ -165,21 +138,19 @@ function LoginScreen() {
                 color: "#1a1a2e",
               }}
             >
-              Submit
+              Login
             </Button>
 
+            {/* Divider */}
             <div className="flex items-center justify-center my-4">
               <Divider sx={{ backgroundColor: "#ffcc00", flexGrow: 1 }} />
-              <Typography
-                variant="body2"
-                className="mx-2"
-                sx={{ color: "#ffcc00" }}
-              >
+              <Typography variant="body2" className="mx-2" sx={{ color: "#ffcc00" }}>
                 Or
               </Typography>
               <Divider sx={{ backgroundColor: "#ffcc00", flexGrow: 1 }} />
             </div>
 
+            {/* Redirect to Register */}
             <Typography
               variant="body2"
               className="text-center mt-4 cursor-pointer hover:text-white"
@@ -194,5 +165,17 @@ function LoginScreen() {
     </div>
   );
 }
+
+const textFieldStyles = {
+  "& .MuiOutlinedInput-root": {
+    "& fieldset": { borderColor: "rgba(255, 204, 0, 0.3)" },
+    "&:hover fieldset": { borderColor: "rgba(255, 204, 0, 0.5)" },
+    "&.Mui-focused fieldset": { borderColor: "rgba(255, 204, 0, 0.7)" },
+    color: "#ffcc00",
+  },
+  backgroundColor: "rgba(255, 255, 255, 0.05)",
+  borderRadius: "8px",
+  marginBottom: "16px",
+};
 
 export default LoginScreen;
