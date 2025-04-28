@@ -969,373 +969,373 @@ const startGameLoop = (io) => {
   }
 
   // Step 3: Deal cards and determine winner
-  const startDealing = async (io) => {
-    try {
-      gameState.status = "dealing"
-      
-      // Get the saved deck and joker card
-      const deck = gameState.deck
-      const joker = gameState.jokerCard
-
-      // Determine the winning side based on bet amounts
-      // If andar has more bets, bahar will win (and vice versa)
-      const forcedWinningSide = gameState.totalBets.andar > gameState.totalBets.bahar ? "bahar" : "andar"
-      console.log(`Forcing ${forcedWinningSide} to win based on bet amounts`)
-
-      // Initialize card arrays and game variables
-      const andarCards = []
-      const baharCards = []
-      let matchFound = false
-
-      // Deal cards until we find a match on the forced winning side
-      while (!matchFound && deck.length > 0) {
-        // Get the next card
-        const card = deck.pop()
-
-        // Determine which side to deal to
-        // We'll alternate, but need to ensure the winning card goes to the forced side
-        let currentSide
-
-        if (card.value === joker.value) {
-          // If this card matches the joker, it should go to the forced winning side
-          currentSide = forcedWinningSide
-          matchFound = true
-          gameState.winningSide = forcedWinningSide
-          gameState.winningCardIndex = forcedWinningSide === "andar" ? andarCards.length : baharCards.length
-        } else {
-          // Otherwise, alternate sides but ensure we don't put a matching card on the wrong side
-          if (andarCards.length <= baharCards.length) {
-            // Normally would go to andar
-            if (card.value === joker.value && forcedWinningSide === "bahar") {
-              // But this is a matching card and we want bahar to win, so put it on bahar
-              currentSide = "bahar"
-            } else {
-              currentSide = "andar"
-            }
-          } else {
-            // Normally would go to bahar
-            if (card.value === joker.value && forcedWinningSide === "andar") {
-              // But this is a matching card and we want andar to win, so put it on andar
-              currentSide = "andar"
-            } else {
-              currentSide = "bahar"
-            }
-          }
-        }
-
-        // Add card to the current side
-        if (currentSide === "andar") {
-          andarCards.push(card)
-          gameState.andarCards = [...andarCards]
-        } else {
-          baharCards.push(card)
-          gameState.baharCards = [...baharCards]
-        }
-
-        // Emit the card dealt event
-        try {
-          io.emit("cardDealt", {
-            side: currentSide,
-            card,
-            index: currentSide === "andar" ? andarCards.length - 1 : baharCards.length - 1,
-          })
-        } catch (error) {
-          console.error("Error emitting card dealt:", error)
-        }
-
-        // Add a delay between dealing cards
-        await new Promise((resolve) => setTimeout(resolve, 1000))
-      }
-
-      // If we ran out of cards without finding a match, force a result
-      if (!matchFound) {
-        gameState.winningSide = forcedWinningSide
-        gameState.winningCardIndex = forcedWinningSide === "andar" ? andarCards.length - 1 : baharCards.length - 1
-      }
-
-      // Save game result for history
-      gameState.lastGameResult = {
-        jokerCard: joker,
-        winningSide: gameState.winningSide,
-        andarCards,
-        baharCards,
-        timestamp: new Date(),
-      }
-
-      // Create winners and losers arrays to send to clients
-      const winners = []
-      const losers = []
-
-      // Process results and update player balances
-      const updatePromises = []
-
-      Object.values(gameState.players).forEach((player) => {
-        if (player.bet) {
-          if (player.bet.side === gameState.winningSide) {
-            // Player wins, gets 2x the bet amount back (1x bet + 1x winnings)
-            const winnings = player.bet.amount * 2
-            player.balance += winnings
-
-            winners.push({
-              id: player.id,
-              username: player.username,
-              winnings: player.bet.amount,
-            })
-
-            if (player.userId) {
-              try {
-                // Add to update promises instead of awaiting here
-                updatePromises.push(
-                  User.findByIdAndUpdate(player.userId, { $inc: { balance: winnings } }).catch((error) =>
-                    console.error(`Error updating balance for user ${player.userId}:`, error),
-                  ),
-                )
-              } catch (error) {
-                console.error("Error updating user balance:", error)
-              }
-            }
-
-            try {
-              io.to(player.id).emit("balanceUpdated", { balance: player.balance })
-              io.to(player.id).emit("winMessage", { amountWon: player.bet.amount })
-            } catch (error) {
-              console.error("Error emitting win message:", error)
-            }
-          } else {
-            // Player lost
-            losers.push({
-              id: player.id,
-              username: player.username,
-              loss: player.bet.amount,
-            })
-
-            try {
-              io.to(player.id).emit("loseMessage", { amountLost: player.bet.amount })
-            } catch (error) {
-              console.error("Error emitting lose message:", error)
-            }
-          }
-        }
-      })
-
-      // Wait for all database updates to complete
-      try {
-        await Promise.allSettled(updatePromises)
-      } catch (error) {
-        console.error("Error updating user balances:", error)
-      }
-
-      // Save game result to database
-      try {
-        const gameRecords = Object.values(gameState.players).map((player) => {
-          if (!player.bet) return null // Skip players who didn't bet
-      
-          return {
-            user: player.userId,
-            betAmount: player.bet.amount,
-            betSide: player.bet.side,
-            jokerCard: gameState.jokerCard,
-            andarCards: gameState.andarCards,
-            baharCards: gameState.baharCards,
-            winningSide: gameState.winningSide,
-            winningCardIndex: gameState.winningCardIndex,
-            result: player.bet.side === gameState.winningSide ? "win" : "lose",
-            winAmount: player.bet.side === gameState.winningSide ? player.bet.amount * 2 : 0, // Double the bet if won
-          }
-        }).filter(record => record !== null) // Remove null entries
-      
-        await Game.insertMany(gameRecords) // Save all game records in one go
-      } catch (error) {
-        console.error("Error saving game record:", error)
-      }
-
-      // Emit game result to all clients
-      try {
-        io.emit("gameResult", {
-          winningSide: gameState.winningSide,
-          winningCardIndex: gameState.winningCardIndex,
-          winners,
-          losers,
-        })
-      } catch (error) {
-        console.error("Error emitting game result:", error)
-      }
-
-      // Wait before starting a new game
-      await new Promise((resolve) => setTimeout(resolve, 10000))
-      resetGame()
-    } catch (error) {
-      console.error("Error in dealing phase:", error)
-      // Try to recover by restarting the game
-      setTimeout(() => resetGame(), 5000)
-    }
-  }
-
-
-
-  // //new logic
   // const startDealing = async (io) => {
   //   try {
-  //     gameState.status = "dealing";
-  
-  //     const deck = gameState.deck;
-  //     const joker = gameState.jokerCard;
-  
-  //     const andarCards = [];
-  //     const baharCards = [];
-  //     let matchFound = false;
-  //     let currentSide = "andar";
-  
+  //     gameState.status = "dealing"
+      
+  //     // Get the saved deck and joker card
+  //     const deck = gameState.deck
+  //     const joker = gameState.jokerCard
+
+  //     // Determine the winning side based on bet amounts
+  //     // If andar has more bets, bahar will win (and vice versa)
+  //     const forcedWinningSide = gameState.totalBets.andar > gameState.totalBets.bahar ? "bahar" : "andar"
+  //     console.log(`Forcing ${forcedWinningSide} to win based on bet amounts`)
+
+  //     // Initialize card arrays and game variables
+  //     const andarCards = []
+  //     const baharCards = []
+  //     let matchFound = false
+
+  //     // Deal cards until we find a match on the forced winning side
   //     while (!matchFound && deck.length > 0) {
-  //       const card = deck.pop();
-  
-  //       if (currentSide === "andar") {
-  //         andarCards.push(card);
-  //         gameState.andarCards = [...andarCards];
-  
-  //         if (card.value === joker.value) {
-  //           matchFound = true;
-  //           gameState.winningSide = "andar";
-  //           gameState.winningCardIndex = andarCards.length - 1;
-  //         }
+  //       // Get the next card
+  //       const card = deck.pop()
+
+  //       // Determine which side to deal to
+  //       // We'll alternate, but need to ensure the winning card goes to the forced side
+  //       let currentSide
+
+  //       if (card.value === joker.value) {
+  //         // If this card matches the joker, it should go to the forced winning side
+  //         currentSide = forcedWinningSide
+  //         matchFound = true
+  //         gameState.winningSide = forcedWinningSide
+  //         gameState.winningCardIndex = forcedWinningSide === "andar" ? andarCards.length : baharCards.length
   //       } else {
-  //         baharCards.push(card);
-  //         gameState.baharCards = [...baharCards];
-  
-  //         if (card.value === joker.value) {
-  //           matchFound = true;
-  //           gameState.winningSide = "bahar";
-  //           gameState.winningCardIndex = baharCards.length - 1;
+  //         // Otherwise, alternate sides but ensure we don't put a matching card on the wrong side
+  //         if (andarCards.length <= baharCards.length) {
+  //           // Normally would go to andar
+  //           if (card.value === joker.value && forcedWinningSide === "bahar") {
+  //             // But this is a matching card and we want bahar to win, so put it on bahar
+  //             currentSide = "bahar"
+  //           } else {
+  //             currentSide = "andar"
+  //           }
+  //         } else {
+  //           // Normally would go to bahar
+  //           if (card.value === joker.value && forcedWinningSide === "andar") {
+  //             // But this is a matching card and we want andar to win, so put it on andar
+  //             currentSide = "andar"
+  //           } else {
+  //             currentSide = "bahar"
+  //           }
   //         }
   //       }
-  
-  //       // Emit card to clients
+
+  //       // Add card to the current side
+  //       if (currentSide === "andar") {
+  //         andarCards.push(card)
+  //         gameState.andarCards = [...andarCards]
+  //       } else {
+  //         baharCards.push(card)
+  //         gameState.baharCards = [...baharCards]
+  //       }
+
+  //       // Emit the card dealt event
   //       try {
   //         io.emit("cardDealt", {
   //           side: currentSide,
   //           card,
   //           index: currentSide === "andar" ? andarCards.length - 1 : baharCards.length - 1,
-  //         });
+  //         })
   //       } catch (error) {
-  //         console.error("Error emitting card dealt:", error);
+  //         console.error("Error emitting card dealt:", error)
   //       }
-  
-  //       // Alternate side
-  //       currentSide = currentSide === "andar" ? "bahar" : "andar";
-  
-  //       await new Promise((resolve) => setTimeout(resolve, 1000));
+
+  //       // Add a delay between dealing cards
+  //       await new Promise((resolve) => setTimeout(resolve, 1000))
   //     }
-  
-  //     // If no match found, randomly pick winner (very rare fallback)
+
+  //     // If we ran out of cards without finding a match, force a result
   //     if (!matchFound) {
-  //       const fallbackSide = Math.random() < 0.3 ? "andar" : "bahar";
-  //       gameState.winningSide = fallbackSide;
-  //       gameState.winningCardIndex = fallbackSide === "andar" ? andarCards.length - 1 : baharCards.length - 1;
+  //       gameState.winningSide = forcedWinningSide
+  //       gameState.winningCardIndex = forcedWinningSide === "andar" ? andarCards.length - 1 : baharCards.length - 1
   //     }
-  
+
+  //     // Save game result for history
   //     gameState.lastGameResult = {
   //       jokerCard: joker,
   //       winningSide: gameState.winningSide,
   //       andarCards,
   //       baharCards,
   //       timestamp: new Date(),
-  //     };
-  
-  //     const winners = [];
-  //     const losers = [];
-  //     const updatePromises = [];
-  
+  //     }
+
+  //     // Create winners and losers arrays to send to clients
+  //     const winners = []
+  //     const losers = []
+
+  //     // Process results and update player balances
+  //     const updatePromises = []
+
   //     Object.values(gameState.players).forEach((player) => {
   //       if (player.bet) {
   //         if (player.bet.side === gameState.winningSide) {
-  //           const winnings = player.bet.amount * 2;
-  //           player.balance += winnings;
-  
+  //           // Player wins, gets 2x the bet amount back (1x bet + 1x winnings)
+  //           const winnings = player.bet.amount * 2
+  //           player.balance += winnings
+
   //           winners.push({
   //             id: player.id,
   //             username: player.username,
   //             winnings: player.bet.amount,
-  //           });
-  
+  //           })
+
   //           if (player.userId) {
-  //             updatePromises.push(
-  //               User.findByIdAndUpdate(player.userId, { $inc: { balance: winnings } }).catch((error) =>
-  //                 console.error(`Error updating balance for user ${player.userId}:`, error)
+  //             try {
+  //               // Add to update promises instead of awaiting here
+  //               updatePromises.push(
+  //                 User.findByIdAndUpdate(player.userId, { $inc: { balance: winnings } }).catch((error) =>
+  //                   console.error(`Error updating balance for user ${player.userId}:`, error),
+  //                 ),
   //               )
-  //             );
+  //             } catch (error) {
+  //               console.error("Error updating user balance:", error)
+  //             }
   //           }
-  
+
   //           try {
-  //             io.to(player.id).emit("balanceUpdated", { balance: player.balance });
-  //             io.to(player.id).emit("winMessage", { amountWon: player.bet.amount });
+  //             io.to(player.id).emit("balanceUpdated", { balance: player.balance })
+  //             io.to(player.id).emit("winMessage", { amountWon: player.bet.amount })
   //           } catch (error) {
-  //             console.error("Error emitting win message:", error);
+  //             console.error("Error emitting win message:", error)
   //           }
   //         } else {
+  //           // Player lost
   //           losers.push({
   //             id: player.id,
   //             username: player.username,
   //             loss: player.bet.amount,
-  //           });
-  
+  //           })
+
   //           try {
-  //             io.to(player.id).emit("loseMessage", { amountLost: player.bet.amount });
+  //             io.to(player.id).emit("loseMessage", { amountLost: player.bet.amount })
   //           } catch (error) {
-  //             console.error("Error emitting lose message:", error);
+  //             console.error("Error emitting lose message:", error)
   //           }
   //         }
   //       }
-  //     });
-  
+  //     })
+
+  //     // Wait for all database updates to complete
   //     try {
-  //       await Promise.allSettled(updatePromises);
+  //       await Promise.allSettled(updatePromises)
   //     } catch (error) {
-  //       console.error("Error updating user balances:", error);
+  //       console.error("Error updating user balances:", error)
   //     }
-  
+
+  //     // Save game result to database
   //     try {
-  //       const gameRecords = Object.values(gameState.players)
-  //         .map((player) => {
-  //           if (!player.bet) return null;
-  
-  //           return {
-  //             user: player.userId,
-  //             betAmount: player.bet.amount,
-  //             betSide: player.bet.side,
-  //             jokerCard: gameState.jokerCard,
-  //             andarCards: gameState.andarCards,
-  //             baharCards: gameState.baharCards,
-  //             winningSide: gameState.winningSide,
-  //             winningCardIndex: gameState.winningCardIndex,
-  //             result: player.bet.side === gameState.winningSide ? "win" : "lose",
-  //             winAmount: player.bet.side === gameState.winningSide ? player.bet.amount * 2 : 0,
-  //           };
-  //         })
-  //         .filter((record) => record !== null);
-  
-  //       await Game.insertMany(gameRecords);
+  //       const gameRecords = Object.values(gameState.players).map((player) => {
+  //         if (!player.bet) return null // Skip players who didn't bet
+      
+  //         return {
+  //           user: player.userId,
+  //           betAmount: player.bet.amount,
+  //           betSide: player.bet.side,
+  //           jokerCard: gameState.jokerCard,
+  //           andarCards: gameState.andarCards,
+  //           baharCards: gameState.baharCards,
+  //           winningSide: gameState.winningSide,
+  //           winningCardIndex: gameState.winningCardIndex,
+  //           result: player.bet.side === gameState.winningSide ? "win" : "lose",
+  //           winAmount: player.bet.side === gameState.winningSide ? player.bet.amount * 2 : 0, // Double the bet if won
+  //         }
+  //       }).filter(record => record !== null) // Remove null entries
+      
+  //       await Game.insertMany(gameRecords) // Save all game records in one go
   //     } catch (error) {
-  //       console.error("Error saving game record:", error);
+  //       console.error("Error saving game record:", error)
   //     }
-  
+
+  //     // Emit game result to all clients
   //     try {
   //       io.emit("gameResult", {
   //         winningSide: gameState.winningSide,
   //         winningCardIndex: gameState.winningCardIndex,
   //         winners,
   //         losers,
-  //       });
+  //       })
   //     } catch (error) {
-  //       console.error("Error emitting game result:", error);
+  //       console.error("Error emitting game result:", error)
   //     }
-  
-  //     await new Promise((resolve) => setTimeout(resolve, 10000));
-  //     resetGame();
+
+  //     // Wait before starting a new game
+  //     await new Promise((resolve) => setTimeout(resolve, 10000))
+  //     resetGame()
   //   } catch (error) {
-  //     console.error("Error in dealing phase:", error);
-  //     setTimeout(() => resetGame(), 5000);
+  //     console.error("Error in dealing phase:", error)
+  //     // Try to recover by restarting the game
+  //     setTimeout(() => resetGame(), 5000)
   //   }
-  // };
+  // }
+
+
+
+  // //new logic
+  const startDealing = async (io) => {
+    try {
+      gameState.status = "dealing";
+  
+      const deck = gameState.deck;
+      const joker = gameState.jokerCard;
+  
+      const andarCards = [];
+      const baharCards = [];
+      let matchFound = false;
+      let currentSide = "andar";
+  
+      while (!matchFound && deck.length > 0) {
+        const card = deck.pop();
+  
+        if (currentSide === "andar") {
+          andarCards.push(card);
+          gameState.andarCards = [...andarCards];
+  
+          if (card.value === joker.value) {
+            matchFound = true;
+            gameState.winningSide = "andar";
+            gameState.winningCardIndex = andarCards.length - 1;
+          }
+        } else {
+          baharCards.push(card);
+          gameState.baharCards = [...baharCards];
+  
+          if (card.value === joker.value) {
+            matchFound = true;
+            gameState.winningSide = "bahar";
+            gameState.winningCardIndex = baharCards.length - 1;
+          }
+        }
+  
+        // Emit card to clients
+        try {
+          io.emit("cardDealt", {
+            side: currentSide,
+            card,
+            index: currentSide === "andar" ? andarCards.length - 1 : baharCards.length - 1,
+          });
+        } catch (error) {
+          console.error("Error emitting card dealt:", error);
+        }
+  
+        // Alternate side
+        currentSide = currentSide === "andar" ? "bahar" : "andar";
+  
+        await new Promise((resolve) => setTimeout(resolve, 1000));
+      }
+  
+      // If no match found, randomly pick winner (very rare fallback)
+      if (!matchFound) {
+        const fallbackSide = Math.random() < 0.3 ? "andar" : "bahar";
+        gameState.winningSide = fallbackSide;
+        gameState.winningCardIndex = fallbackSide === "andar" ? andarCards.length - 1 : baharCards.length - 1;
+      }
+  
+      gameState.lastGameResult = {
+        jokerCard: joker,
+        winningSide: gameState.winningSide,
+        andarCards,
+        baharCards,
+        timestamp: new Date(),
+      };
+  
+      const winners = [];
+      const losers = [];
+      const updatePromises = [];
+  
+      Object.values(gameState.players).forEach((player) => {
+        if (player.bet) {
+          if (player.bet.side === gameState.winningSide) {
+            const winnings = player.bet.amount * 2;
+            player.balance += winnings;
+  
+            winners.push({
+              id: player.id,
+              username: player.username,
+              winnings: player.bet.amount,
+            });
+  
+            if (player.userId) {
+              updatePromises.push(
+                User.findByIdAndUpdate(player.userId, { $inc: { balance: winnings } }).catch((error) =>
+                  console.error(`Error updating balance for user ${player.userId}:`, error)
+                )
+              );
+            }
+  
+            try {
+              io.to(player.id).emit("balanceUpdated", { balance: player.balance });
+              io.to(player.id).emit("winMessage", { amountWon: player.bet.amount });
+            } catch (error) {
+              console.error("Error emitting win message:", error);
+            }
+          } else {
+            losers.push({
+              id: player.id,
+              username: player.username,
+              loss: player.bet.amount,
+            });
+  
+            try {
+              io.to(player.id).emit("loseMessage", { amountLost: player.bet.amount });
+            } catch (error) {
+              console.error("Error emitting lose message:", error);
+            }
+          }
+        }
+      });
+  
+      try {
+        await Promise.allSettled(updatePromises);
+      } catch (error) {
+        console.error("Error updating user balances:", error);
+      }
+  
+      try {
+        const gameRecords = Object.values(gameState.players)
+          .map((player) => {
+            if (!player.bet) return null;
+  
+            return {
+              user: player.userId,
+              betAmount: player.bet.amount,
+              betSide: player.bet.side,
+              jokerCard: gameState.jokerCard,
+              andarCards: gameState.andarCards,
+              baharCards: gameState.baharCards,
+              winningSide: gameState.winningSide,
+              winningCardIndex: gameState.winningCardIndex,
+              result: player.bet.side === gameState.winningSide ? "win" : "lose",
+              winAmount: player.bet.side === gameState.winningSide ? player.bet.amount * 2 : 0,
+            };
+          })
+          .filter((record) => record !== null);
+  
+        await Game.insertMany(gameRecords);
+      } catch (error) {
+        console.error("Error saving game record:", error);
+      }
+  
+      try {
+        io.emit("gameResult", {
+          winningSide: gameState.winningSide,
+          winningCardIndex: gameState.winningCardIndex,
+          winners,
+          losers,
+        });
+      } catch (error) {
+        console.error("Error emitting game result:", error);
+      }
+  
+      await new Promise((resolve) => setTimeout(resolve, 10000));
+      resetGame();
+    } catch (error) {
+      console.error("Error in dealing phase:", error);
+      setTimeout(() => resetGame(), 5000);
+    }
+  };
   
 
   // Start the game loop
