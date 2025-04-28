@@ -50,7 +50,7 @@ export const UserProvider = ({ children }) => {
       localStorage.setItem("token", response.data.token);
       setUser(response.data.user);
       setBalance(response.data.user.balance || 0);
-      toast.success("Login successful!");
+      // toast.success("Login successful!");
       return true;
     } catch (err) {
       toast.error(err.response?.data?.message || "Login failed");
@@ -78,7 +78,7 @@ export const UserProvider = ({ children }) => {
     localStorage.removeItem("token");
     setUser(null);
     setBalance(0);
-    toast.info("Logged out successfully");
+    // toast.info("Logged out successfully");
   };
 
   const updateBalance = (newBalance) => {
