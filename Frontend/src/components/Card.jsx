@@ -20,18 +20,18 @@ const Card = ({ card, flipped, delay = 0, highlighted = false }) => {
   // If no card is provided, show the back of the card
   if (!card) {
     return (
-      <div className="card-container w-24 h-36 md:w-32 md:h-48">
-        <div className={`card-inner relative w-full h-full`}>
+      <div className="card-container w-14 h-20 md:w-28 md:h-36">
+        <div className="card-inner relative w-full h-full">
           <div className="card-back absolute w-full h-full rounded-lg bg-blue-900 border-2 border-blue-700 flex items-center justify-center">
-            <div className="bg-blue-800 w-16 h-24 md:w-20 md:h-32 rounded-lg flex items-center justify-center">
-              <div className="text-yellow-500 text-2xl font-bold">AB</div>
+            <div className="bg-blue-800 w-12 h-16 md:w-16 md:h-24 rounded-lg flex items-center justify-center">
+              <div className="text-yellow-500 text-xl md:text-2xl font-bold">AB</div>
             </div>
           </div>
         </div>
       </div>
-    )
+    );
   }
-
+  
   const { suit, value } = card
 
   const getSuitColor = () => {
@@ -69,33 +69,34 @@ const Card = ({ card, flipped, delay = 0, highlighted = false }) => {
   } 
 
   return (
-    <div className={`card-container w-20 h-30 md:w-29 md:h-40 ${highlighted ? "animate-pulse" : ""}`}>
-      <div className={`card-inner relative w-full h-full ${isFlipped ? "flipped" : ""}`}>
-        <div className="card-back absolute w-full h-full rounded-lg bg-blue-900 border-2 border-blue-700 flex items-center justify-center">
-          <div className="bg-blue-800 w-16 h-24 md:w-20 md:h-32 rounded-lg flex items-center justify-center">
-            <div className="text-yellow-500 text-2xl font-bold">AB</div>
-          </div>
+    <div className={`card-container w-15 h-21 md:w-28 md:h-36 ${highlighted ? "animate-pulse" : ""}`}>
+    <div className={`card-inner relative w-full h-full ${isFlipped ? "flipped" : ""}`}>
+      <div className="card-back absolute w-full h-full rounded-lg bg-blue-900 border-2 border-blue-700 flex items-center justify-center">
+        <div className="bg-blue-800 w-12 h-16 md:w-16 md:h-24 rounded-lg flex items-center justify-center">
+          <div className="text-yellow-500 text-xl md:text-2xl font-bold">AB</div>
         </div>
-
-        <div
-          className={`card-front absolute w-full h-full rounded-lg bg-white border-2 ${highlighted ? "border-yellow-400" : "border-gray-300"} p-2 flex flex-col`}
-        >
-          <div className={`flex justify-between items-center ${getSuitColor()}`}>
-            <div className="text-lg md:text-xl font-bold">{getCardValue()}</div>
-            <div className="text-lg md:text-xl">{getSuitSymbol()}</div>
-          </div>
-
-          <div className={`flex-grow flex items-center justify-center ${getSuitColor()}`}>
-            <div className="text-4xl md:text-5xl">{getSuitSymbol()}</div>
-          </div>
-
-          <div className={`flex justify-between items-center ${getSuitColor()} rotate-180`}>
-            <div className="text-lg md:text-xl font-bold">{getCardValue()}</div>
-            <div className="text-lg md:text-xl">{getSuitSymbol()}</div>
-          </div>
+      </div>
+  
+      <div
+        className={`card-front absolute w-full h-full rounded-lg bg-white border-2 ${highlighted ? "border-yellow-400" : "border-gray-300"} p-1 md:p-2 flex flex-col`}
+      >
+        <div className={`flex justify-between items-center ${getSuitColor()}`}>
+          <div className="text-sm md:text-lg font-bold">{getCardValue()}</div>
+          <div className="text-sm md:text-lg">{getSuitSymbol()}</div>
+        </div>
+  
+        <div className={`flex-grow flex items-center justify-center ${getSuitColor()}`}>
+          <div className="text-2xl md:text-4xl">{getSuitSymbol()}</div>
+        </div>
+  
+        <div className={`flex justify-between items-center ${getSuitColor()} rotate-180`}>
+          <div className="text-sm md:text-lg font-bold">{getCardValue()}</div>
+          <div className="text-sm md:text-lg">{getSuitSymbol()}</div>
         </div>
       </div>
     </div>
+  </div>
+  
   )
 }
 

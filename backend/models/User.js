@@ -11,7 +11,7 @@ const userSchema = new mongoose.Schema({
   },
   mobileNo:{
     type: String,
-    required: true,
+    
     min: 10,
     max: 15,
     unique: true,
@@ -44,6 +44,11 @@ const userSchema = new mongoose.Schema({
     type: Boolean,
     default: false,
   },
+  isBlocked: {
+    type: Boolean,
+    default: false,
+  }
+,  
   isAdmin: { type: Boolean, default: false },
   transactions: [
     {

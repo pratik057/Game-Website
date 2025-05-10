@@ -4,7 +4,9 @@ import { useState, useEffect, useContext } from "react";
 import { UserContext } from "../context/UserContext";
 import axios from "axios";
 import { toast } from "react-toastify";
-
+import { Link } from "react-router-dom";
+import Logo from "../assets/logo.png"; // Import your logo
+import BackgroundMusic from "../components/BagroundMusic"; // Adjust the import path as necessary
 const History = () => {
   const { user } = useContext(UserContext);
   const [games, setGames] = useState([]);
@@ -113,8 +115,37 @@ const History = () => {
   }
 
   return (
-    <div className="max-w-5xl mx-auto p-4">
-      <h1 className="text-3xl font-bold mb-8 text-center">Game History</h1>
+
+    <>
+     <BackgroundMusic src="../../public/BagroundMusic.mp3" />
+      <nav className="w-full shadow-md p-4">
+  <div className="max-w-7xl mx-auto flex flex-wrap justify-between items-center">
+    {/* Logo */}
+    <Link to="/dashboard" className="flex items-center space-x-2">
+      <img
+        src={Logo || "/placeholder.svg"}
+        alt="Andar Bahar"
+        className="h-15 md:h-24 w-auto drop-shadow-lg"
+      />
+    
+    </Link>
+
+    {/* Close Button */}
+    <Link
+      to="/"
+      className="text-red-700 hover:text-white hover:bg-red-700 transition-colors duration-300 text-3xl md:text-6xl font-bold px-4 py-1 rounded-md md:static absolute top-4 right-4 z-50"
+      aria-label="Close"
+    >
+      &times;
+    </Link>
+  </div>
+
+  {/* Heading */}
+  <h1 className="text-2xl md:text-3xl font-bold text-center mt-4">Game History</h1>
+</nav>
+
+        <div className="max-w-5xl  mx-auto p-4">
+      
 
       {/* Stats Cards */}
       {/* <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
@@ -203,6 +234,7 @@ const History = () => {
         )}
       </div>
     </div>
+    </>
   );
 };
 

@@ -2,130 +2,119 @@
 
 import { useState, useContext } from "react"
 import { UserContext } from "../context/UserContext"
+import BettingTimer from "./BettingTimer"
 
-// eslint-disable-next-line react/prop-types
-const BetControls = ({ onPlaceBet, disabled, currentBet }) => {
-  const { balance } = useContext(UserContext)
+const BetControls = ({ onPlaceBet, disabled, currentBet, connected, gameState }) => {
+  const { balance ,user} = useContext(UserContext)
   const [betAmount, setBetAmount] = useState(10)
-
-  const predefinedBets = [10,20,50,100,200,500,1000]
-
-  const handleBetAmountChange = (amount) => {
-    setBetAmount(amount)
-  }
-
-  const handleCustomBetChange = (e) => {
-    const value = Number.parseInt(e.target.value)
-    if (!isNaN(value) && value >= 0) {
-      setBetAmount(value)
-    } else {
-      setBetAmount(0)
-    }
-  }
+  const predefinedBets = [10, 20, 50, 100, 200, 500, 1000]
 
   const handlePlaceBet = (side) => {
-    if (betAmount <= 0) return
-    if (betAmount > balance) return
-
+    if (betAmount <= 0 || betAmount > balance) return
     onPlaceBet(side, betAmount)
   }
-
-  // If user already placed a bet, show their current bet
-  if (currentBet) {
-    return (
-      <div className="lg:w-[60%] w-full bg-gray-800 rounded-lg p-4 shadow-lg">
-        <h3 className="text-xl font-bold text-white mb-4">Your Bet</h3>
-
-        <div className="flex justify-center items-center p-4 bg-gray-700 rounded-lg">
-          <div className={`text-center ${currentBet.side === "andar" ? "text-red-500" : "text-blue-500"}`}>
-            <div className="text-lg font-bold mb-1">{currentBet.side === "andar" ? "ANDAR" : "BAHAR"}</div>
-            <div className="text-2xl font-bold">{currentBet.amount}</div>
-          </div>
-        </div>
-
-        <div className="mt-4 text-center text-gray-400">Waiting for the round to complete...</div>
-      </div>
-    )
-  }
+  console.log(user)
 
   return (
-    <div className="lg:w-[60%] w-full bg-gray-800 rounded-lg p-4 shadow-lg ">
-      <h3 className="text-xl font-bold text-white mb-4 ">Place Your Bet</h3>
+    <div className="w-full h-full bg-gray-800 border-gray-700 rounded-xl shadow-2xl p-4 mb-4 max-w-5xl mx-auto text-white relative overflow-hidden">
+      {/* Decorative pattern overlay */}
+      <div className="absolute inset-0 opacity-5 pointer-events-none">
+        <div className="absolute inset-0 bg-[radial-gradient(#ffffff33_1px,transparent_1px)] bg-[length:20px_20px]"></div>
+      </div>
 
-      <div className="mb-4">
-        <div className="flex justify-between items-center mb-2">
-          <label className="text-gray-300">Bet Amount:</label>
-          <span className="text-yellow-500 font-bold">{betAmount}</span>
+      {/* Header: Connection + Game Status */}
+      <div className="flex flex-col sm:flex-row justify-between items-center rounded-lg shadow-inner gap-4 relative z-10">
+        {/* Connection + Timer */}
+        <div className="flex items-center space-x-4 text-sm">
+          <div className="flex items-center bg-black/30 px-3 py-1 rounded-full">
+            <div className={`w-2 h-2 rounded-full mr-2 ${connected ? "bg-green-500 animate-pulse" : "bg-red-500"}`} />
+            {connected ? "Connected" : "Disconnected"}
+          </div>
+          {gameState.status === "betting" && gameState.bettingTimeLeft > 0 && (
+            <div className="ml-4 bg-black/30 px-3 py-1 rounded-full">
+              <BettingTimer timeLeft={gameState.bettingTimeLeft} />
+            </div>
+          )}
         </div>
 
-        <div className="flex flex-wrap gap-2 mb-4">
-          {predefinedBets.map((amount) => (
-            <button
-              key={amount}
-              onClick={() => handleBetAmountChange(amount)}
-              className={`px-3 py-1 rounded-md ${betAmount === amount ? "bg-yellow-500 text-black" : "bg-gray-700 text-white"}`}
-              disabled={disabled}
-            >
-              {amount}
-            </button>
-          ))}
-        </div>
-
-        <div className="flex items-center gap-2">
-          <input
-            type="number"
-            value={betAmount}
-            onChange={handleCustomBetChange}
-            className="w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-md text-white focus:outline-none focus:ring-2 focus:ring-yellow-500"
-            min="1"
-            max={balance}
-            disabled={true}
-
-          />
-          <button
-            onClick={() => setBetAmount(Math.floor(balance / 2))}
-            className="px-3 py-2 bg-gray-700 text-white rounded-md hover:bg-gray-600"
-            disabled={disabled}
+        {/* Game Status */}
+        <div className="text-sm font-semibold bg-black/30 px-4 py-1 rounded-full">
+          <span className="text-gray-300 mr-2">Game Status:</span>
+          <span
+            className={`font-bold ${
+              gameState.status === "betting"
+                ? "text-yellow-400"
+                : gameState.status === "dealing"
+                  ? "text-blue-400"
+                  : gameState.status === "result"
+                    ? "text-green-500"
+                    : "text-gray-400"
+            }`}
           >
-            1/2
-          </button>
-          <button
-            onClick={() => setBetAmount(balance)}
-            className="px-3 py-2 bg-gray-700 text-white rounded-md hover:bg-gray-600"
-            disabled={disabled}
-          >
-            Max
-          </button>
+            {gameState.status === "betting" ? (
+              gameState.bettingTimeLeft === 0 ? (
+                <span className="text-red-500">Bets off. Wait for round.</span>
+              ) : (
+                <span>Betting Open</span>
+              )
+            ) : gameState.status === "dealing" ? (
+              <span>Dealing Cards</span>
+            ) : gameState.status === "result" ? (
+              <span>Round Complete</span>
+            ) : (
+              <span>Waiting</span>
+            )}
+          </span>
         </div>
       </div>
 
-      <div className="grid grid-cols-2 gap-4">
+      {/* Current Bet Preview */}
+      {currentBet && (
+        <div className="text-center text-white font-semibold text-sm mt-3 bg-black/40 py-2 rounded-lg backdrop-blur-sm">
+          You bet <span className="text-yellow-400">{currentBet.amount}</span> on{" "}
+          <span className={currentBet.side === "andar" ? "text-red-400" : "text-blue-400"}>
+            {currentBet.side.toUpperCase()}
+          </span>
+        </div>
+      )}
+{betAmount > balance && <p className="text-red-500 mt-2 text-center">Insufficient balance</p>}
+      {/* Bet Chips */}
+      <div className="flex justify-center flex-wrap gap-[5px] mt-3">
+        {predefinedBets.map((amount) => (
+          <button
+            key={amount}
+            onClick={() => setBetAmount(amount)}
+            className={`px-2 py-1 md:py-2 md:px-4 rounded-full text-xs font-semibold border-2 transition-all duration-200 ${
+              betAmount === amount
+                ? "bg-yellow-500 text-black border-yellow-300 shadow-[0_0_10px_rgba(253,224,71,0.5)]"
+                : "bg-gray-800 text-white border-gray-600 hover:border-yellow-600"
+            } ${disabled ? "opacity-50 cursor-not-allowed" : "hover:bg-gray-700"}`}
+            disabled={disabled}
+          >
+            {amount}
+          </button>
+        ))}
+      </div>
+
+      {/* Place Bet Buttons */}
+      <div className="flex justify-center gap-6 pt-3">
         <button
           onClick={() => handlePlaceBet("andar")}
-          className={`py-3 rounded-lg font-bold text-lg bg-red-500 hover:bg-red-600 text-white`}
-          disabled={disabled || betAmount <= 0 || betAmount > balance}
+          className="bg-gradient-to-br from-red-500 to-red-900 text-white px-4 py-1 md:py-2 md:px-8 rounded-xl text-md font-bold shadow-lg hover:brightness-110 transition border-2 border-red-700/50 hover:border-red-400"
+          disabled={disabled}
         >
           ANDAR
         </button>
         <button
           onClick={() => handlePlaceBet("bahar")}
-          className={`py-3 rounded-lg font-bold text-lg bg-blue-500 hover:bg-blue-600 text-white`}
-          disabled={disabled || betAmount <= 0 || betAmount > balance}
+          className="bg-gradient-to-br from-blue-500 to-blue-900 text-white px-4 py-1 md:py-2 md:px-8 rounded-xl text-md font-bold shadow-lg hover:brightness-110 transition border-2 border-blue-700/50 hover:border-blue-400"
+          disabled={disabled}
         >
           BAHAR
         </button>
       </div>
-
-      {betAmount > balance && <p className="text-red-500 mt-2 text-center">Insufficient balance</p>}
-
-      {disabled && !currentBet && (
-        <p className="text-yellow-500 mt-2 text-center">
-          {betAmount <= 0 ? "Please enter a valid bet amount" : "Betting is currently closed"}
-        </p>
-      )}
     </div>
   )
 }
 
 export default BetControls
-

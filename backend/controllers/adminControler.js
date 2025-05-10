@@ -133,3 +133,35 @@ export const editUser = async (req, res) => {
       res.status(500).json({ success: false, message: "Server error" });
   }
 };
+export const deleteUser = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const deleted = await User.findByIdAndDelete(id);
+    if (!deleted) return res.status(404).json({ success: false, message: "User not found" });
+
+    res.status(200).json({ success: true, message: "User deleted successfully" });
+  } catch (error) {
+    console.error("Delete user error:", error);
+    res.status(500).json({ success: false, message: "Server error" });
+  }
+};
+export const toggleBlockUser = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const user = await User.findById(id);
+
+    if (!user) return res.status(404).json({ success: false, message: "User not found" });
+
+    user.isBlocked = !user.isBlocked;
+    await user.save();
+
+    res.status(200).json({
+      success: true,
+      message: `User has been ${user.isBlocked ? 'blocked' : 'unblocked'}`,
+      isBlocked: user.isBlocked,
+    });
+  } catch (error) {
+    console.error("Toggle block error:", error);
+    res.status(500).json({ success: false, message: "Server error" });
+  }
+};

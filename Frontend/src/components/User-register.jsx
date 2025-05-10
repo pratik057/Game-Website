@@ -14,16 +14,16 @@ import {
 import { Visibility, VisibilityOff } from "@mui/icons-material";
 import { UserContext } from "../context/UserContext";
 import NewBackground from "../assets/user-bg.png";
-import Logo from "../assets/logo.png"; // Make sure the path is correct
+import Logo from "../assets/logo.png";
 
 const Register = () => {
   const [email, setEmail] = useState("");
   const [username, setUsername] = useState("");
+  const [mobileNo, setMobileNo] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
-  const [message, setMessage] = useState("");
-  const [mobileNo, setMobileNo] = useState("");
   const [showPassword, setShowPassword] = useState(false);
+  const [message, setMessage] = useState("");
   const { register } = useContext(UserContext);
   const navigate = useNavigate();
 
@@ -41,200 +41,193 @@ const Register = () => {
     }
   };
 
-  const handleClickShowPassword = () => {
-    setShowPassword(!showPassword);
-  };
+  const handleClickShowPassword = () => setShowPassword((prev) => !prev);
 
   return (
-    <div
-      className="min-h-screen w-full flex flex-col items-center justify-start bg-cover bg-center px-4 py-8 relative"
-      style={{ backgroundImage: `url(${NewBackground})` }}
+    <Box
+      sx={{
+        minHeight: "100vh",
+        height: "100%",
+        width: "100%",
+        backgroundImage: `url(${NewBackground})`,
+        backgroundSize: "cover",
+        backgroundPosition: "center",
+        display: "flex",
+        flexDirection: "column",
+        alignItems: "center",
+        pt: { xs: 5},
+        // px: 2,
+        position: "relative",
+      }}
     >
       {/* Logo */}
-      <div className="w-full flex justify-center md:justify-start md:pl-8 absolute top-4 md:top-6">
+      <Box
+        sx={{
+          position: "absolute",
+          top: { xs: 24, md: 24 },
+          left: { xs: "50%", md: 32 },
+          transform: { xs: "translateX(-50%)", md: "none" },
+        }}
+      >
         <img
           src={Logo}
           alt="Logo"
-          className="w-20 md:w-24 lg:w-28"
-          style={{ maxWidth: "150px", objectFit: "contain" }}
+          style={{ width: "90px", height: "90px", objectFit: "contain" }}
         />
-      </div>
+      </Box>
 
-      {/* Main Container */}
-      <Container maxWidth="lg" className="flex flex-col md:flex-row items-center justify-between w-full pt-28">
-        {/* Left Side - Title and description */}
-        <div className="text-white mb-10 md:mb-0 md:w-1/2 md:pr-8 text-center md:text-left">
-          <h1 className="text-4xl md:text-5xl font-bold mb-6">
-            <span className="text-yellow-400">ANDAR</span> <span className="text-white">BAHAR</span>
-          </h1>
-          <p className="text-lg mb-8 max-w-md">
-            Sign up to ANDAR BAHAR and experience real-time AI-powered gameplay insights with expert live guidance.
-          </p>
-        </div>
-
-        {/* Right Side - Register Form */}
-        <Paper
-          elevation={3}
-          className="md:w-5/12 w-full p-6 rounded-xl"
+      {/* Main Content */}
+      <Container maxWidth="lg" sx={{ mt: { xs: 10, md: [-1] } }}>
+        <Box
           sx={{
-            background: "rgba(200, 200, 255, 0.25)",
-            backdropFilter: "blur(10px)",
-            color: "#ffcc00",
-            padding: "24px",
+            display: "flex",
+            flexDirection: { xs: "column", md: "row" },
+            alignItems: "center",
+            justifyContent: "space-between",
+            gap: 4,
           }}
         >
-          <Box className="text-center mb-4">
-            <Typography variant="subtitle1" sx={{ color: "#ffcc00", fontWeight: 500 }}>
-              WELCOME
-            </Typography>
-            <Typography variant="h5" sx={{ color: "#ffcc00", fontWeight: "bold" }}>
-              Create your Account
+          {/* Left Text */}
+          <Box sx={{ flex: 1, textAlign: { xs: "center", md: "left" }, color: "#fff" }}>
+            
+            <Typography variant="h6" sx={{ maxWidth: "400px" }}>
+              Sign up to ANDAR BAHAR and experience real-time gameplay insights with expert live guidance.
             </Typography>
           </Box>
 
-          <Box component="form" className="space-y-4 mt-6" onSubmit={handleRegister}>
-            <TextField
-              fullWidth
-              label="Username"
-              variant="outlined"
-              value={username}
-              onChange={(e) => setUsername(e.target.value)}
-              InputLabelProps={{ style: { color: "rgba(255, 204, 0, 0.7)" } }}
-              sx={{
-                "& .MuiOutlinedInput-root": {
-                  "& fieldset": { borderColor: "rgba(255, 204, 0, 0.3)" },
-                  "&:hover fieldset": { borderColor: "rgba(255, 204, 0, 0.5)" },
-                  "&.Mui-focused fieldset": { borderColor: "rgba(255, 204, 0, 0.7)" },
-                  color: "#ffcc00",
-                },
-                backgroundColor: "rgba(255, 255, 255, 0.05)",
-                borderRadius: "8px",
-              }}
-            />
-            <TextField
-              fullWidth
-              label="Email"
-              type="email"
-              variant="outlined"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              InputLabelProps={{ style: { color: "rgba(255, 204, 0, 0.7)" } }}
-              sx={{
-                "& .MuiOutlinedInput-root": {
-                  "& fieldset": { borderColor: "rgba(255, 204, 0, 0.3)" },
-                  "&:hover fieldset": { borderColor: "rgba(255, 204, 0, 0.5)" },
-                  "&.Mui-focused fieldset": { borderColor: "rgba(255, 204, 0, 0.7)" },
-                  color: "#ffcc00",
-                },
-                backgroundColor: "rgba(255, 255, 255, 0.05)",
-                borderRadius: "8px",
-              }}
-            />
-            <TextField
-              fullWidth
-              label="Mobile Number"
-              type="tel"
-              variant="outlined"
-              value={mobileNo}
-              onChange={(e) => setMobileNo(e.target.value)}
-              InputLabelProps={{ style: { color: "rgba(255, 204, 0, 0.7)" } }}
-              sx={{
-                "& .MuiOutlinedInput-root": {
-                  "& fieldset": { borderColor: "rgba(255, 204, 0, 0.3)" },
-                  "&:hover fieldset": { borderColor: "rgba(255, 204, 0, 0.5)" },
-                  "&.Mui-focused fieldset": { borderColor: "rgba(255, 204, 0, 0.7)" },
-                  color: "#ffcc00",
-                },
-                backgroundColor: "rgba(255, 255, 255, 0.05)",
-                borderRadius: "8px",
-              }}
-            />
-            <TextField
-              fullWidth
-              label="Password"
-              type={showPassword ? "text" : "password"}
-              variant="outlined"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              InputLabelProps={{ style: { color: "rgba(255, 204, 0, 0.7)" } }}
-              InputProps={{
-                endAdornment: (
-                  <InputAdornment position="end">
-                    <IconButton onClick={handleClickShowPassword} edge="end" sx={{ color: "#ffcc00" }}>
-                      {showPassword ? <VisibilityOff /> : <Visibility />}
-                    </IconButton>
-                  </InputAdornment>
-                ),
-              }}
-              sx={{
-                "& .MuiOutlinedInput-root": {
-                  "& fieldset": { borderColor: "rgba(255, 204, 0, 0.3)" },
-                  "&:hover fieldset": { borderColor: "rgba(255, 204, 0, 0.5)" },
-                  "&.Mui-focused fieldset": { borderColor: "rgba(255, 204, 0, 0.7)" },
-                  color: "#ffcc00",
-                },
-                backgroundColor: "rgba(255, 255, 255, 0.05)",
-                borderRadius: "8px",
-              }}
-            />
-            <TextField
-              fullWidth
-              label="Confirm Password"
-              type="password"
-              variant="outlined"
-              value={confirmPassword}
-              onChange={(e) => setConfirmPassword(e.target.value)}
-              InputLabelProps={{ style: { color: "rgba(255, 204, 0, 0.7)" } }}
-              sx={{
-                "& .MuiOutlinedInput-root": {
-                  "& fieldset": { borderColor: "rgba(255, 204, 0, 0.3)" },
-                  "&:hover fieldset": { borderColor: "rgba(255, 204, 0, 0.5)" },
-                  "&.Mui-focused fieldset": { borderColor: "rgba(255, 204, 0, 0.7)" },
-                  color: "#ffcc00",
-                },
-                backgroundColor: "rgba(255, 255, 255, 0.05)",
-                borderRadius: "8px",
-              }}
-            />
-
-            <Button
-              type="submit"
-              fullWidth
-              variant="contained"
-              sx={{
-                backgroundColor: "#00e676",
-                "&:hover": { backgroundColor: "#00c853" },
-                textTransform: "none",
-                borderRadius: "8px",
-                padding: "12px",
-                fontWeight: "bold",
-                color: "#1a1a2e",
-              }}
-            >
-              Register
-            </Button>
-
-            <div className="flex items-center justify-center my-4">
-              <Divider sx={{ backgroundColor: "#ffcc00", flexGrow: 1 }} />
-              <Typography variant="body2" className="mx-2" sx={{ color: "#ffcc00" }}>
-                Or
+          {/* Register Form */}
+          <Paper
+            elevation={3}
+            sx={{
+              flex: 1,
+              p: 4,
+              borderRadius: 3,
+              background: "rgba(200, 200, 255, 0.25)",
+              backdropFilter: "blur(10px)",
+              color: "#ffcc00",
+            }}
+          >
+            <Box textAlign="center" mb={2}>
+              <Typography variant="subtitle1" sx={{ fontWeight: 500 }}>
+                WELCOME
               </Typography>
-              <Divider sx={{ backgroundColor: "#ffcc00", flexGrow: 1 }} />
-            </div>
+              <Typography variant="h5" sx={{ fontWeight: "bold" }}>
+                Create your Account
+              </Typography>
+            </Box>
 
-            <Typography
-              variant="body2"
-              className="text-center mt-4 cursor-pointer hover:text-white"
-              onClick={() => navigate("/login")}
-              sx={{ color: "#ffcc00" }}
-            >
-              Already have an account? Sign in
-            </Typography>
-          </Box>
-        </Paper>
+            <form onSubmit={handleRegister}>
+              <Box sx={{ display: "flex", flexDirection: "column", gap: 2 }}>
+                <TextField
+                  label="Username"
+                  variant="outlined"
+                  fullWidth
+                  value={username}
+                  onChange={(e) => setUsername(e.target.value)}
+                  InputLabelProps={{ style: { color: "rgba(255, 204, 0, 0.7)" } }}
+                  sx={inputStyles}
+                />
+                <TextField
+                  label="Email"
+                  type="email"
+                  variant="outlined"
+                  fullWidth
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  InputLabelProps={{ style: { color: "rgba(255, 204, 0, 0.7)" } }}
+                  sx={inputStyles}
+                />
+                <TextField
+                  label="Mobile Number"
+                  type="tel"
+                  variant="outlined"
+                  fullWidth
+                  value={mobileNo}
+                  onChange={(e) => setMobileNo(e.target.value)}
+                  InputLabelProps={{ style: { color: "rgba(255, 204, 0, 0.7)" } }}
+                  sx={inputStyles}
+                />
+                <TextField
+                  label="Password"
+                  type={showPassword ? "text" : "password"}
+                  variant="outlined"
+                  fullWidth
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  InputProps={{
+                    endAdornment: (
+                      <InputAdornment position="end">
+                        <IconButton onClick={handleClickShowPassword} edge="end" sx={{ color: "#ffcc00" }}>
+                          {showPassword ? <VisibilityOff /> : <Visibility />}
+                        </IconButton>
+                      </InputAdornment>
+                    ),
+                  }}
+                  InputLabelProps={{ style: { color: "rgba(255, 204, 0, 0.7)" } }}
+                  sx={inputStyles}
+                />
+                <TextField
+                  label="Confirm Password"
+                  type="password"
+                  variant="outlined"
+                  fullWidth
+                  value={confirmPassword}
+                  onChange={(e) => setConfirmPassword(e.target.value)}
+                  InputLabelProps={{ style: { color: "rgba(255, 204, 0, 0.7)" } }}
+                  sx={inputStyles}
+                />
+
+                {message && (
+                  <Typography variant="body2" color="error" textAlign="center">
+                    {message}
+                  </Typography>
+                )}
+
+                <Button
+                  type="submit"
+                  variant="contained"
+                  fullWidth
+                  sx={{
+                    backgroundColor: "#00e676",
+                    "&:hover": { backgroundColor: "#00c853" },
+                    textTransform: "none",
+                    fontWeight: "bold",
+                    color: "#1a1a2e",
+                    py: 1.5,
+                    borderRadius: 2,
+                  }}
+                >
+                  Register
+                </Button>
+
+                <Divider sx={{ backgroundColor: "#ffcc00", my: 2 }} />
+
+                <Typography
+                  variant="body2"
+                  align="center"
+                  sx={{ color: "#ffcc00", cursor: "pointer", "&:hover": { color: "#fff" } }}
+                  onClick={() => navigate("/login")}
+                >
+                  Already have an account? Sign in
+                </Typography>
+              </Box>
+            </form>
+          </Paper>
+        </Box>
       </Container>
-    </div>
+    </Box>
   );
+};
+
+const inputStyles = {
+  "& .MuiOutlinedInput-root": {
+    "& fieldset": { borderColor: "rgba(255, 204, 0, 0.3)" },
+    "&:hover fieldset": { borderColor: "rgba(255, 204, 0, 0.5)" },
+    "&.Mui-focused fieldset": { borderColor: "rgba(255, 204, 0, 0.7)" },
+    color: "#ffcc00",
+  },
+  backgroundColor: "rgba(255, 255, 255, 0.05)",
+  borderRadius: "8px",
 };
 
 export default Register;

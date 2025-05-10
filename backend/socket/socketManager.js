@@ -822,7 +822,14 @@ export const initializeSocketIO = (io) => {
           socket.emit("betError", { message: "Insufficient balance" })
           return
         }
-
+        if (player.userId) {
+          const dbUser = await User.findById(player.userId).select("isBlocked");
+          if (dbUser?.isBlocked) {
+            socket.emit("betError", { message: "You are blocked from playing." });
+            return;
+          }
+        }
+      
         // Set processing flag to prevent race conditions
         gameState.isProcessingBets = true
 

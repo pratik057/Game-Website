@@ -38,7 +38,7 @@ function LoginScreen() {
 
   return (
     <div
-      className="min-h-screen w-full flex flex-col items-center justify-start bg-cover bg-center px-4 py-8 relative"
+      className="min-h-screen h-screen w-full flex flex-col items-center justify-start bg-cover bg-center px-4 py-8 relative"
       style={{ backgroundImage: `url(${NewBackground})` }}
     >
       {/* Logo - Top Left on Desktop, Centered on Mobile */}
@@ -58,12 +58,9 @@ function LoginScreen() {
       >
         {/* Left Side - Title and Description */}
         <div className="text-white mb-10 md:mb-0 md:w-1/2 md:pr-8 text-center md:text-left">
-          <h1 className="text-4xl md:text-5xl font-bold mb-6">
-            <span className="text-yellow-400">ANDAR</span>{" "}
-            <span className="text-white">BAHAR</span>
-          </h1>
+          
           <p className="text-lg mb-6 max-w-md mx-auto md:mx-0">
-            Sign in to ANDAR BAHAR and experience real-time AI-powered gameplay insights.
+            Sign in to ANDAR BAHAR and experience real-time  gameplay insights.
           </p>
           <h2 className="text-2xl md:text-3xl font-semibold">
             We are happy to see you back...

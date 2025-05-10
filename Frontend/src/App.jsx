@@ -18,6 +18,7 @@ import UserDashboard from "./components/User-Dashbord";
 import Logout from "./components/logout"
 import Game from "./pages/Game";
 import History from "./pages/History";
+import Rules from "./pages/Rules";
 
 function App() {
   const [loading, setLoading] = useState(true);
@@ -51,6 +52,7 @@ function App() {
                     <Route path="/logout" element={user ? <Logout /> : <Navigate to="/" />} />
                     <Route path="/game" element={user ? <Game /> : <Navigate to="/" />} />
                     <Route path="/history" element={user ? <History /> : <Navigate to="/" />} />
+                    <Route path="/Rules" element={user ? <Rules /> : <Navigate to="/" />} />
                   </Routes>
                 )}
               </UserContext.Consumer>

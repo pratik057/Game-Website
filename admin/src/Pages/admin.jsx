@@ -14,6 +14,7 @@ import {
   TableHead,
   TableRow,
   Paper,
+  Typography,
 } from "@mui/material";
 
 const Users = () => {
@@ -36,7 +37,7 @@ const Users = () => {
   }, []);
 
   const fetchUsers = async () => {
-    const token = localStorage.getItem("adminToken"); // Retrieve token
+    const token = localStorage.getItem("adminToken");
     if (!token) {
       alert("Authentication token not found. Please log in again.");
       return;
@@ -44,10 +45,7 @@ const Users = () => {
 
     try {
       const res = await axios.get("https://game-website-yyuo.onrender.com/api/admin/users", {
-        headers: {
-          Authorization: `Bearer ${token}`,
-          "Content-Type": "application/json",
-        }  // Attach token
+        headers: { Authorization: `Bearer ${token}` },
       });
       setUsers(res.data.users);
       setFilteredUsers(res.data.users);
@@ -57,14 +55,12 @@ const Users = () => {
     }
   };
 
-  // Handle search input
   const handleSearch = (e) => {
     const query = e.target.value.toLowerCase();
     setSearchEmail(query);
     setFilteredUsers(users.filter((user) => user.email.toLowerCase().includes(query)));
   };
 
-  // Handle edit button click
   const handleEdit = (user) => {
     setSelectedUser(user);
     setFormData({
@@ -78,7 +74,6 @@ const Users = () => {
     setShow(true);
   };
 
-  // Handle input changes
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
@@ -93,95 +88,132 @@ const Users = () => {
     if (/^\d*\.?\d*$/.test(value)) setRemoveBalance(value);
   };
 
-  // Handle save button click
   const handleSave = async () => {
     const token = localStorage.getItem("adminToken");
-    if (!token) {
-      alert("Authentication token not found. Please log in again.");
-      return;
-    }
+    if (!token) return alert("Token missing. Log in again.");
 
-    const additionalBalance = parseFloat(addBalance) || 0;
-    const deductionBalance = parseFloat(removeBalance) || 0;
-    let updatedBalance = (parseFloat(formData.balance) || 0) + additionalBalance - deductionBalance;
+    const additional = parseFloat(addBalance) || 0;
+    const deduction = parseFloat(removeBalance) || 0;
+    let updatedBalance = (parseFloat(formData.balance) || 0) + additional - deduction;
 
-    if (updatedBalance < 0) {
-      alert("Balance cannot be negative!");
-      return;
-    }
+    if (updatedBalance < 0) return alert("Balance can't be negative!");
 
     try {
       await axios.put(
         `https://game-website-yyuo.onrender.com/api/admin/users/${selectedUser._id}`,
         { ...formData, balance: updatedBalance },
-        { headers: {
-          Authorization: `Bearer ${token}`,
-          "Content-Type": "application/json",
-        } } // Attach token
+        { headers: { Authorization: `Bearer ${token}` } }
       );
 
       fetchUsers();
       setShow(false);
-      setAddBalance("");
-      setRemoveBalance("");
     } catch (error) {
-      console.error("Error updating user:", error);
-      alert("Failed to update user. Please try again.");
+      console.error("Update error:", error);
+      alert("Failed to update user.");
     }
   };
+
+  const handleDelete = async (userId) => {
+    const token = localStorage.getItem("adminToken");
+    if (!token) return alert("Token missing.");
+
+    if (!window.confirm("Are you sure you want to delete this user?")) return;
+
+    try {
+      await axios.delete(
+        `https://game-website-yyuo.onrender.com/api/admin/users/${userId}`,
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+      fetchUsers();
+    } catch (error) {
+      console.error("Delete error:", error);
+      alert("Failed to delete user.");
+    }
+  };
+
+  const toggleBlock = async (userId, isBlocked) => {
+    const token = localStorage.getItem("adminToken");
+    if (!token) return alert("Token missing.");
+
+    try {
+      await axios.put(
+        `https://game-website-yyuo.onrender.com/api/admin/users/${userId}/block`,
+        { isBlocked: !isBlocked },
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+      fetchUsers();
+    } catch (error) {
+      console.error("Block/unblock error:", error);
+      alert("Failed to update block status.");
+    }
+  };
+
+  const userCount = filteredUsers.length;
+  const totalBalance = filteredUsers.reduce((acc, user) => acc + (user.balance || 0), 0);
 
   return (
     <div className="container mx-auto p-6 bg-gray-100 min-h-screen">
       <h2 className="text-3xl font-bold text-center mb-6 text-gray-800">Users List</h2>
 
-      {/* Search Field */}
-      <div className="flex justify-center mb-6">
+      {/* Search and Stats */}
+      <div className="flex justify-between items-center mb-4">
         <TextField
-          fullWidth
           label="Search by Email"
-          variant="outlined"
           value={searchEmail}
           onChange={handleSearch}
-          className="shadow-lg rounded-lg bg-white"
-          sx={{ width: "50%" }}
+          variant="outlined"
+          sx={{ width: "40%" }}
         />
+        <div className="space-x-6 text-gray-700 font-medium">
+          <span>👤 Total Users: {userCount}</span>
+          <span>💰 Total Coins: {totalBalance}</span>
+        </div>
       </div>
 
       {/* Users Table */}
-      <TableContainer component={Paper} className="shadow-lg rounded-lg">
+      <TableContainer component={Paper}>
         <Table>
-          <TableHead className="bg-blue-500">
+          <TableHead className="bg-blue-600">
             <TableRow>
-              <TableCell className="text-white font-bold">User ID</TableCell>
-              <TableCell className="text-white font-bold">Username</TableCell>
-              <TableCell className="text-white font-bold">Email</TableCell>
-              <TableCell className="text-white font-bold">Balance</TableCell>
-              <TableCell className="text-white font-bold text-center">Actions</TableCell>
+              <TableCell className="text-white">User ID</TableCell>
+              <TableCell className="text-white">Username</TableCell>
+              <TableCell className="text-white">Email</TableCell>
+              <TableCell className="text-white">Balance</TableCell>
+              <TableCell className="text-white text-center">Actions</TableCell>
             </TableRow>
           </TableHead>
           <TableBody>
             {filteredUsers.length > 0 ? (
               filteredUsers.map((user) => (
-                <TableRow key={user._id} className="hover:bg-gray-100 transition">
+                <TableRow key={user._id} hover>
                   <TableCell>{user._id}</TableCell>
                   <TableCell>{user.username}</TableCell>
                   <TableCell>{user.email}</TableCell>
-                  <TableCell>COINS : {user.balance}</TableCell>
-                  <TableCell className="text-center">
-                    <Button
-                      variant="contained"
-                      color="primary"
-                      onClick={() => handleEdit(user)}
-                      className="hover:bg-blue-700 transition"
-                    >
+                  <TableCell>COINS: {user.balance}</TableCell>
+                  <TableCell className="text-center space-x-2">
+                    <Button variant="contained" color="primary" onClick={() => handleEdit(user)}>
                       Edit
+                    </Button>
+                    <Button
+                      variant="outlined"
+                      color="error"
+                      onClick={() => handleDelete(user._id)}
+                    >
+                      Delete
+                    </Button>
+                    <Button
+                      variant="outlined"
+                      color={user.isBlocked ? "success" : "warning"}
+                      onClick={() => toggleBlock(user._id, user.isBlocked)}
+                    >
+                      {user.isBlocked ? "Unblock" : "Block"}
                     </Button>
                   </TableCell>
                 </TableRow>
               ))
             ) : (
               <TableRow>
-                <TableCell colSpan={5} className="text-center text-gray-500 py-4">
+                <TableCell colSpan={5} className="text-center text-gray-500">
                   No users found.
                 </TableCell>
               </TableRow>
@@ -190,20 +222,20 @@ const Users = () => {
         </Table>
       </TableContainer>
 
-      {/* Edit User Dialog */}
+      {/* Edit Dialog */}
       <Dialog open={show} onClose={() => setShow(false)}>
-        <DialogTitle className="text-center text-blue-600 font-bold">Edit User</DialogTitle>
-        <DialogContent className="space-y-4 p-6">
-          <TextField fullWidth label="User ID" value={formData.userId} disabled variant="outlined" />
-          <TextField fullWidth label="Username" name="username" value={formData.username} onChange={handleChange} variant="outlined" />
-          <TextField fullWidth label="Email" name="email" value={formData.email} onChange={handleChange} variant="outlined" />
-          <TextField fullWidth label="Current Balance" value={`COINS: ${formData.balance}`} disabled variant="outlined" />
-          <TextField fullWidth label="Add Balance" value={addBalance} onChange={handleBalanceChange} variant="outlined" />
-          <TextField fullWidth label="Remove Balance" value={removeBalance} onChange={handleRemoveBalanceChange} variant="outlined" />
+        <DialogTitle>Edit User</DialogTitle>
+        <DialogContent className="space-y-4 mt-2">
+          <TextField fullWidth label="User ID" value={formData.userId} disabled />
+          <TextField fullWidth label="Username" name="username" value={formData.username} onChange={handleChange} />
+          <TextField fullWidth label="Email" name="email" value={formData.email} onChange={handleChange} />
+          <TextField fullWidth label="Current Balance" value={`COINS: ${formData.balance}`} disabled />
+          <TextField fullWidth label="Add Balance" value={addBalance} onChange={handleBalanceChange} />
+          <TextField fullWidth label="Remove Balance" value={removeBalance} onChange={handleRemoveBalanceChange} />
         </DialogContent>
-        <DialogActions className="p-4">
+        <DialogActions>
           <Button onClick={() => setShow(false)} color="secondary">Close</Button>
-          <Button onClick={handleSave} color="primary" variant="contained">Save Changes</Button>
+          <Button onClick={handleSave} variant="contained" color="primary">Save Changes</Button>
         </DialogActions>
       </Dialog>
     </div>

@@ -784,6 +784,12 @@ export const SocketProvider = ({ children }) => {
       setIsPlacingBet(false);
     };
 
+    const handalBlockedUser = ({ message }) => {
+      console.error("Blocked user:", message);
+      toast.error(message || "Your account is blocked");
+      setIsPlacingBet(false);
+    }
+
     const handleBalanceUpdated = ({ balance }) => {
       if (balance !== undefined) {
         updateBalance(balance);
@@ -817,6 +823,7 @@ export const SocketProvider = ({ children }) => {
     socket.on("balanceUpdated", handleBalanceUpdated);
     socket.on("winMessage", handleWinMessage);
     socket.on("loseMessage", handleLoseMessage);
+    socket.on("blockedUser", handalBlockedUser);
 
     // Clean up event listeners on unmount
     return () => {
@@ -838,6 +845,7 @@ export const SocketProvider = ({ children }) => {
       socket.off("balanceUpdated", handleBalanceUpdated);
       socket.off("winMessage", handleWinMessage);
       socket.off("loseMessage", handleLoseMessage);
+      socket.off("blockedUser", handalBlockedUser);
     };
   }, [socket, user, updateBalance, gameHistory]);
 
@@ -876,6 +884,10 @@ export const SocketProvider = ({ children }) => {
     // Check if already placed a bet
     if (currentBet) {
       toast.warning("You've already placed a bet for this round");
+      return;
+    }
+    if(user.isblocked){
+      toast.error("Your account is blocked. Please contact support.");
       return;
     }
 

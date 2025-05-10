@@ -49,7 +49,9 @@ export const UserProvider = ({ children }) => {
       });
       localStorage.setItem("token", response.data.token);
       setUser(response.data.user);
+
       setBalance(response.data.user.balance || 0);
+      console.log("Login successful:", response.data.user);
       // toast.success("Login successful!");
       return true;
     } catch (err) {

@@ -92,6 +92,7 @@ export const loginUser = async (req, res) => {
         balance: user.balance,
         role: user.role,
         isActive: true,
+        isBlocked: user.isBlocked,
       },
     });
   } catch (error) {
@@ -114,6 +115,9 @@ export const getMe = async (req, res) => {
       email: user.email,
       balance: user.balance,
       role: user.role,
+      isActive: user.isActive,
+      mobileNo: user.mobileNo,
+      isblocked: user.isBlocked,
     });
   } catch (error) {
     console.error("Get me error:", error);
