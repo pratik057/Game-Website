@@ -36,6 +36,7 @@ const Users = () => {
     fetchUsers();
   }, []);
 
+  console.log("Users data:", users);
   const fetchUsers = async () => {
     const token = localStorage.getItem("adminToken");
     if (!token) {
@@ -179,6 +180,7 @@ const Users = () => {
               <TableCell className="text-white">Username</TableCell>
               <TableCell className="text-white">Email</TableCell>
               <TableCell className="text-white">Balance</TableCell>
+              <TableCell className="text-white">Active</TableCell>
               <TableCell className="text-white text-center">Actions</TableCell>
             </TableRow>
           </TableHead>
@@ -190,6 +192,13 @@ const Users = () => {
                   <TableCell>{user.username}</TableCell>
                   <TableCell>{user.email}</TableCell>
                   <TableCell>COINS: {user.balance}</TableCell>
+                  <TableCell>
+          {user.isActive ? (
+            <span className="text-green-600 font-semibold">Active</span>
+          ) : (
+            <span className="text-red-500 font-semibold">Inactive</span>
+          )}
+        </TableCell>
                   <TableCell className="text-center space-x-2">
                     <Button variant="contained" color="primary" onClick={() => handleEdit(user)}>
                       Edit

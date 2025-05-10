@@ -76,13 +76,30 @@ export const UserProvider = ({ children }) => {
     }
   };
 
-  const logout = () => {
+  
+
+  const logout = async () => {
+    const token = localStorage.getItem("token");
+    if (!token) return;
+  
+    try {
+      await axios.post(`${API_BASE}/logout`, {}, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+    } catch (error) {
+      console.error("Logout error:", error);
+      // Optionally show an error toast here
+    }
+  
+    // Clear frontend state regardless of API response
     localStorage.removeItem("token");
     setUser(null);
     setBalance(0);
     // toast.info("Logged out successfully");
   };
-
+  
   const updateBalance = (newBalance) => {
     setBalance(newBalance);
   };

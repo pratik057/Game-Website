@@ -85,11 +85,13 @@ export const loginUser = async (req, res) => {
 
     const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET, { expiresIn: "1d" });
 
-    user.password = undefined;
 
+    user.password = undefined;
+    await User.findByIdAndUpdate(user._id, { isActive: true });
     res.status(200).json({
       success: true,
       token,
+     
       user: {
         id: user._id,
         username: user.username,
@@ -97,9 +99,10 @@ export const loginUser = async (req, res) => {
         mobileNo: user.mobileNo,
         balance: user.balance,
         role: user.role,
-        isActive: true,
+        isActive: user.isActive,
         isBlocked: user.isBlocked,
       },
+     
     });
   } catch (error) {
     console.error("Login error:", error);
@@ -131,6 +134,20 @@ export const getMe = async (req, res) => {
     res.status(500).json({ success: false, message: "Server error" });
   }
 };
+
+export const logoutUser = async (req, res) => {
+  try {
+    const userId = req.user.id;
+
+    await User.findByIdAndUpdate(userId, { isActive: false });
+
+    res.status(200).json({ success: true, message: "Logged out successfully" });
+  } catch (error) {
+    console.error("Logout error:", error);
+    res.status(500).json({ success: false, message: "Server error" });
+  }
+};
+
 
 // @desc    Get transaction history
 // @route   GET /api/users/transactions
