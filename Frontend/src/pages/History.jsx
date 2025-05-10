@@ -117,7 +117,7 @@ const History = () => {
   return (
 
     <>
-     {/* <BackgroundMusic src="../../public/BagroundMusic.mp3" /> */}
+   
       <nav className="w-full shadow-md p-4">
   <div className="max-w-7xl mx-auto flex flex-wrap justify-between items-center">
     {/* Logo */}

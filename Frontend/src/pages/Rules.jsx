@@ -10,7 +10,7 @@ import {
 } from '@mui/material';
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import { Link } from "react-router-dom";
-import BackgroundMusic from "../components/BagroundMusic"; // Adjust the import path as necessary
+
 const AndarBaharRules = () => {
   return (
     <Container maxWidth="md" sx={{ mt: 5 }}>
@@ -41,7 +41,7 @@ const AndarBaharRules = () => {
         <Typography variant="h4" align="center" gutterBottom sx={{ color: '#90caf9' }}>
           Andar Bahar - Game Rules
         </Typography>
-        <BackgroundMusic src="../../public/BagroundMusic.mp3" />
+        
         <List>
           {[
             {
