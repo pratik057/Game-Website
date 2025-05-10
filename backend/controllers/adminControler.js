@@ -78,61 +78,70 @@ export const users= async (req, res) => {
 };
 
 import Transaction from "../models/Transaction.js";
+// Ensure this is imported if not already
+
 export const editUser = async (req, res) => {
   try {
-      const { id } = req.params; // User ID from URL
-      const { username, email, balance } = req.body; // Updated fields
+    const { id } = req.params;
+    const { username, email, balance, mobileNo, password } = req.body;
 
-      const user = await User.findById(id);
-      if (!user) {
-          return res.status(404).json({ success: false, message: "User not found" });
-      }
+    const user = await User.findById(id);
+    if (!user) {
+      return res.status(404).json({ success: false, message: "User not found" });
+    }
 
-      let transactionType = null;
-      let transactionAmount = 0;
+    let transactionType = null;
+    let transactionAmount = 0;
 
-      // Check if balance is changed and determine transaction type
-      if (balance !== undefined && balance !== user.balance) {
-          transactionType = balance > user.balance ? "credit" : "debit";
-          transactionAmount = Math.abs(balance - user.balance);
-      }
+    // Handle balance change
+    if (balance !== undefined && balance !== user.balance) {
+      transactionType = balance > user.balance ? "credit" : "debit";
+      transactionAmount = Math.abs(balance - user.balance);
+    }
 
-      // Update user details
-      user.username = username || user.username;
-      user.email = email || user.email;
-      user.balance = balance !== undefined ? balance : user.balance;
+    // Update fields
+    user.username = username || user.username;
+    user.email = email || user.email;
+    user.balance = balance !== undefined ? balance : user.balance;
+    user.mobileNo = mobileNo || user.mobileNo;
 
-      // Save updated user
-      await user.save();
+    // Update password if provided
+    if (password && password.trim() !== "") {
+      const salt = await bcrypt.genSalt(10);
+      user.password = await bcrypt.hash(password, salt);
+    }
 
-      // Save transaction if balance changed
-      if (transactionType) {
-          const transaction = await Transaction.create({
-              userId: user._id,
-              type: transactionType,
-              amount: transactionAmount,
-          });
+    await user.save();
 
-          // 🔹 **Fix: Add transaction ID to user's transactions array**
-          user.transactions.push(transaction._id);
-          await user.save();
-      }
-
-      res.status(200).json({ 
-          success: true, 
-          message: "User updated successfully", 
-          user: {
-              id: user._id,
-              username: user.username,
-              email: user.email,
-              balance: user.balance,
-          }
+    // Save transaction if needed
+    if (transactionType) {
+      const transaction = await Transaction.create({
+        userId: user._id,
+        type: transactionType,
+        amount: transactionAmount,
       });
+
+      user.transactions.push(transaction._id);
+      await user.save(); // Save again after pushing transaction
+    }
+
+    res.status(200).json({
+      success: true,
+      message: "User updated successfully",
+      user: {
+        id: user._id,
+        username: user.username,
+        email: user.email,
+        mobileNo: user.mobileNo,
+        balance: user.balance,
+      },
+    });
   } catch (error) {
-      console.error("Edit user error:", error);
-      res.status(500).json({ success: false, message: "Server error" });
+    console.error("Edit user error:", error);
+    res.status(500).json({ success: false, message: "Server error" });
   }
 };
+
 export const deleteUser = async (req, res) => {
   try {
     const { id } = req.params;
