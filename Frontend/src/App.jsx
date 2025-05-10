@@ -19,7 +19,8 @@ import Logout from "./components/logout"
 import Game from "./pages/Game";
 import History from "./pages/History";
 import Rules from "./pages/Rules";
-
+import ForgotPassword from "./pages/forgetPasword";
+import ResetPassword from "./pages/ResetPasword";
 function App() {
   const [loading, setLoading] = useState(true);
 
@@ -53,6 +54,9 @@ function App() {
                     <Route path="/game" element={user ? <Game /> : <Navigate to="/" />} />
                     <Route path="/history" element={user ? <History /> : <Navigate to="/" />} />
                     <Route path="/Rules" element={user ? <Rules /> : <Navigate to="/" />} />
+
+                    <Route path="/forgot-password" element={<ForgotPassword />} />
+                    <Route path="/reset-password" element={<ResetPassword />} />
                   </Routes>
                 )}
               </UserContext.Consumer>

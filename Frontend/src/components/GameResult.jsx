@@ -1,16 +1,16 @@
 "use client"
 
-import { useEffect, useRef } from "react"
+import { useEffect} from "react"
 import { motion, AnimatePresence } from "framer-motion"
 import confetti from "canvas-confetti"
 
 const GameResult = ({ result, winAmount, onPlayAgain, autoClose = false }) => {
-  const winAudioRef = useRef(null)
-  const lossAudioRef = useRef(null)
+  // const winAudioRef = useRef(null)
+  // const lossAudioRef = useRef(null)
 
   useEffect(() => {
     if (result === "win") {
-      winAudioRef.current?.play().catch(e => console.warn("Audio error:", e))
+      // winAudioRef.current?.play().catch(e => console.warn("Audio error:", e))
 
       const duration = 3000
       const animationEnd = Date.now() + duration
@@ -38,7 +38,7 @@ const GameResult = ({ result, winAmount, onPlayAgain, autoClose = false }) => {
 
       return () => clearInterval(interval)
     } else if (result === "loss") {
-      lossAudioRef.current?.play().catch(e => console.warn("Audio error:", e))
+      // lossAudioRef.current?.play().catch(e => console.warn("Audio error:", e))
     }
   }, [result])
 
@@ -56,8 +56,8 @@ const GameResult = ({ result, winAmount, onPlayAgain, autoClose = false }) => {
   return (
     <>
       {/* Preload audio (hidden) */}
-      <audio ref={winAudioRef} src="/Sounds/YouWin.mp3" preload="auto" />
-      <audio ref={lossAudioRef} src="/Sounds/Loss.mp3" preload="auto" />
+      {/* <audio ref={winAudioRef} src="/Sounds/YouWin.mp3" preload="auto" />
+      <audio ref={lossAudioRef} src="/Sounds/Loss.mp3" preload="auto" /> */}
 
       <AnimatePresence>
         <motion.div

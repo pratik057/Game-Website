@@ -30,7 +30,7 @@ const Navbar = () => {
         <div className="flex justify-between items-center h-16">
           <div className="flex items-center">
             <Link to="/dashboard" className="flex items-center">
-              <img src={Logo || "/placeholder.svg"} alt="Andar Bahar" className="h-15 w-18 mr-2 drop-shadow-lg" />
+              <img src={Logo || "/placeholder.svg"} alt="Andar Bahar" className="h-10 w-15 mr-2 drop-shadow-lg" />
             </Link>
             <div className="hidden md:block ml-10">
               <div className="flex items-center space-x-4">
@@ -56,10 +56,10 @@ const Navbar = () => {
             </div>
           </div>
 
-          <h1 className="text-xl sm:text-3xl md:text-5xl font-extrabold text-center relative">
-            <span className="text-red-500 drop-shadow-[0_0_8px_rgba(239,68,68,0.3)]">Andar</span>{" "}
-            <span className="text-white">or</span>{" "}
-            <span className="text-blue-500 drop-shadow-[0_0_8px_rgba(59,130,246,0.3)]">Bahar</span>
+          <h1 className="text-xl sm:text-3xl md:text-4xl font-extrabold text-center relative">
+            <span  className="text-blue-500 drop-shadow-[0_0_8px_rgba(59,130,246,0.3)]">Andar</span>{" "}
+            <span className="text-white"> </span>{" "}
+            <span className="text-red-500 drop-shadow-[0_0_8px_rgba(239,68,68,0.3)]">Bahar</span>
           </h1>
 
           <div className="hidden md:block">

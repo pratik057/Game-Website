@@ -93,21 +93,31 @@ const BetControls = ({ onPlaceBet, disabled, currentBet, connected, gameState })
           >
             {amount}
           </button>
+         
         ))}
+        <input type="number" 
+      className={`px-2 py-1 md:py-2 md:px-4 rounded-full text-xs font-semibold border-2 transition-all duration-200${disabled ? "opacity-50 cursor-not-allowed" : "hover:bg-gray-700"}`}
+        disabled={disabled}
+        onChange={(e) => setBetAmount(e.target.value)}
+        value={betAmount}
+        />
+
       </div>
+
 
       {/* Place Bet Buttons */}
       <div className="flex justify-center gap-6 pt-3">
         <button
           onClick={() => handlePlaceBet("andar")}
-          className="bg-gradient-to-br from-red-500 to-red-900 text-white px-4 py-1 md:py-2 md:px-8 rounded-xl text-md font-bold shadow-lg hover:brightness-110 transition border-2 border-red-700/50 hover:border-red-400"
+          className="bg-gradient-to-br from-blue-500 to-blue-900 text-white px-4 py-1 md:py-2 md:px-8 rounded-xl text-md font-bold shadow-lg hover:brightness-110 transition border-2 border-blue-700/50 hover:border-blue-400"
+         
           disabled={disabled}
         >
           ANDAR
         </button>
         <button
           onClick={() => handlePlaceBet("bahar")}
-          className="bg-gradient-to-br from-blue-500 to-blue-900 text-white px-4 py-1 md:py-2 md:px-8 rounded-xl text-md font-bold shadow-lg hover:brightness-110 transition border-2 border-blue-700/50 hover:border-blue-400"
+          className="bg-gradient-to-br from-red-500 to-red-900 text-white px-4 py-1 md:py-2 md:px-8 rounded-xl text-md font-bold shadow-lg hover:brightness-110 transition border-2 border-red-700/50 hover:border-red-400"
           disabled={disabled}
         >
           BAHAR

@@ -2,7 +2,7 @@ import User from "../models/User.js";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 import dotenv from "dotenv";
-
+import nodemailer from "nodemailer";
 dotenv.config();
 
 // @desc    Register user
@@ -111,6 +111,8 @@ export const loginUser = async (req, res) => {
 };
 
 
+
+
 // @desc    Get current logged-in user
 // @route   GET /api/users/me
 // @access  Private
@@ -167,3 +169,94 @@ export const getTransactionHistory = async (req, res) => {
     res.status(500).json({ success: false, message: "Server error" });
   }
 };
+
+
+
+
+
+// Function to handle forgot password
+export const forgotPassword = async (req, res) => {
+  const { email } = req.body;
+
+  try {
+    const user = await User.findOne({ email });
+    if (!user) {
+      return res.status(404).json({
+        success: false,
+        message: 'User with this email does not exist',
+      });
+    }
+
+    const resetToken = jwt.sign({ userId: user._id }, process.env.JWT_SECRET, { expiresIn: '1h' });
+
+    const resetLink = `https://creative-duckanoo-fb515f.netlify.app/reset-password?token=${resetToken}`; // ✅ fixed
+
+    const transporter = nodemailer.createTransport({
+      service: 'gmail',
+      auth: {
+        user: process.env.EMAIL,
+        pass: process.env.EMAIL_PASS,
+      },
+    });
+
+    const mailOptions = {
+      from: process.env.EMAIL,
+      to: email,
+      subject: 'Password Reset Request',
+      text: `You requested a password reset. Click below:\n\n${resetLink}`,
+    };
+
+    await transporter.sendMail(mailOptions);
+
+    res.status(200).json({
+      success: true,
+      message: 'Password reset link sent to your email',
+    });
+  } catch (error) {
+    console.error('Error in forgot password:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Server error',
+    });
+  }
+};
+
+
+
+
+export const resetPassword = async (req, res) => {
+  const { token, newPassword } = req.body;
+
+  if (!token) {
+    return res.status(400).json({ message: "Token is missing" });
+  }
+
+  try {
+    // Verify the token
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    console.log("Decoded token:", decoded); // Log the decoded object, not just the raw token
+  
+ 
+  
+    // Find the user from decoded token
+    const user = await User.findById(decoded.userId);
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+  
+    // Hash the new password
+    const hashedPassword = await bcrypt.hash(newPassword, 10);
+    user.password = hashedPassword;
+  
+    // Save updated user
+    await user.save();
+  
+    return res.status(200).json({ message: "Password has been reset successfully" });
+  } catch (error) {
+    console.error("Reset password error:", error.message);
+    return res.status(400).json({ message: "Invalid or expired token" });
+  }
+};
+
+
+

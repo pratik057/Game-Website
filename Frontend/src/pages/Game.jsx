@@ -7,7 +7,7 @@ import Card from "../components/Card"
 import BetControls from "../components/BetControls"
 import GameResult from "../components/GameResult"
 import Navbar from "../components/Navbar"
-// import BackgroundMusic from "../components/BagroundMusic"
+
 const Game = () => {
   const { user, balance } = useContext(UserContext)
   const { connected, gameState, currentBet, placeBet } = useContext(SocketContext)
@@ -29,7 +29,7 @@ const Game = () => {
  
       <div className=" w-full h-[100%] flex flex-col justify-between bg-gradient-to-b mt-4 from-gray-900 via-gray-900 to-black text-white px-4 md:px-8 lg:px-16 overflow-hidden">
         {/* Bet Controls */}
-        {/* <BackgroundMusic src="/Sounds/BagroundMusic.mp3" /> */}
+        
         <BetControls
           onPlaceBet={placeBet}
           disabled={gameState.status !== "betting" || currentBet !== null}
@@ -60,9 +60,77 @@ const Game = () => {
 
             {/* Cards Section */}
             <div className="grid grid-cols-2 gap-9 w-full px-4 mt-9">
+                    {/* BAHAR Section */}
+                    <div className="flex flex-col items-center w-full relative">
+                
+                <h2 className="text-sm md:text-lg font-bold text-red-400 mb-5 uppercase bg-red-950/50 px-6 py-1 rounded-full shadow-lg">
+                  Bahar
+                </h2>
+                <div className="relative w-full flex justify-center min-h-[200px]">
+                  {gameState.baharCards.length > 0 ? (
+                    <>
+                      {/* Mobile layout: 5 cards per row */}
+                      <div className="relative w-full h-auto sm:hidden">
+                        {gameState.baharCards.map((card, index) => (
+                          <div
+                            key={`bahar-mobile-${index}`}
+                            className="absolute"
+                            style={{
+                              left: `${(index % 5) * 16}px`,
+                              top: `${Math.floor(index / 5) * 32}px`,
+                              zIndex: index,
+                            }}
+                          >
+                            <Card
+                              card={card}
+                              flipped={true}
+                              highlighted={
+                                gameState.status === "result" &&
+                                gameState.winningSide === "bahar" &&
+                                index === gameState.winningCardIndex
+                              }
+                            />
+                          </div>
+                        ))}
+                      </div>
+
+                      {/* Desktop layout: 10 cards per row */}
+                      <div className="relative w-full h-auto hidden sm:block">
+                        {gameState.baharCards.map((card, index) => (
+                          <div
+                            key={`bahar-desktop-${index}`}
+                            className="absolute"
+                            style={{
+                              left: `${(index % 10) * 20}px`,
+                              top: `${Math.floor(index / 10) * 40}px`,
+                              zIndex: index,
+                            }}
+                          >
+                            <Card
+                              card={card}
+                              flipped={true}
+                              highlighted={
+                                gameState.status === "result" &&
+                                gameState.winningSide === "bahar" &&
+                                index === gameState.winningCardIndex
+                              }
+                            />
+                          </div>
+                        ))}
+                      </div>
+                    </>
+                  ) : (
+                    <div className="w-14 h-20 md:w-28 md:h-36 rounded-lg border-2 border-dashed  flex items-center justify-center mt-6 bg-black/20 backdrop-blur-sm">
+                      <span className="text-yellow-300/70 text-sm text-center text-wrap md:text-base">
+                        No cards yet
+                      </span>
+                    </div>
+                  )}
+                </div>
+              </div>
               {/* ANDAR Section */}
               <div className="flex flex-col items-center w-full relative">
-                <h2 className="text-sm md:text-lg font-bold text-red-400 mb-5 uppercase bg-red-950/50 px-6 py-1 rounded-full shadow-lg">
+              <h2 className="text-sm md:text-lg font-bold text-blue-400 mb-5 uppercase bg-blue-950/50 px-6 py-1 rounded-full shadow-lg">
                   Andar
                 </h2>
                 <div className="relative w-full flex justify-center mr-3">
@@ -128,73 +196,7 @@ const Game = () => {
                 </div>
               </div>
 
-              {/* BAHAR Section */}
-              <div className="flex flex-col items-center w-full relative">
-                <h2 className="text-sm md:text-lg font-bold text-blue-400 mb-5 uppercase bg-blue-950/50 px-6 py-1 rounded-full shadow-lg">
-                  Bahar
-                </h2>
-                <div className="relative w-full flex justify-center min-h-[200px]">
-                  {gameState.baharCards.length > 0 ? (
-                    <>
-                      {/* Mobile layout: 5 cards per row */}
-                      <div className="relative w-full h-auto sm:hidden">
-                        {gameState.baharCards.map((card, index) => (
-                          <div
-                            key={`bahar-mobile-${index}`}
-                            className="absolute"
-                            style={{
-                              left: `${(index % 5) * 16}px`,
-                              top: `${Math.floor(index / 5) * 32}px`,
-                              zIndex: index,
-                            }}
-                          >
-                            <Card
-                              card={card}
-                              flipped={true}
-                              highlighted={
-                                gameState.status === "result" &&
-                                gameState.winningSide === "bahar" &&
-                                index === gameState.winningCardIndex
-                              }
-                            />
-                          </div>
-                        ))}
-                      </div>
-
-                      {/* Desktop layout: 10 cards per row */}
-                      <div className="relative w-full h-auto hidden sm:block">
-                        {gameState.baharCards.map((card, index) => (
-                          <div
-                            key={`bahar-desktop-${index}`}
-                            className="absolute"
-                            style={{
-                              left: `${(index % 10) * 20}px`,
-                              top: `${Math.floor(index / 10) * 40}px`,
-                              zIndex: index,
-                            }}
-                          >
-                            <Card
-                              card={card}
-                              flipped={true}
-                              highlighted={
-                                gameState.status === "result" &&
-                                gameState.winningSide === "bahar" &&
-                                index === gameState.winningCardIndex
-                              }
-                            />
-                          </div>
-                        ))}
-                      </div>
-                    </>
-                  ) : (
-                    <div className="w-14 h-20 md:w-28 md:h-36 rounded-lg border-2 border-dashed  flex items-center justify-center mt-6 bg-black/20 backdrop-blur-sm">
-                      <span className="text-yellow-300/70 text-sm text-center text-wrap md:text-base">
-                        No cards yet
-                      </span>
-                    </div>
-                  )}
-                </div>
-              </div>
+        
             </div>
           </div>
         </div>

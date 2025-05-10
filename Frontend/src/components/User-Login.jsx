@@ -156,6 +156,14 @@ function LoginScreen() {
             >
               I DON'T HAVE AN ACCOUNT
             </Typography>
+            <Typography
+              variant="body2"
+              className="text-center mt-4 cursor-pointer hover:text-white"
+              onClick={() => navigate("/forgot-password")}
+              sx={{ color: "#ffcc00" }}
+            >
+             Forget Password?
+            </Typography>
           </Box>
         </Paper>
       </Container>

@@ -6,7 +6,7 @@ import axios from "axios";
 import { toast } from "react-toastify";
 import { Link } from "react-router-dom";
 import Logo from "../assets/logo.png"; // Import your logo
-import BackgroundMusic from "../components/BagroundMusic"; // Adjust the import path as necessary
+// import BackgroundMusic from "../components/BagroundMusic"; // Adjust the import path as necessary
 const History = () => {
   const { user } = useContext(UserContext);
   const [games, setGames] = useState([]);
@@ -117,7 +117,7 @@ const History = () => {
   return (
 
     <>
-     <BackgroundMusic src="../../public/BagroundMusic.mp3" />
+     {/* <BackgroundMusic src="../../public/BagroundMusic.mp3" /> */}
       <nav className="w-full shadow-md p-4">
   <div className="max-w-7xl mx-auto flex flex-wrap justify-between items-center">
     {/* Logo */}
@@ -132,7 +132,7 @@ const History = () => {
 
     {/* Close Button */}
     <Link
-      to="/"
+      to="/game"
       className="text-red-700 hover:text-white hover:bg-red-700 transition-colors duration-300 text-3xl md:text-6xl font-bold px-4 py-1 rounded-md md:static absolute top-4 right-4 z-50"
       aria-label="Close"
     >
@@ -209,7 +209,10 @@ const History = () => {
                       {new Date(game.createdAt).toLocaleString()}
                     </td>
                     <td className="px-4 py-3">{game.betAmount.toFixed(2)}</td>
-                    <td className="px-4 py-3 text-blue-500">{game.betSide}</td>
+                    <td className={`px-4 py-3 ${game.betSide === "andar" ? "text-blue-500" : "text-red-500"}`}>
+  {game.betSide}
+</td>
+
                     <td className="px-4 py-3">
                       <span
                         className={`px-2 py-1 rounded-full text-xs ${
