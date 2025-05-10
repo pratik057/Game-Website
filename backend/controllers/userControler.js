@@ -62,12 +62,18 @@ export const registerUser = async (req, res) => {
 // @access  Public
 export const loginUser = async (req, res) => {
   try {
-    const { email, password } = req.body;
-    if (!email || !password) {
+    const { username, email, password } = req.body;
+    const identifier = email || username; // Try email first, fallback to username
+
+    if (!identifier || !password) {
       return res.status(400).json({ success: false, message: "Please fill in all fields" });
     }
 
-    const user = await User.findOne({ email }).select("+password");
+    // Find user by email or username
+    const user = await User.findOne({
+      $or: [{ email: identifier }, { username: identifier }],
+    }).select("+password");
+
     if (!user) {
       return res.status(400).json({ success: false, message: "User does not exist" });
     }
@@ -100,6 +106,7 @@ export const loginUser = async (req, res) => {
     res.status(500).json({ success: false, message: "Server error" });
   }
 };
+
 
 // @desc    Get current logged-in user
 // @route   GET /api/users/me

@@ -20,7 +20,7 @@ import Logo from "../assets/logo.png";
 
 function LoginScreen() {
   const [showPassword, setShowPassword] = useState(false);
-  const [email, setEmail] = useState("");
+ const [identifyr, setIdentifier] = useState("");
   const [password, setPassword] = useState("");
 
   const { login } = useContext(UserContext);
@@ -30,7 +30,7 @@ function LoginScreen() {
 
   const handleLogin = async (e) => {
     e.preventDefault();
-    const success = await login(email, password);
+    const success = await login(identifyr, password);
     if (success) {
       navigate("/dashboard");
     }
@@ -91,10 +91,10 @@ function LoginScreen() {
             {/* Email */}
             <TextField
               fullWidth
-              label="Email"
+              label="Email or Username"
               variant="outlined"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
+              value={identifyr}
+              onChange={(e) => setIdentifier(e.target.value)}
               InputLabelProps={{ style: { color: "rgba(255, 204, 0, 0.7)" } }}
               sx={textFieldStyles}
             />
