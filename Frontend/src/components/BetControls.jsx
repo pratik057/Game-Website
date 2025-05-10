@@ -13,7 +13,7 @@ const BetControls = ({ onPlaceBet, disabled, currentBet, connected, gameState })
     if (betAmount <= 0 || betAmount > balance) return
     onPlaceBet(side, betAmount)
   }
-  console.log(user)
+ 
 
   return (
     <div className="w-full h-full bg-gray-800 border-gray-700 rounded-xl shadow-2xl p-4 mb-4 max-w-5xl mx-auto text-white relative overflow-hidden">

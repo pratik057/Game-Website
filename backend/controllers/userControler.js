@@ -234,7 +234,7 @@ export const resetPassword = async (req, res) => {
   try {
     // Verify the token
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
-    console.log("Decoded token:", decoded); // Log the decoded object, not just the raw token
+    // Log the decoded object, not just the raw token
   
  
   

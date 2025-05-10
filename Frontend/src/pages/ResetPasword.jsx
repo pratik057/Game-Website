@@ -32,7 +32,7 @@ const ResetPassword = () => {
   const navigate = useNavigate()
 
   const token = new URLSearchParams(location.search).get("token")
-console.log(token)
+
   const calculatePasswordStrength = (password) => {
     let strength = 0
     if (password.length >= 8) strength += 25

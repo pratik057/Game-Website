@@ -40,7 +40,7 @@ const History = () => {
           }
         );
 
-        console.log("API Response:", response.data);
+       
 
         if (!response.data || !response.data.games) {
           console.error("Invalid API response format");

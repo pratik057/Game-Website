@@ -96,7 +96,7 @@ export const getGameResult = async (req, res) => {
 export const getGameHistory = async (req, res) => {
   try {
     const userId = req.user?.id; // Get user ID from request
-    console.log("User ID:", userId);
+    
 
     if (!userId) {
       return res.status(401).json({ success: false, message: "Unauthorized access." });
@@ -109,8 +109,7 @@ export const getGameHistory = async (req, res) => {
     const user = await User.findById(userId).select("transactions");
     const transactions = user?.transactions || [];
 
-    console.log("Retrieved game history:", games);
-    console.log("Retrieved transaction history:", transactions);
+   
 
     res.status(200).json({
       success: true,
@@ -131,7 +130,7 @@ export const getGameHistory = async (req, res) => {
 export const getTransactionHistory = async (req, res) => {
   try {
     const userId = req.user?.id;
-    console.log("User ID:", userId);
+  
 
     if (!userId) {
       return res.status(401).json({ success: false, message: "Unauthorized access." });
