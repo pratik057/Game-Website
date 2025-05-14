@@ -1,0 +1,24 @@
+/* custom.css */
+@media (min-width: 750px) and (max-width: 1024px) {
+    .tabview{
+        display: none;
+    }
+}
+@media (min-width: 639px) and (max-width: 1024px) {
+    .dashboard{
+       height: auto;
+
+    }
+    .image{
+        display: none;
+    }
+    .margin{
+        margin-top: 30px;
+    }
+  
+}
+@media (min-width: 0px) and (max-width: 768px) {
+    .baground{
+        height: full;
+    }
+}

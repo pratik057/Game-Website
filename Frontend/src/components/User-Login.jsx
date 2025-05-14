@@ -38,7 +38,7 @@ function LoginScreen() {
 
   return (
     <div
-      className="min-h-screen h-screen w-full flex flex-col items-center justify-start bg-cover bg-center px-4 py-8 relative"
+      className="min-h-screen h-full w-full flex flex-col items-center justify-start bg-cover bg-center px-4 py-8 relative"
       style={{ backgroundImage: `url(${NewBackground})` }}
     >
       {/* Logo - Top Left on Desktop, Centered on Mobile */}

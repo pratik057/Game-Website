@@ -49,6 +49,9 @@ const userSchema = new mongoose.Schema({
     default: false,
   }
 ,  
+resetPasswordToken: String,
+resetPasswordExpires: Date,
+
   isAdmin: { type: Boolean, default: false },
   transactions: [
     {

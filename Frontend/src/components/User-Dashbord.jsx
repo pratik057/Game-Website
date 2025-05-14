@@ -85,7 +85,7 @@ import girlimage from "../assets/model.png";
 import backgroundImage from "../assets/bg.png";
 import { UserContext } from "../context/UserContext";
 import Logo from "../assets/logo.png";
-
+import "../css/custom.css";
 const GameUI = () => {
   const { logout } = useContext(UserContext);
   const navigate = useNavigate();
@@ -97,7 +97,7 @@ const GameUI = () => {
 
   return (
     <div
-      className="w-screen h-screen flex flex-col lg:flex-row items-center justify-center bg-cover bg-center relative overflow-hidden"
+      className="w-screen h-screen  flex flex-col lg:flex-row items-center justify-center bg-cover bg-center relative overflow-hidden dashbord "
       style={{ backgroundImage: `url(${backgroundImage})` }}
     >
      <div className="w-full flex justify-center md:justify-start md:pl-8 absolute top-4 md:top-6">
@@ -111,7 +111,7 @@ const GameUI = () => {
     
 
       {/* Left Section */}
-      <div className="w-full lg:w-1/2 flex flex-col items-center text-center lg:text-left px-4 sm:px-6 md:px-12 mt-20 sm:mt-0">
+      <div className="w-full lg:w-1/2 flex flex-col items-center text-center lg:text-left px-4 sm:px-6 md:px-12 mt-20 sm:mt-0 margin">
         {/* Game Menu */}
         <main className="flex justify-center w-full px-4 sm:px-12 lg:px-24 mt-4 sm:mt-8">
           <div className="bg-[#1a1a2e] rounded-lg shadow-[0_0_15px_#ffd70030] p-6 w-full max-w-md flex flex-col items-center">
@@ -150,7 +150,7 @@ const GameUI = () => {
       </div>
 
       {/* Right Section (Game Assistant Image) */}
-      <div className="w-1/2 h-full sm:flex hidden justify-center items-center relative">
+      <div className="w-1/2 h-full sm:flex hidden justify-center items-center relative image">
         <img
           src={girlimage}
           alt="Game Assistant"

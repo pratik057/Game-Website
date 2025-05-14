@@ -6,7 +6,7 @@ import { UserContext } from "../context/UserContext";
 import LoginModal from "./User-Login";
 import RegisterModal from "./User-register";
 import Logo from "../assets/logo.png";
-
+import "../css/custom.css"
 const Navbar = () => {
   const { user, balance, logout } = useContext(UserContext);
   const [showLoginModal, setShowLoginModal] = useState(false);
@@ -64,7 +64,7 @@ const Navbar = () => {
             </div>
           </div>
 
-          <h1 className="text-xl sm:text-3xl md:text-4xl font-extrabold text-center relative">
+          <h1 className="text-xl sm:text-3xl md:text-4xl font-extrabold text-center relative tabview">
             <span className="text-blue-500 drop-shadow-[0_0_8px_rgba(59,130,246,0.3)]">
               Andar
             </span>{" "}

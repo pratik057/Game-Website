@@ -181,15 +181,17 @@ export const forgotPassword = async (req, res) => {
   try {
     const user = await User.findOne({ email });
     if (!user) {
-      return res.status(404).json({
-        success: false,
-        message: 'User with this email does not exist',
-      });
+      return res.status(404).json({ success: false, message: 'User with this email does not exist' });
     }
 
     const resetToken = jwt.sign({ userId: user._id }, process.env.JWT_SECRET, { expiresIn: '1h' });
 
-    const resetLink = `https://creative-duckanoo-fb515f.netlify.app/reset-password?token=${resetToken}`; // ✅ fixed
+    // Save token and expiry to DB
+    user.resetPasswordToken = resetToken;
+    user.resetPasswordExpires = Date.now() + 3600000; // 1 hour
+    await user.save();
+
+    const resetLink = `https://creative-duckanoo-fb515f.netlify.app/reset-password?token=${resetToken}`;
 
     const transporter = nodemailer.createTransport({
       service: 'gmail',
@@ -203,21 +205,15 @@ export const forgotPassword = async (req, res) => {
       from: process.env.EMAIL,
       to: email,
       subject: 'Password Reset Request',
-      text: `You requested a password reset. Click below:\n\n${resetLink}`,
+      text: `You requested a password reset. Click below to reset your password:\n\n${resetLink}`,
     };
 
     await transporter.sendMail(mailOptions);
 
-    res.status(200).json({
-      success: true,
-      message: 'Password reset link sent to your email',
-    });
+    res.status(200).json({ success: true, message: 'Password reset link sent to your email' });
   } catch (error) {
-    console.error('Error in forgot password:', error);
-    res.status(500).json({
-      success: false,
-      message: 'Server error',
-    });
+    console.error('Forgot Password Error:', error);
+    res.status(500).json({ success: false, message: 'Server error' });
   }
 };
 
@@ -227,36 +223,35 @@ export const forgotPassword = async (req, res) => {
 export const resetPassword = async (req, res) => {
   const { token, newPassword } = req.body;
 
-  if (!token) {
-    return res.status(400).json({ message: "Token is missing" });
-  }
+  if (!token) return res.status(400).json({ message: "Token is missing" });
 
   try {
-    // Verify the token
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
-    // Log the decoded object, not just the raw token
-  
- 
-  
-    // Find the user from decoded token
-    const user = await User.findById(decoded.userId);
+
+    const user = await User.findOne({
+      _id: decoded.userId,
+      resetPasswordToken: token,
+      resetPasswordExpires: { $gt: Date.now() },
+    });
+
     if (!user) {
-      return res.status(404).json({ message: "User not found" });
+      return res.status(400).json({ message: "Invalid or expired token" });
     }
-  
-    // Hash the new password
+
     const hashedPassword = await bcrypt.hash(newPassword, 10);
     user.password = hashedPassword;
-  
-    // Save updated user
+
+    // Invalidate the token
+    user.resetPasswordToken = undefined;
+    user.resetPasswordExpires = undefined;
+
     await user.save();
-  
+
     return res.status(200).json({ message: "Password has been reset successfully" });
   } catch (error) {
-    console.error("Reset password error:", error.message);
+    console.error("Reset Password Error:", error.message);
     return res.status(400).json({ message: "Invalid or expired token" });
   }
 };
-
 
 
