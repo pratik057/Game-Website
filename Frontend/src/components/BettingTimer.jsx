@@ -1,6 +1,6 @@
 const BettingTimer = ({ timeLeft }) => {
   // Calculate percentage for the progress bar
-  const percentage = (timeLeft / 30) * 100
+  const percentage = (timeLeft / 20) * 100
 
   return (
     <div className="flex items-center">

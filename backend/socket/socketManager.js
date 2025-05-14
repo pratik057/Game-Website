@@ -698,7 +698,7 @@ const gameState = {
   baharCards: [],
   winningSide: null,
   winningCardIndex: null,
-  bettingTimeLeft: 30, // seconds
+  bettingTimeLeft: 20, // seconds
   players: {},
   totalBets: {
     andar: 0,
@@ -948,7 +948,7 @@ const startGameLoop = (io) => {
 
       // Change game status to betting
       gameState.status = "betting"
-      gameState.bettingTimeLeft = 30
+      gameState.bettingTimeLeft = 20
       
       // Notify clients that betting has started
       io.emit("bettingStarted", { timeLeft: gameState.bettingTimeLeft })

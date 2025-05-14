@@ -20,7 +20,7 @@ import Logo from "../assets/logo.png";
 
 function LoginScreen() {
   const [showPassword, setShowPassword] = useState(false);
- const [identifyr, setIdentifier] = useState("");
+  const [identifyr, setIdentifier] = useState("");
   const [password, setPassword] = useState("");
 
   const { login } = useContext(UserContext);
@@ -58,9 +58,8 @@ function LoginScreen() {
       >
         {/* Left Side - Title and Description */}
         <div className="text-white mb-10 md:mb-0 md:w-1/2 md:pr-8 text-center md:text-left">
-          
           <p className="text-lg mb-6 max-w-md mx-auto md:mx-0">
-            Sign in to ANDAR BAHAR and experience real-time  gameplay insights.
+            Sign in to ANDAR BAHAR and experience real-time gameplay insights.
           </p>
           <h2 className="text-2xl md:text-3xl font-semibold">
             We are happy to see you back...
@@ -82,12 +81,19 @@ function LoginScreen() {
             <Typography variant="subtitle1" sx={{ color: "#ffcc00" }}>
               WELCOME BACK
             </Typography>
-            <Typography variant="h5" sx={{ color: "#ffcc00", fontWeight: "bold" }}>
+            <Typography
+              variant="h5"
+              sx={{ color: "#ffcc00", fontWeight: "bold" }}
+            >
               Sign in to your Account
             </Typography>
           </Box>
 
-          <Box component="form" className="space-y-4 mt-6" onSubmit={handleLogin}>
+          <Box
+            component="form"
+            className="space-y-4 mt-6"
+            onSubmit={handleLogin}
+          >
             {/* Email */}
             <TextField
               fullWidth
@@ -111,7 +117,11 @@ function LoginScreen() {
               InputProps={{
                 endAdornment: (
                   <InputAdornment position="end">
-                    <IconButton onClick={handleClickShowPassword} edge="end" sx={{ color: "#ffcc00" }}>
+                    <IconButton
+                      onClick={handleClickShowPassword}
+                      edge="end"
+                      sx={{ color: "#ffcc00" }}
+                    >
                       {showPassword ? <VisibilityOff /> : <Visibility />}
                     </IconButton>
                   </InputAdornment>
@@ -141,7 +151,11 @@ function LoginScreen() {
             {/* Divider */}
             <div className="flex items-center justify-center my-4">
               <Divider sx={{ backgroundColor: "#ffcc00", flexGrow: 1 }} />
-              <Typography variant="body2" className="mx-2" sx={{ color: "#ffcc00" }}>
+              <Typography
+                variant="body2"
+                className="mx-2"
+                sx={{ color: "#ffcc00" }}
+              >
                 Or
               </Typography>
               <Divider sx={{ backgroundColor: "#ffcc00", flexGrow: 1 }} />
@@ -162,7 +176,7 @@ function LoginScreen() {
               onClick={() => navigate("/forgot-password")}
               sx={{ color: "#ffcc00" }}
             >
-             Forget Password?
+              Forget Password?
             </Typography>
           </Box>
         </Paper>

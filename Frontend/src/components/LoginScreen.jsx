@@ -14,7 +14,7 @@ export default function LoginScreen() {
         <img
           src={Logo}
           alt="Logo"
-          className="w-20 md:w-24 lg:w-28"
+          className="w-20 md:w-20 lg:w-20"
           style={{ maxWidth: "150px", objectFit: "contain" }}
         />
       </div>

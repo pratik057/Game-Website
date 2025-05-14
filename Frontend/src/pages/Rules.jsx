@@ -10,11 +10,17 @@ import {
 } from '@mui/material';
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import { Link } from "react-router-dom";
-
+import Logo from "../assets/logo.png"; // Import your logo
 const AndarBaharRules = () => {
   return (
     <Container maxWidth="md" sx={{ mt: 5 }}>
-      
+        <Link to="/dashboard" className="flex items-center space-x-2">
+                  <img
+                    src={Logo || "/placeholder.svg"}
+                    alt="Andar Bahar"
+                    className="h-15 md:h-24 w-auto drop-shadow-lg"
+                  />
+                </Link>
       <Paper
         elevation={3}
         sx={{

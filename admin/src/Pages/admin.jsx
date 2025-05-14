@@ -58,8 +58,14 @@ const Users = () => {
   const handleSearch = (e) => {
     const query = e.target.value.toLowerCase();
     setSearchEmail(query);
-    setFilteredUsers(users.filter((user) => user.email.toLowerCase().includes(query)));
+    setFilteredUsers(
+      users.filter((user) =>
+        user.email.toLowerCase().includes(query) ||
+        user.username.toLowerCase().includes(query)
+      )
+    );
   };
+  
 
   const handleEdit = (user) => {
     setSelectedUser(user);
@@ -158,7 +164,7 @@ const Users = () => {
       {/* Search and Stats */}
       <div className="flex justify-between items-center mb-4">
         <TextField
-          label="Search by Email"
+          label="Search by Email or Username"
           value={searchEmail}
           onChange={handleSearch}
           variant="outlined"
