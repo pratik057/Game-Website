@@ -13,6 +13,5 @@ router.delete("/users/:id",verifyAdmin,deleteUser); // Delete user
 router.put("/users/:id/block",verifyAdmin,toggleBlockUser); // Block/Unblock user
 router.get("/users",verifyAdmin,users); // Get all users
 router.put("/users/:id",verifyAdmin,editUser); // Edit user
-// Get online players
- // Get user's transactions
+
 export default router;

@@ -40,7 +40,7 @@ const WalletControls = ({ onClose }) => {
 
   const fetchTransactionHistory = async () => {
     try {
-      const response = await fetch(`https://game-website-yyuo.onrender.com/api/games/transactions`, {
+      const response = await fetch(`http://localhost:5000/api/games/transactions`, {
         method: "GET",
         headers: {
           "Content-Type": "application/json",
