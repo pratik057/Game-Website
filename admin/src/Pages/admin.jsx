@@ -44,7 +44,7 @@
 //     }
 
 //     try {
-//       const res = await axios.get("http://localhost:5000/api/admin/users", {
+//       const res = await axios.get("https://game-website-yyuo.onrender.com/api/admin/users", {
 //         headers: { Authorization: `Bearer ${token}` },
 //       });
 //       setUsers(res.data.users);
@@ -108,7 +108,7 @@
 
 //     try {
 //       await axios.put(
-//         `http://localhost:5000/api/admin/users/${selectedUser._id}`,
+//         `https://game-website-yyuo.onrender.com/api/admin/users/${selectedUser._id}`,
 //         { ...formData, balance: updatedBalance },
 //         { headers: { Authorization: `Bearer ${token}` } }
 //       );
@@ -129,7 +129,7 @@
 
 //     try {
 //       await axios.delete(
-//         `http://localhost:5000/api/admin/users/${userId}`,
+//         `https://game-website-yyuo.onrender.com/api/admin/users/${userId}`,
 //         { headers: { Authorization: `Bearer ${token}` } }
 //       );
 //       fetchUsers();
@@ -145,7 +145,7 @@
 
 //     try {
 //       await axios.put(
-//         `http://localhost:5000/api/admin/users/${userId}/block`,
+//         `https://game-website-yyuo.onrender.com/api/admin/users/${userId}/block`,
 //         { isBlocked: !isBlocked },
 //         { headers: { Authorization: `Bearer ${token}` } }
 //       );
@@ -368,7 +368,7 @@ const fetchUsers = async () => {
   }
 
   try {
-    const res = await axios.get("http://localhost:5000/api/admin/users", {
+    const res = await axios.get("https://game-website-yyuo.onrender.com/api/admin/users", {
       headers: { Authorization: `Bearer ${token}` },
     });
     const nonAdminUsers = res.data.users.filter(user => user.isAdmin !== true);
@@ -507,7 +507,7 @@ const handleSave = async () => {
 
   try {
     await axios.put(
-      `http://localhost:5000/api/admin/users/${selectedUser._id}`,
+      `https://game-website-yyuo.onrender.com/api/admin/users/${selectedUser._id}`,
       updateData,
       {
         headers: { Authorization: `Bearer ${token}` },
@@ -534,7 +534,7 @@ const handleDelete = async (userId) => {
 
   try {
     await axios.delete(
-      `http://localhost:5000/api/admin/users/${userId}`,
+      `https://game-website-yyuo.onrender.com/api/admin/users/${userId}`,
       {
         headers: { Authorization: `Bearer ${token}` },
       }
@@ -556,7 +556,7 @@ const toggleBlock = async (userId, isBlocked) => {
 
   try {
     await axios.put(
-      `http://localhost:5000/api/admin/users/${userId}/block`,
+      `https://game-website-yyuo.onrender.com/api/admin/users/${userId}/block`,
       { isBlocked: !isBlocked },
       {
         headers: { Authorization: `Bearer ${token}` },
@@ -686,14 +686,14 @@ const getSearchIcon = () => {
                 }}
                 className="cursor-pointer"
               />
-              {/* <Chip
+              <Chip
                 label="Active Users"
                 color="success"
                 onClick={() => {
                   setFilteredUsers(users.filter((user) => user.isActive))
                 }}
                 className="cursor-pointer"
-              /> */}
+              />
               <Chip
                 label="Blocked Users"
                 color="error"
@@ -773,7 +773,7 @@ const getSearchIcon = () => {
                             className="bg-amber-50"
                           />
                         </TableCell>
-                        {/* <TableCell>
+                        <TableCell>
                           <div className="flex flex-col gap-1">
                             {user.isActive ? (
                               <Chip size="small" label="Active" className="bg-green-100 text-green-800" />
@@ -784,7 +784,7 @@ const getSearchIcon = () => {
                               <Chip size="small" label="Blocked" className="bg-red-100 text-red-800" />
                             )}
                           </div>
-                        </TableCell> */}
+                        </TableCell>
                         <TableCell>
                           <div className="flex justify-center gap-2">
                             <Tooltip title="Edit User">
