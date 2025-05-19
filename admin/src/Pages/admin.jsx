@@ -31,6 +31,7 @@ const Users = () => {
     email: "",
     balance: 0,
   });
+  const [onlinePlayers, setOnlinePlayers] = useState([]);
 
   useEffect(() => {
     fetchUsers();
@@ -118,6 +119,24 @@ const Users = () => {
       alert("Failed to update user.");
     }
   };
+  const activePlayers = async () => {
+    const token = localStorage.getItem("adminToken");
+    if (!token) return alert("Token missing.");
+    try {
+      const res = await axios.get(
+        "https://game-website-yyuo.onrender.com/api/admin/onlinePlayers",
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+      const activeUsers = res.data
+
+     console.log("Active Users:", activeUsers);
+    } catch (error) {
+      console.error("Error fetching active users:", error);
+      alert("Failed to fetch active users.");
+    }
+  };
+activePlayers();
+  
 
   const handleDelete = async (userId) => {
     const token = localStorage.getItem("adminToken");

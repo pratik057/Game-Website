@@ -1,6 +1,5 @@
 import User from "../models/User.js";
 import Game from "../models/game.js";
-import ActivePlayer from "../models/ActivePlayers.js";
 import jwt from "jsonwebtoken";
 import bcrypt from "bcryptjs";
 
@@ -176,15 +175,3 @@ export const toggleBlockUser = async (req, res) => {
 };
 
 
-export const getActivePlayers = async (req, res) => {
-  // GET /api/active-players/online
-
-  try {
-    const players = await ActivePlayer.find({ isActive: true }).populate("userId", "username")
-    res.json(players)
-  } catch (error) {
-    res.status(500).json({ message: "Failed to fetch active players" })
-  }
-
-
-};
