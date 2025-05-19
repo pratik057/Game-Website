@@ -31,7 +31,6 @@ const Users = () => {
     email: "",
     balance: 0,
   });
-  const [onlinePlayers, setOnlinePlayers] = useState([]);
 
   useEffect(() => {
     fetchUsers();
@@ -81,6 +80,8 @@ const Users = () => {
     setShow(true);
   };
 
+  
+
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
@@ -119,24 +120,6 @@ const Users = () => {
       alert("Failed to update user.");
     }
   };
-  const activePlayers = async () => {
-    const token = localStorage.getItem("adminToken");
-    if (!token) return alert("Token missing.");
-    try {
-      const res = await axios.get(
-        "https://game-website-yyuo.onrender.com/api/admin/onlinePlayers",
-        { headers: { Authorization: `Bearer ${token}` } }
-      );
-      const activeUsers = res.data
-
-     console.log("Active Users:", activeUsers);
-    } catch (error) {
-      console.error("Error fetching active users:", error);
-      alert("Failed to fetch active users.");
-    }
-  };
-activePlayers();
-  
 
   const handleDelete = async (userId) => {
     const token = localStorage.getItem("adminToken");
@@ -175,7 +158,7 @@ activePlayers();
 
   const userCount = filteredUsers.length;
   const totalBalance = filteredUsers.reduce((acc, user) => acc + (user.balance || 0), 0);
-
+  const ActiveUser = filteredUsers.filter(user => user.isActive).length;
   return (
     <div className="container mx-auto p-6 bg-gray-100 min-h-screen">
       <h2 className="text-3xl font-bold text-center mb-6 text-gray-800">Users List</h2>
@@ -192,6 +175,7 @@ activePlayers();
         <div className="space-x-6 text-gray-700 font-medium">
           <span>👤 Total Users: {userCount}</span>
           <span>💰 Total Coins: {totalBalance}</span>
+          <span>🟢 Active Users: {ActiveUser}</span>
         </div>
       </div>
 

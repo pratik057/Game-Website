@@ -87,7 +87,6 @@ export const loginUser = async (req, res) => {
 
 
     user.password = undefined;
-    await User.findByIdAndUpdate(user._id, { isActive: true });
     res.status(200).json({
       success: true,
       token,
