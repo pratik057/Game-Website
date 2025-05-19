@@ -878,7 +878,7 @@ export const initializeSocketIO = (io) => {
       try {
         if (gameState.players[socket.id]) {
           io.emit("playerLeft", { id: socket.id, username: gameState.players[socket.id].username })
-          await User.findByIdAndUpdate(gameState.players[socket.id].userId, { isActive: true });
+          await User.findByIdAndUpdate(gameState.players[socket.id].userId, { isActive: false });
 
           delete gameState.players[socket.id]
         }
