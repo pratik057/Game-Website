@@ -9,4 +9,5 @@ router.post("/bet", protect, placeBet);
 router.get("/:gameId/result", protect, getGameResult);
 router.get("/history", protect, getGameHistory); // Fixed function name
 router.get("/transactions", protect, getTransactionHistory); // Fixed function name
+
 export default router;

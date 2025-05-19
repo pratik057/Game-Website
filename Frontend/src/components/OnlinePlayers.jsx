@@ -1,12 +1,13 @@
 "use client"
 
-import { useState } from "react"
-
+import { useState,useContext } from "react"
+import { SocketContext } from "../context/SocketContext"
 const OnlinePlayers = ({ players = [] }) => {
   const [expanded, setExpanded] = useState(true)
- 
+ const { onlinePlayers } = useContext(SocketContext)
 
-  if (!players || players.length === 0) {
+
+  if (!onlinePlayers || onlinePlayers.length === 0) {
     return (
       <div className="bg-gray-800 rounded-lg p-4 mb-6">
         <div className="flex justify-between items-center mb-4">
@@ -32,8 +33,8 @@ const OnlinePlayers = ({ players = [] }) => {
 
       {expanded && (
   <div className="space-y-3 max-h-96 overflow-y-auto pr-2">
-    {(players ?? []).length > 0 ? (
-      players.map((player) => (
+    {(onlinePlayers ?? []).length > 0 ? (
+      onlinePlayers.map((player) => (
         <div
           key={player?.id || Math.random()}
           className="flex items-center justify-between bg-gray-700 rounded-lg p-3"

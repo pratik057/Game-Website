@@ -160,11 +160,11 @@
 // //     gameState.jokerCard = joker;
 // //     io.emit("jokerRevealed", { jokerCard: joker });
 // //     await new Promise((resolve) => setTimeout(resolve, 2000));
-  
+
 // //     const andarBet = gameState.totalBets.andar;
 // //     const baharBet = gameState.totalBets.bahar;
 // //     let forcedWinningSide = andarBet < baharBet ? "andar" : "bahar";
-  
+
 // //     let andar = [], bahar = [], foundMatch = false;
 // //     while (!foundMatch && deck.length > 0) {
 // //       const card = deck.pop();
@@ -174,10 +174,10 @@
 // //       if (card.value === joker.value && currentSide === forcedWinningSide) foundMatch = true;
 // //       await new Promise((resolve) => setTimeout(resolve, 1000));
 // //     }
-  
+
 // //     gameState.winningSide = forcedWinningSide;
 // //     io.emit("gameResult", { winningSide: forcedWinningSide });
-  
+
 // //     // Calculate winnings
 // //     Object.values(gameState.players).forEach(async (player) => {
 // //       if (player.bet) {
@@ -185,7 +185,7 @@
 // //           // Player wins, gets 2x the bet amount back
 // //           const winnings = player.bet.amount * 2;
 // //           player.balance += winnings;
-          
+
 // //           if (player.userId) {
 // //             try {
 // //               await User.findByIdAndUpdate(player.userId, { $inc: { balance: winnings } });
@@ -193,7 +193,7 @@
 // //               console.error("Error updating user balance:", error);
 // //             }
 // //           }
-  
+
 // //           io.to(player.id).emit("balanceUpdated", { balance: player.balance });
 // //           io.to(player.id).emit("winMessage", { amountWon: winnings });
 // //         } else {
@@ -202,14 +202,13 @@
 // //         }
 // //       }
 // //     });
-  
+
 // //     await new Promise((resolve) => setTimeout(resolve, 10000));
 // //     resetGame();
 // //   };
-  
+
 // //   resetGame();
 // // };
-
 
 // import { generateDeck, shuffleDeck } from "../utils/gameUtils.js"
 // import User from "../models/User.js"
@@ -441,7 +440,6 @@
 //     try {
 //       if (bettingTimer) clearInterval(bettingTimer)
 
-
 //       gameState.bettingTimeLeft = 30
 //       io.emit("bettingStarted", { timeLeft: gameState.bettingTimeLeft })
 
@@ -639,7 +637,7 @@
 //       try {
 //         const gameRecords = Object.values(gameState.players).map((player) => {
 //           if (!player.bet) return null // Skip players who didn't bet
-      
+
 //           return {
 //             user: player.userId,
 //             betAmount: player.bet.amount,
@@ -653,7 +651,7 @@
 //             winAmount: player.bet.side === gameState.winningSide ? player.bet.amount * 2 : 0, // Double the bet if won
 //           }
 //         }).filter(record => record !== null) // Remove null entries
-      
+
 //         await Game.insertMany(gameRecords) // Save all game records in one go
 //       } catch (error) {
 //         console.error("Error saving game record:", error)
@@ -685,11 +683,11 @@
 //   resetGame()
 // }
 
-import { generateDeck, shuffleDeck } from "../utils/gameUtils.js"
-import User from "../models/User.js"
-import Game from "../models/game.js"
-import jwt from "jsonwebtoken"
-
+import { generateDeck, shuffleDeck } from "../utils/gameUtils.js";
+import User from "../models/User.js";
+import Game from "../models/game.js";
+import jwt from "jsonwebtoken";
+import ActivePlayer from "../models/ActivePlayers.js";
 // Game state
 const gameState = {
   status: "waiting", // waiting, jokerRevealed, betting, dealing, result
@@ -707,35 +705,35 @@ const gameState = {
   gameId: generateGameId(),
   lastGameResult: null,
   isProcessingBets: false, // Flag to prevent race conditions
-}
+};
 
 // Timer references
-let bettingTimer = null
-const gameLoopTimer = null
+let bettingTimer = null;
+const gameLoopTimer = null;
 
 // Generate a random game ID
 function generateGameId() {
-  return Math.random().toString(36).substring(2, 15)
+  return Math.random().toString(36).substring(2, 15);
 }
 
 // Verify JWT token
 const verifyToken = (token) => {
   try {
-    if (!token) return null
-    return jwt.verify(token, process.env.JWT_SECRET || "andarbahar-secret-key")
+    if (!token) return null;
+    return jwt.verify(token, process.env.JWT_SECRET || "andarbahar-secret-key");
   } catch (error) {
-    console.error("Token verification error:", error)
-    return null
+    console.error("Token verification error:", error);
+    return null;
   }
-}
+};
 
 // Initialize Socket.IO
 export const initializeSocketIO = (io) => {
   // Clean up any existing timers on server restart
-  if (bettingTimer) clearInterval(bettingTimer)
-  if (gameLoopTimer) clearInterval(gameLoopTimer)
+  if (bettingTimer) clearInterval(bettingTimer);
+  if (gameLoopTimer) clearInterval(gameLoopTimer);
 
-  startGameLoop(io)
+  startGameLoop(io);
 
   io.on("connection", (socket) => {
     try {
@@ -747,18 +745,18 @@ export const initializeSocketIO = (io) => {
           username: player.username,
           bet: player.bet,
         })),
-      })
+      });
     } catch (error) {
-      console.error("Error sending initial game state:", error)
+      console.error("Error sending initial game state:", error);
     }
 
     socket.on("authenticate", async ({ token }) => {
       try {
-        const decoded = verifyToken(token)
+        const decoded = verifyToken(token);
 
         if (decoded) {
           try {
-            const user = await User.findById(decoded.id)
+            const user = await User.findById(decoded.id);
             if (user) {
               gameState.players[socket.id] = {
                 id: socket.id,
@@ -766,85 +764,113 @@ export const initializeSocketIO = (io) => {
                 username: user.username,
                 balance: user.balance,
                 bet: null,
-              }
-              io.emit("playerJoined", { id: socket.id, username: user.username })
+              };
+              await ActivePlayer.findOneAndUpdate(
+                { userId: user._id },
+                {
+                  socketId: socket.id,
+                  username: user.username,
+                  isActive: true,
+                  joinedAt: new Date(),
+                },
+                { upsert: true, new: true }
+              );
+
+              io.emit("playerJoined", {
+                id: socket.id,
+                username: user.username,
+              });
               socket.emit("authenticated", {
                 userId: user._id,
                 username: user.username,
                 balance: user.balance,
-              })
+              });
             }
           } catch (error) {
-            console.error("Authentication error:", error)
-            socket.emit("authError", { message: "Authentication failed" })
+            console.error("Authentication error:", error);
+            socket.emit("authError", { message: "Authentication failed" });
           }
         }
       } catch (error) {
-        console.error("Token verification error:", error)
-        socket.emit("authError", { message: "Invalid token" })
+        console.error("Token verification error:", error);
+        socket.emit("authError", { message: "Invalid token" });
       }
-    })
+    });
 
     socket.on("placeBet", async ({ side, amount }) => {
       try {
         // Validate inputs to prevent crashes
-        if (!side || !["andar", "bahar"].includes(side) || !amount || isNaN(amount) || amount <= 0) {
-          socket.emit("betError", { message: "Invalid bet parameters" })
-          return
+        if (
+          !side ||
+          !["andar", "bahar"].includes(side) ||
+          !amount ||
+          isNaN(amount) ||
+          amount <= 0
+        ) {
+          socket.emit("betError", { message: "Invalid bet parameters" });
+          return;
         }
 
         // Check if game is in betting state
         if (gameState.status !== "betting") {
-          socket.emit("betError", { message: "Betting is not open right now" })
-          return
+          socket.emit("betError", { message: "Betting is not open right now" });
+          return;
         }
 
         // Check if we're already processing a bet to prevent race conditions
         if (gameState.isProcessingBets) {
-          socket.emit("betError", { message: "Processing another bet, please try again" })
-          return
+          socket.emit("betError", {
+            message: "Processing another bet, please try again",
+          });
+          return;
         }
 
-        const player = gameState.players[socket.id]
+        const player = gameState.players[socket.id];
         if (!player) {
-          socket.emit("betError", { message: "Player not found" })
-          return
+          socket.emit("betError", { message: "Player not found" });
+          return;
         }
 
         // Check if player already placed a bet
         if (player.bet) {
-          socket.emit("betError", { message: "You've already placed a bet for this round" })
-          return
+          socket.emit("betError", {
+            message: "You've already placed a bet for this round",
+          });
+          return;
         }
 
         // Check if player has enough balance
         if (player.balance < amount) {
-          socket.emit("betError", { message: "Insufficient balance" })
-          return
+          socket.emit("betError", { message: "Insufficient balance" });
+          return;
         }
         if (player.userId) {
           const dbUser = await User.findById(player.userId).select("isBlocked");
           if (dbUser?.isBlocked) {
-            socket.emit("betError", { message: "You are blocked from playing." });
+            socket.emit("betError", {
+              message: "You are blocked from playing.",
+            });
             return;
           }
         }
-      
+
         // Set processing flag to prevent race conditions
-        gameState.isProcessingBets = true
+        gameState.isProcessingBets = true;
 
         try {
           // Update player's bet and balance
-          player.bet = { side, amount }
-          player.balance -= amount
-          gameState.totalBets[side] += amount
+          player.bet = { side, amount };
+          player.balance -= amount;
+          gameState.totalBets[side] += amount;
 
           // Update user balance in database
           if (player.userId) {
             try {
-              await User.findByIdAndUpdate(player.userId, { $inc: { balance: -amount } })
+              await User.findByIdAndUpdate(player.userId, {
+                $inc: { balance: -amount },
+              });
             } catch (error) {
-              console.error("Error updating user balance:", error)
+              console.error("Error updating user balance:", error);
               // Continue with the game even if DB update fails
             }
           }
@@ -856,74 +882,85 @@ export const initializeSocketIO = (io) => {
             side,
             amount,
             totalBets: gameState.totalBets,
-          })
+          });
 
           // Update player's balance
-          socket.emit("balanceUpdated", { balance: player.balance })
+          socket.emit("balanceUpdated", { balance: player.balance });
         } finally {
           // Always reset the processing flag
-          gameState.isProcessingBets = false
+          gameState.isProcessingBets = false;
         }
       } catch (error) {
-        console.error("Error processing bet:", error)
-        socket.emit("betError", { message: "An error occurred while placing your bet" })
-        gameState.isProcessingBets = false
+        console.error("Error processing bet:", error);
+        socket.emit("betError", {
+          message: "An error occurred while placing your bet",
+        });
+        gameState.isProcessingBets = false;
       }
-    })
+    });
 
-    socket.on("disconnect", () => {
+    socket.on("disconnect", async () => {
       try {
         if (gameState.players[socket.id]) {
-          io.emit("playerLeft", { id: socket.id, username: gameState.players[socket.id].username })
-          delete gameState.players[socket.id]
+          io.emit("playerLeft", {
+            id: socket.id,
+            username: gameState.players[socket.id].username,
+          });
+          delete gameState.players[socket.id];
+
+          await ActivePlayer.findOneAndUpdate(
+            { userId: player.userId }, // Match by userId
+            { isActive: false }, // Set inactive
+            { new: true }
+          );
         }
       } catch (error) {
-        console.error("Error handling disconnect:", error)
+        console.error("Error handling disconnect:", error);
       }
-    })
-  })
-}
+    });
+  });
+};
 
 // Start the game loop
 const startGameLoop = (io) => {
   const resetGame = () => {
     try {
       // First step: Show joker card
-      showJokerCard(io)
+      showJokerCard(io);
     } catch (error) {
-      console.error("Error resetting game:", error)
+      console.error("Error resetting game:", error);
       // Try to recover by restarting the game loop
-      setTimeout(() => resetGame(), 5000)
+      setTimeout(() => resetGame(), 5000);
     }
-  }
+  };
 
   // Step 1: Show joker card
   const showJokerCard = (io) => {
     try {
       // Reset game state
-      gameState.status = "jokerRevealed"
-      gameState.andarCards = []
-      gameState.baharCards = []
-      gameState.winningSide = null
-      gameState.winningCardIndex = null
-      gameState.totalBets = { andar: 0, bahar: 0 }
-      gameState.gameId = generateGameId()
-      gameState.isProcessingBets = false
+      gameState.status = "jokerRevealed";
+      gameState.andarCards = [];
+      gameState.baharCards = [];
+      gameState.winningSide = null;
+      gameState.winningCardIndex = null;
+      gameState.totalBets = { andar: 0, bahar: 0 };
+      gameState.gameId = generateGameId();
+      gameState.isProcessingBets = false;
 
       Object.values(gameState.players).forEach((player) => {
-        player.bet = null
-      })
+        player.bet = null;
+      });
 
       // Generate and shuffle a fresh deck of cards
-      const deck = shuffleDeck(generateDeck())
+      const deck = shuffleDeck(generateDeck());
 
       // Draw the joker card
-      const joker = deck.pop()
-      gameState.jokerCard = joker
-      gameState.deck = deck // Save the deck for later use
+      const joker = deck.pop();
+      gameState.jokerCard = joker;
+      gameState.deck = deck; // Save the deck for later use
 
       // Emit joker card to all clients
-      io.emit("jokerRevealed", { jokerCard: joker })
+      io.emit("jokerRevealed", { jokerCard: joker });
       io.emit("gameState", {
         ...gameState,
         players: Object.values(gameState.players).map((p) => ({
@@ -931,55 +968,55 @@ const startGameLoop = (io) => {
           username: p.username,
           bet: p.bet,
         })),
-      })
+      });
 
       // Wait 3 seconds before starting betting phase
-      setTimeout(() => startBettingTimer(io), 3000)
+      setTimeout(() => startBettingTimer(io), 3000);
     } catch (error) {
-      console.error("Error showing joker card:", error)
-      setTimeout(() => resetGame(), 5000)
+      console.error("Error showing joker card:", error);
+      setTimeout(() => resetGame(), 5000);
     }
-  }
+  };
 
   // Step 2: Start betting timer
   const startBettingTimer = (io) => {
     try {
-      if (bettingTimer) clearInterval(bettingTimer)
+      if (bettingTimer) clearInterval(bettingTimer);
 
       // Change game status to betting
-      gameState.status = "betting"
-      gameState.bettingTimeLeft = 20
-      
+      gameState.status = "betting";
+      gameState.bettingTimeLeft = 20;
+
       // Notify clients that betting has started
-      io.emit("bettingStarted", { timeLeft: gameState.bettingTimeLeft })
+      io.emit("bettingStarted", { timeLeft: gameState.bettingTimeLeft });
 
       bettingTimer = setInterval(() => {
         try {
-          gameState.bettingTimeLeft -= 1
-          io.emit("bettingTimeUpdate", { timeLeft: gameState.bettingTimeLeft })
+          gameState.bettingTimeLeft -= 1;
+          io.emit("bettingTimeUpdate", { timeLeft: gameState.bettingTimeLeft });
 
           if (gameState.bettingTimeLeft <= 0) {
-            clearInterval(bettingTimer)
-            startDealing(io)
+            clearInterval(bettingTimer);
+            startDealing(io);
           }
         } catch (error) {
-          console.error("Error in betting timer:", error)
+          console.error("Error in betting timer:", error);
           // Don't clear the interval here, let it continue
         }
-      }, 1000)
+      }, 1000);
     } catch (error) {
-      console.error("Error starting betting timer:", error)
+      console.error("Error starting betting timer:", error);
       // Try to recover
-      clearInterval(bettingTimer)
-      setTimeout(() => resetGame(), 5000)
+      clearInterval(bettingTimer);
+      setTimeout(() => resetGame(), 5000);
     }
-  }
+  };
 
   // Step 3: Deal cards and determine winner
   // const startDealing = async (io) => {
   //   try {
   //     gameState.status = "dealing"
-      
+
   //     // Get the saved deck and joker card
   //     const deck = gameState.deck
   //     const joker = gameState.jokerCard
@@ -1136,7 +1173,7 @@ const startGameLoop = (io) => {
   //     try {
   //       const gameRecords = Object.values(gameState.players).map((player) => {
   //         if (!player.bet) return null // Skip players who didn't bet
-      
+
   //         return {
   //           user: player.userId,
   //           betAmount: player.bet.amount,
@@ -1150,7 +1187,7 @@ const startGameLoop = (io) => {
   //           winAmount: player.bet.side === gameState.winningSide ? player.bet.amount * 2 : 0, // Double the bet if won
   //         }
   //       }).filter(record => record !== null) // Remove null entries
-      
+
   //       await Game.insertMany(gameRecords) // Save all game records in one go
   //     } catch (error) {
   //       console.error("Error saving game record:", error)
@@ -1178,28 +1215,26 @@ const startGameLoop = (io) => {
   //   }
   // }
 
-
-
   // //new logic
   const startDealing = async (io) => {
     try {
       gameState.status = "dealing";
-  
+
       const deck = gameState.deck;
       const joker = gameState.jokerCard;
-  
+
       const andarCards = [];
       const baharCards = [];
       let matchFound = false;
       let currentSide = "andar";
-  
+
       while (!matchFound && deck.length > 0) {
         const card = deck.pop();
-  
+
         if (currentSide === "andar") {
           andarCards.push(card);
           gameState.andarCards = [...andarCards];
-  
+
           if (card.value === joker.value) {
             matchFound = true;
             gameState.winningSide = "andar";
@@ -1208,38 +1243,44 @@ const startGameLoop = (io) => {
         } else {
           baharCards.push(card);
           gameState.baharCards = [...baharCards];
-  
+
           if (card.value === joker.value) {
             matchFound = true;
             gameState.winningSide = "bahar";
             gameState.winningCardIndex = baharCards.length - 1;
           }
         }
-  
+
         // Emit card to clients
         try {
           io.emit("cardDealt", {
             side: currentSide,
             card,
-            index: currentSide === "andar" ? andarCards.length - 1 : baharCards.length - 1,
+            index:
+              currentSide === "andar"
+                ? andarCards.length - 1
+                : baharCards.length - 1,
           });
         } catch (error) {
           console.error("Error emitting card dealt:", error);
         }
-  
+
         // Alternate side
         currentSide = currentSide === "andar" ? "bahar" : "andar";
-  
+
         await new Promise((resolve) => setTimeout(resolve, 1000));
       }
-  
+
       // If no match found, randomly pick winner (very rare fallback)
       if (!matchFound) {
         const fallbackSide = Math.random() < 0.3 ? "andar" : "bahar";
         gameState.winningSide = fallbackSide;
-        gameState.winningCardIndex = fallbackSide === "andar" ? andarCards.length - 1 : baharCards.length - 1;
+        gameState.winningCardIndex =
+          fallbackSide === "andar"
+            ? andarCards.length - 1
+            : baharCards.length - 1;
       }
-  
+
       gameState.lastGameResult = {
         jokerCard: joker,
         winningSide: gameState.winningSide,
@@ -1247,34 +1288,43 @@ const startGameLoop = (io) => {
         baharCards,
         timestamp: new Date(),
       };
-  
+
       const winners = [];
       const losers = [];
       const updatePromises = [];
-  
+
       Object.values(gameState.players).forEach((player) => {
         if (player.bet) {
           if (player.bet.side === gameState.winningSide) {
             const winnings = player.bet.amount * 2;
             player.balance += winnings;
-  
+
             winners.push({
               id: player.id,
               username: player.username,
               winnings: player.bet.amount,
             });
-  
+
             if (player.userId) {
               updatePromises.push(
-                User.findByIdAndUpdate(player.userId, { $inc: { balance: winnings } }).catch((error) =>
-                  console.error(`Error updating balance for user ${player.userId}:`, error)
+                User.findByIdAndUpdate(player.userId, {
+                  $inc: { balance: winnings },
+                }).catch((error) =>
+                  console.error(
+                    `Error updating balance for user ${player.userId}:`,
+                    error
+                  )
                 )
               );
             }
-  
+
             try {
-              io.to(player.id).emit("balanceUpdated", { balance: player.balance });
-              io.to(player.id).emit("winMessage", { amountWon: player.bet.amount });
+              io.to(player.id).emit("balanceUpdated", {
+                balance: player.balance,
+              });
+              io.to(player.id).emit("winMessage", {
+                amountWon: player.bet.amount,
+              });
             } catch (error) {
               console.error("Error emitting win message:", error);
             }
@@ -1284,27 +1334,29 @@ const startGameLoop = (io) => {
               username: player.username,
               loss: player.bet.amount,
             });
-  
+
             try {
-              io.to(player.id).emit("loseMessage", { amountLost: player.bet.amount });
+              io.to(player.id).emit("loseMessage", {
+                amountLost: player.bet.amount,
+              });
             } catch (error) {
               console.error("Error emitting lose message:", error);
             }
           }
         }
       });
-  
+
       try {
         await Promise.allSettled(updatePromises);
       } catch (error) {
         console.error("Error updating user balances:", error);
       }
-  
+
       try {
         const gameRecords = Object.values(gameState.players)
           .map((player) => {
             if (!player.bet) return null;
-  
+
             return {
               user: player.userId,
               betAmount: player.bet.amount,
@@ -1314,17 +1366,21 @@ const startGameLoop = (io) => {
               baharCards: gameState.baharCards,
               winningSide: gameState.winningSide,
               winningCardIndex: gameState.winningCardIndex,
-              result: player.bet.side === gameState.winningSide ? "win" : "lose",
-              winAmount: player.bet.side === gameState.winningSide ? player.bet.amount * 2 : 0,
+              result:
+                player.bet.side === gameState.winningSide ? "win" : "lose",
+              winAmount:
+                player.bet.side === gameState.winningSide
+                  ? player.bet.amount * 2
+                  : 0,
             };
           })
           .filter((record) => record !== null);
-  
+
         await Game.insertMany(gameRecords);
       } catch (error) {
         console.error("Error saving game record:", error);
       }
-  
+
       try {
         io.emit("gameResult", {
           winningSide: gameState.winningSide,
@@ -1335,7 +1391,7 @@ const startGameLoop = (io) => {
       } catch (error) {
         console.error("Error emitting game result:", error);
       }
-  
+
       await new Promise((resolve) => setTimeout(resolve, 10000));
       resetGame();
     } catch (error) {
@@ -1343,11 +1399,12 @@ const startGameLoop = (io) => {
       setTimeout(() => resetGame(), 5000);
     }
   };
-  
 
   // Start the game loop
-  resetGame()
-}
+  resetGame();
+};
 
 // For testing purposes
-console.log("Game loop initialized with the correct sequence: joker card → betting time → betting → card dealing")
+console.log(
+  "Game loop initialized with the correct sequence: joker card → betting time → betting → card dealing"
+);
