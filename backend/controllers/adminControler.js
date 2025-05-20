@@ -63,7 +63,7 @@ export const getGames = async (req, res) => {
 
     const query = userId ? { userId } : {}
 
-    const games = await Game.find(query)
+    const games = await Game.findById(query)
 
     res.json({ games })
   } catch (err) {

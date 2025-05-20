@@ -363,8 +363,7 @@ const [showDialog, setShowDialog] = useState(false)
   const [passwordError, setPasswordError] = useState("")
 
   useEffect(() => {
-    fetchUsers(),
-
+    fetchUsers()
   }, [])
 
   const fetchUsers = async () => {
@@ -411,6 +410,7 @@ const handleDetails = async (user) => {
         }
       )
       setGames(res.data.games)
+      console.log("Games data:", res.data)
     } catch (err) {
       console.error("Error fetching games:", err)
       showSnackbar("Failed to fetch games. Please try again.", "error")
