@@ -59,11 +59,16 @@ export const loginAdmin = async (req, res) => {
 
 export const getGames = async (req, res) => {
   try {
-    const games = await Game.find();
-    res.status(200).json({ success: true, games });
-  } catch (error) {
-    console.error("Get games error:", error);
-    res.status(500).json({ success: false, message: "Server error" });
+    const { userId } = req.query
+
+    const query = userId ? { userId } : {}
+
+    const games = await Game.find(query)
+
+    res.json({ games })
+  } catch (err) {
+    console.error(err)
+    res.status(500).json({ message: 'Server error while fetching games' })
   }
 };
 export const users= async (req, res) => {

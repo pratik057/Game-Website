@@ -332,12 +332,17 @@ const Users = () => {
   const [searchTerm, setSearchTerm] = useState("")
   const [searchType, setSearchType] = useState("all") // "all", "email", "mobileNo", "username"
   const [show, setShow] = useState(false)
-  const [showDetails, setShowDetails] = useState(false)
+ 
   const [selectedUser, setSelectedUser] = useState(null)
+ 
+const [showDialog, setShowDialog] = useState(false)
+  const [games, setGames] = useState([])
+
+
   const [addBalance, setAddBalance] = useState("")
   const [removeBalance, setRemoveBalance] = useState("")
   const [loading, setLoading] = useState(true)
-  const [gameDetails, setGameDetails] = useState([])
+  
   const [snackbar, setSnackbar] = useState({
     open: false,
     message: "",
@@ -358,7 +363,8 @@ const Users = () => {
   const [passwordError, setPasswordError] = useState("")
 
   useEffect(() => {
-    fetchUsers()
+    fetchUsers(),
+
   }, [])
 
   const fetchUsers = async () => {
@@ -378,7 +384,7 @@ const Users = () => {
 
       setUsers(nonAdminUsers);
       setFilteredUsers(nonAdminUsers);
-      console.log("Fetched non-admin users:", nonAdminUsers);
+      
       setLoading(false);
     } catch (error) {
       console.error("Error fetching users:", error);
@@ -387,26 +393,31 @@ const Users = () => {
     }
   }
 
-  const fetchGames = async () => {
+const handleDetails = async (user) => {
+    setShowDialog(true)
+    setLoading(true)
 
     const token = localStorage.getItem("adminToken")
     if (!token) {
       showSnackbar("Authentication token not found. Please log in again.", "error")
       return
     }
+
     try {
-      const res = await axios.get("https://game-website-yyuo.onrender.com/api/admin/games", {
-        headers: { Authorization: `Bearer ${token}` },
-      })
-      console.log("Fetched games:", res.data.games)
-      setGameDetails(res.data.games)
-      console.log("Game details:", gameDetails)
-    } catch (error) {
-      console.error("Error fetching games:", error)
+      const res = await axios.get(
+        `https://game-website-yyuo.onrender.com/api/admin/games?userId=${user._id}`,
+        {
+          headers: { Authorization: `Bearer ${token}` },
+        }
+      )
+      setGames(res.data.games)
+    } catch (err) {
+      console.error("Error fetching games:", err)
       showSnackbar("Failed to fetch games. Please try again.", "error")
+    } finally {
+      setLoading(false)
     }
   }
-
 
   const showSnackbar = (message, severity = "success") => {
     setSnackbar({ open: true, message, severity })
@@ -445,6 +456,7 @@ const Users = () => {
     )
   }
 
+  
   const handleEdit = (user) => {
     setSelectedUser(user)
     setFormData({
@@ -463,10 +475,8 @@ const Users = () => {
     setShow(true)
   }
 
-  const handleDetails = () => {
-    setShowDetails(true)
 
-  }
+
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value })
@@ -915,7 +925,7 @@ const totalProfit = creditBalance - debitBalance;
                            <Tooltip title="User details">
                               <IconButton
                                 color="error"
-                                onClick={handleDetails}
+                                onClick={() => handleDetails(user)}
                                 size="small"
                                 className="bg-red-50 hover:bg-red-100"
                               >
@@ -1315,9 +1325,9 @@ const totalProfit = creditBalance - debitBalance;
 
 
       {/* User Details Dialog */}
-    <Dialog
-        open={showDetails}
-        onClose={() => setShowDetails(false)}
+  <Dialog
+        open={showDialog}
+        onClose={() => setShowDialog(false)}
         maxWidth="md"
         fullWidth
         PaperProps={{
@@ -1328,19 +1338,51 @@ const totalProfit = creditBalance - debitBalance;
         <DialogTitle className="bg-gradient-to-r from-blue-600 to-blue-700 text-white py-4">
           <div className="flex items-center">
             <div className="bg-white p-2 rounded-full mr-3">
-              <EditIcon className="text-blue-600" />
+              <InfoIcon className="text-blue-600" />
             </div>
             <Typography variant="h6" className="font-bold">
-              User Details
+              User Game Details
             </Typography>
           </div>
         </DialogTitle>
 
-       
-      
-
-     
+        <DialogContent dividers>
+          {loading ? (
+            <div className="flex justify-center items-center py-6">
+              <CircularProgress />
+            </div>
+          ) : games.length === 0 ? (
+            <p className="text-gray-500 text-center py-4">No games found for this user.</p>
+          ) : (
+            <div className="overflow-x-auto">
+              <table className="min-w-full bg-white shadow border border-gray-200 rounded-lg">
+                <thead className="bg-blue-600 text-white">
+                  <tr>
+                    <th className="px-4 py-2 text-left">Game ID</th>
+                    <th className="px-4 py-2 text-left">Score</th>
+                    <th className="px-4 py-2 text-left">Status</th>
+                    <th className="px-4 py-2 text-left">Created At</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {games.map((game) => (
+                    <tr key={game._id} className="border-t hover:bg-gray-50">
+                      <td className="px-4 py-2">{game._id}</td>
+                      <td className="px-4 py-2">{game.score}</td>
+                      <td className="px-4 py-2 capitalize">{game.status}</td>
+                      <td className="px-4 py-2">
+                        {new Date(game.createdAt).toLocaleString()}
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          )}
+        </DialogContent>
       </Dialog>
+
+
       {/* Snackbar for notifications */}
       <Snackbar
         open={snackbar.open}
