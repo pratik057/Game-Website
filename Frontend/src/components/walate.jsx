@@ -66,12 +66,12 @@ const WalletControls = ({ onClose }) => {
 
   const handleDeposit = () => {
     const whatsappMessage = `UserId:${user.id} %0AName: ${user.username}%0AEmail: ${user.email}%0AAmount to deposit: ${amount}`;
-    const whatsappLink = `https://wa.me/918975461685?text=${whatsappMessage}`;
+    const whatsappLink = `https://wa.me/919713383890?text=${whatsappMessage}`;
     window.open(whatsappLink, "_blank");
   };
   const handleWithdraw = () => {
     const whatsappMessage = `UserId:${user.id} %0AName: ${user.username}%0AEmail: ${user.email}%0AAmount to Withdraw: ${amount}`;
-    const whatsappLink = `https://wa.me/918975461685?text=${whatsappMessage}`;
+    const whatsappLink = `https://wa.me/919713383890?text=${whatsappMessage}`;
     window.open(whatsappLink, "_blank");
   };
 
