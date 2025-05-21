@@ -306,6 +306,7 @@ import {
   Key as KeyIcon,
 } from "@mui/icons-material"
 import InfoIcon from '@mui/icons-material/Info';
+import CloseIcon from "@mui/icons-material/Close";
 // Add this CSS animation to the top of the file, after the imports
 const styles = `
 @keyframes fadeIn {
@@ -403,14 +404,16 @@ const handleDetails = async (user) => {
     }
 
     try {
+      
       const res = await axios.get(
         `https://game-website-yyuo.onrender.com/api/admin/games?userId=${user._id}`,
         {
           headers: { Authorization: `Bearer ${token}` },
         }
       )
+
       setGames(res.data.games)
-      console.log("Games data:", res.data)
+      console.log("Games data:", res.data.games)
     } catch (err) {
       console.error("Error fetching games:", err)
       showSnackbar("Failed to fetch games. Please try again.", "error")
@@ -868,7 +871,7 @@ const totalProfit = creditBalance - debitBalance;
                         </TableCell>
                         <TableCell>
                           <Chip
-                            icon={<MoneyIcon className="text-amber-500" />}
+                            // icon={<MoneyIcon className="text-amber-500" />}
                             label={`${user.balance || 0} COINS`}
                             className="bg-amber-50"
                           />
@@ -976,7 +979,7 @@ const totalProfit = creditBalance - debitBalance;
           className: "rounded-lg overflow-hidden",
         }}
       >
-        <DialogTitle className="bg-gradient-to-r from-blue-600 to-blue-700 text-white py-4">
+        <DialogTitle className="bg-gradient-to-r from-blue-600 to-blue-700 text-white py-4 flex justify-between">
           <div className="flex items-center">
             <div className="bg-white p-2 rounded-full mr-3">
               <EditIcon className="text-blue-600" />
@@ -984,8 +987,18 @@ const totalProfit = creditBalance - debitBalance;
             <Typography variant="h6" className="font-bold">
               Edit User Profile
             </Typography>
+         
+
           </div>
+             <IconButton
+          aria-label="close"
+          onClick={() => setShow(false)}
+          sx={{ color: "white" }}
+        >
+          <CloseIcon />
+        </IconButton>
         </DialogTitle>
+         
 
         <Box sx={{ borderBottom: 1, borderColor: "divider" }}>
           <Tabs
@@ -1326,61 +1339,92 @@ const totalProfit = creditBalance - debitBalance;
 
       {/* User Details Dialog */}
   <Dialog
-        open={showDialog}
-        onClose={() => setShowDialog(false)}
-        maxWidth="md"
-        fullWidth
-        PaperProps={{
-          elevation: 8,
-          className: "rounded-lg overflow-hidden",
-        }}
-      >
-        <DialogTitle className="bg-gradient-to-r from-blue-600 to-blue-700 text-white py-4">
-          <div className="flex items-center">
-            <div className="bg-white p-2 rounded-full mr-3">
-              <InfoIcon className="text-blue-600" />
-            </div>
-            <Typography variant="h6" className="font-bold">
-              User Game Details
-            </Typography>
+      open={showDialog}
+      onClose={() => setShowDialog(false)}
+      maxWidth="md"
+      fullWidth
+      PaperProps={{
+        elevation: 8,
+        className: "rounded-lg overflow-hidden",
+      }}
+    >
+      <DialogTitle className="bg-gradient-to-r from-blue-600 to-blue-700 text-white py-4 flex items-center justify-between">
+        <div className="flex items-center">
+          <div className="bg-white p-2 rounded-full mr-3">
+            <InfoIcon className="text-blue-600" />
           </div>
-        </DialogTitle>
+          <Typography variant="h6" className="font-bold">
+            User Game Details
+          </Typography>
+        </div>
+        <IconButton
+          aria-label="close"
+          onClick={() => setShowDialog(false)}
+          sx={{ color: "white" }}
+        >
+          <CloseIcon />
+        </IconButton>
+      </DialogTitle>
 
-        <DialogContent dividers>
-          {loading ? (
-            <div className="flex justify-center items-center py-6">
-              <CircularProgress />
-            </div>
-          ) : games.length === 0 ? (
-            <p className="text-gray-500 text-center py-4">No games found for this user.</p>
-          ) : (
-            <div className="overflow-x-auto">
-              <table className="min-w-full bg-white shadow border border-gray-200 rounded-lg">
-                <thead className="bg-blue-600 text-white">
-                  <tr>
-                    <th className="px-4 py-2 text-left">Game ID</th>
-                    <th className="px-4 py-2 text-left">Score</th>
-                    <th className="px-4 py-2 text-left">Status</th>
-                    <th className="px-4 py-2 text-left">Created At</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {games.map((game) => (
-                    <tr key={game._id} className="border-t hover:bg-gray-50">
-                      <td className="px-4 py-2">{game._id}</td>
-                      <td className="px-4 py-2">{game.score}</td>
-                      <td className="px-4 py-2 capitalize">{game.status}</td>
-                      <td className="px-4 py-2">
-                        {new Date(game.createdAt).toLocaleString()}
-                      </td>
-                    </tr>
+      <DialogContent dividers>
+        {loading ? (
+          <div className="flex justify-center items-center py-6">
+            <CircularProgress />
+          </div>
+        ) : games.length === 0 ? (
+          <p className="text-gray-500 text-center py-4">
+            No games found for this user.
+          </p>
+        ) : (
+          <div className="overflow-x-auto">
+            <table className="min-w-full bg-white shadow-lg rounded-lg border border-gray-200">
+              <thead className="bg-blue-600 text-white">
+                <tr>
+                  {[
+                    "Game ID",
+                    "Bet Amount",
+                    "Bet Side",
+                    "Joker Card",
+                    "Winning Side",
+                    "Result",
+                    "Win Amount",
+                    "Created At",
+                  ].map((head) => (
+                    <th
+                      key={head}
+                      className="px-4 py-3 text-left text-sm font-semibold uppercase tracking-wide"
+                    >
+                      {head}
+                    </th>
                   ))}
-                </tbody>
-              </table>
-            </div>
-          )}
-        </DialogContent>
-      </Dialog>
+                </tr>
+              </thead>
+              <tbody>
+                {games.map((game) => (
+                  <tr
+                    key={game._id}
+                    className="border-t border-gray-200 hover:bg-gray-50 transition-colors"
+                  >
+                    <td className="px-4 py-2 text-sm break-words max-w-xs">{game._id}</td>
+                    <td className="px-4 py-2 text-sm">{game.betAmount}</td>
+                    <td className="px-4 py-2 text-sm capitalize">{game.betSide}</td>
+                    <td className="px-4 py-2 text-sm capitalize">
+                      {game.jokerCard.suit} {game.jokerCard.value}
+                    </td>
+                    <td className="px-4 py-2 text-sm capitalize">{game.winningSide}</td>
+                    <td className="px-4 py-2 text-sm capitalize">{game.result}</td>
+                    <td className="px-4 py-2 text-sm">{game.winAmount}</td>
+                    <td className="px-4 py-2 text-sm whitespace-nowrap">
+                      {new Date(game.createdAt).toLocaleString()}
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        )}
+      </DialogContent>
+    </Dialog>
 
 
       {/* Snackbar for notifications */}

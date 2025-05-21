@@ -2,7 +2,7 @@ import User from "../models/User.js";
 import Game from "../models/game.js";
 import jwt from "jsonwebtoken";
 import bcrypt from "bcryptjs";
-
+import mongoose from "mongoose";
 // Admin Register (Only for first-time setup)
 
 
@@ -56,21 +56,24 @@ export const loginAdmin = async (req, res) => {
     res.status(500).json({ success: false, message: "Server error" });
   }
 };
-
 export const getGames = async (req, res) => {
   try {
     const { userId } = req.query
 
-    const query = userId ? { userId } : {}
+    const query = {}
 
-    const games = await Game.findById(query)
+    if (userId && mongoose.Types.ObjectId.isValid(userId)) {
+      query.userId = new mongoose.Types.ObjectId(userId)
+    }
+
+    const games = await Game.find({ user: userId })
 
     res.json({ games })
   } catch (err) {
     console.error(err)
     res.status(500).json({ message: 'Server error while fetching games' })
   }
-};
+}
 export const users= async (req, res) => {
   try {
     const users = (await User.find().populate("transactions"));
