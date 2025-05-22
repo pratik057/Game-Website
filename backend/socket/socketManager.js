@@ -689,7 +689,7 @@ import { generateDeck, shuffleDeck } from "../utils/gameUtils.js"
 import User from "../models/User.js"
 import Game from "../models/game.js"
 import jwt from "jsonwebtoken"
-
+import PreviousGameWinner from "../models/PreviousGameWinner.js"
 // Game state
 const gameState = {
   status: "waiting", // waiting, jokerRevealed, betting, dealing, result
@@ -1332,15 +1332,20 @@ const startGameLoop = (io) => {
   
       try {
         io.emit("gameResult", {
+
           winningSide: gameState.winningSide,
           winningCardIndex: gameState.winningCardIndex,
           winners,
           losers,
         });
+
       } catch (error) {
         console.error("Error emitting game result:", error);
       }
-  
+      await PreviousGameWinner.insertOne({
+        winningSide: gameState.winningSide,
+      });
+   
       await new Promise((resolve) => setTimeout(resolve, 10000));
       resetGame();
     } catch (error) {

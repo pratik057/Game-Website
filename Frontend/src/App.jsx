@@ -37,7 +37,7 @@ function App() {
     <UserProvider>
       <SocketProvider>
         <Router>
-          <div className="flex flex-col min-h-screen bg-gray-900 text-white">
+          <div className="flex flex-col min-h-screen bg-gray-800 text-white">
             <main className="h-full w-full flex-grow">
               {loading ? (
                 <LoadingScreen />

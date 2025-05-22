@@ -367,7 +367,8 @@ const [showDialog, setShowDialog] = useState(false)
     fetchUsers()
   }, [])
 
-  const fetchUsers = async () => {
+  const fetchUsers = async (e) => {
+    e.preventDefault()
     setLoading(true)
     const token = localStorage.getItem("adminToken")
     if (!token) {
@@ -394,6 +395,7 @@ const [showDialog, setShowDialog] = useState(false)
   }
 
 const handleDetails = async (user) => {
+  
     setShowDialog(true)
     setLoading(true)
 

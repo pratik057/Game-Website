@@ -2,10 +2,14 @@ import Game from "../models/game.js";
 import User from "../models/User.js";
 import Transaction from "../models/Transaction.js";
 import mongoose from "mongoose";
-
+import PreviousGameWinner from "../models/PreviousGameWinner.js";
 // @desc    Create a new game
 // @route   POST /api/game/create
 // @access  Private
+
+
+
+
 export const createGame = async (req, res) => {
   try {
     const { gameType, betAmount } = req.body;
@@ -149,4 +153,19 @@ export const getTransactionHistory = async (req, res) => {
     res.status(500).json({ success: false, message: "Server error" });
   }
 };
+
+export const getPriviousGameHistory   = async () => {
+  try {
+    const PreviousGamesWiningSide = await PreviousGameWinner.find().sort({ createdAt: -1 }).limit(10);
+    if (!PreviousGamesWiningSide || PreviousGamesWiningSide.length === 0) {
+      return { success: false, message: "No previous game history found." };
+    }
+    return { success: true, PreviousGamesWiningSide };
+    } catch (error) {
+    console.error("Get previous game history error:", error);
+    return { success: false, message: "Server error" };
+    }
+
+}
+
 

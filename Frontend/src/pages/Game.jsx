@@ -1,17 +1,28 @@
 "use client"
 
-import { useContext } from "react"
+import { useContext, useState ,useEffect} from "react"
 import { UserContext } from "../context/UserContext"
 import { SocketContext } from "../context/SocketContext"
 import Card from "../components/Card"
 import BetControls from "../components/BetControls"
 import GameResult from "../components/GameResult"
 import Navbar from "../components/Navbar"
-
+import { Dialog, DialogTitle, DialogContent, DialogActions, Button } from "@mui/material";
+import axios from "axios";
+import {
+  Box,
+  Typography,
+ 
+  CircularProgress,
+  Divider,
+  List,
+  ListItem,
+  ListItemText
+} from '@mui/material';
 const Game = () => {
   const { user, balance } = useContext(UserContext)
   const { connected, gameState, currentBet, placeBet } = useContext(SocketContext)
-
+const [previousWinnings, setPreviousWinnings] = useState([]);
   const userWon = gameState.status === "result" && currentBet && currentBet.side === gameState.winningSide
 
   const calculateWinAmount = () => {
@@ -20,23 +31,62 @@ const Game = () => {
     return Math.floor(currentBet.amount * multiplier)
   }
 
+  const [betDialogOpen, setBetDialogOpen] = useState(false);
+
+  const handleOpen = () => setBetDialogOpen(true);
+  const handleClose = () => setBetDialogOpen(false);
   const winAmount = calculateWinAmount()
 
+  const fetchPreviousWinning = async () => {
+  try {
+    const response = await axios.get("http://localhost:5000/api/game/previous-winning", {
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${user.token}`,
+      },
+    });
+
+    const data = response.data;
+
+    if (data.success) {
+      setPreviousWinnings(data.previousWinning);
+      console.log("Previous winning data:", data.previousWinning);
+    } else {
+      console.error("Error fetching previous winning data:", data.message);
+    }
+
+  } catch (error) {
+    console.error("Error fetching previous winning data:", error.message);
+  }
+};
+
+useEffect(() => {
+fetchPreviousWinning();
+},[])
+
   return (
-    <> <div className="bg-gradient-to-b  from-gray-900 via-gray-900 to-black">
+    <> 
+    <div className="bg-gradient-to-b  from-gray-900 via-gray-900 to-grey-800">
 
       <Navbar />
  
-      <div className=" w-full h-[100%] flex flex-col justify-between bg-gradient-to-b mt-4 from-gray-900 via-gray-900 to-black text-white px-4 md:px-8 lg:px-16 overflow-hidden">
+      <div className=" w-full h-[100%] flex flex-col justify-between bg-gradient-to-b mt-4 from-gray-900 via-gray-900 to-gray-800 text-white px-4 md:px-8 lg:px-16 overflow-hidden">
         {/* Bet Controls */}
-        
-        <BetControls
-          onPlaceBet={placeBet}
-          disabled={gameState.status !== "betting" || currentBet !== null}
-          currentBet={currentBet}
-          connected={connected}
-          gameState={gameState}
-        />
+      <Dialog open={betDialogOpen} onClose={handleClose} maxWidth="sm" fullWidth>
+        <DialogTitle>Place Your Bet</DialogTitle>
+        <DialogContent>
+          <BetControls
+            onPlaceBet={placeBet}
+            disabled={gameState.status !== "betting" || currentBet !== null}
+            currentBet={currentBet}
+            connected={connected}
+            gameState={gameState}
+          />
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={handleClose}>Cancel</Button>
+        </DialogActions>
+      </Dialog>
 
         {/* Main Game Section */}
         <div className="flex flex-col flex-grow w-full h-full items-center ">
@@ -61,7 +111,75 @@ const Game = () => {
             {/* Cards Section */}
             <div className="grid grid-cols-2 gap-9 w-full px-4 mt-9">
                     {/* BAHAR Section */}
-                    <div className="flex flex-col items-center w-full relative">
+                
+              {/* ANDAR Section */}
+              <div className="flex flex-col items-center w-full relative" onClick={handleOpen}>
+              <h2 className="text-sm md:text-lg font-bold text-blue-400 mb-5 uppercase bg-blue-950/50 px-6 py-1 rounded-full shadow-lg">
+                  Andar
+                </h2>
+                <div className="relative w-full flex justify-center mr-3">
+                  {gameState.andarCards.length > 0 ? (
+                    <>
+                      {/* Mobile layout: 5 cards per row */}
+                      <div className="relative w-full h-auto sm:hidden">
+                        {gameState.andarCards.map((card, index) => (
+                          <div
+                            key={`andar-mobile-${index}`}
+                            className="absolute"
+                            style={{
+                              left: `${(index % 5) * 16}px`,
+                              top: `${Math.floor(index / 5) * 32}px`,
+                              zIndex: index,
+                            }}
+                          >
+                            <Card
+                              card={card}
+                              flipped={true}
+                              highlighted={
+                                gameState.status === "result" &&
+                                gameState.winningSide === "andar" &&
+                                index === gameState.winningCardIndex
+                              }
+                            />
+                          </div>
+                        ))}
+                      </div>
+
+                      {/* Desktop layout: 10 cards per row */}
+                      <div className="relative w-full h-auto hidden sm:block">
+                        {gameState.andarCards.map((card, index) => (
+                          <div
+                            key={`andar-desktop-${index}`}
+                            className="absolute"
+                            style={{
+                              left: `${(index % 10) * 20}px`,
+                              top: `${Math.floor(index / 10) * 40}px`,
+                              zIndex: index,
+                            }}
+                          >
+                            <Card
+                              card={card}
+                              flipped={true}
+                              highlighted={
+                                gameState.status === "result" &&
+                                gameState.winningSide === "andar" &&
+                                index === gameState.winningCardIndex
+                              }
+                            />
+                          </div>
+                        ))}
+                      </div>
+                    </>
+                  ) : (
+                    <div className="w-14 h-20 md:w-28 md:h-36 rounded-lg border-2 border-dashed flex items-center justify-center mt-6 bg-black/20 backdrop-blur-sm"  >
+                      <span className="text-yellow-300/70 text-sm text-center text-wrap md:text-base">
+                        No cards yet
+                      </span>
+                    </div>
+                  )}
+                </div>
+              </div>
+                  <div className="flex flex-col items-center w-full relative" onClick={handleOpen}>
                 
                 <h2 className="text-sm md:text-lg font-bold text-red-400 mb-5 uppercase bg-red-950/50 px-6 py-1 rounded-full shadow-lg">
                   Bahar
@@ -128,78 +246,42 @@ const Game = () => {
                   )}
                 </div>
               </div>
-              {/* ANDAR Section */}
-              <div className="flex flex-col items-center w-full relative">
-              <h2 className="text-sm md:text-lg font-bold text-blue-400 mb-5 uppercase bg-blue-950/50 px-6 py-1 rounded-full shadow-lg">
-                  Andar
-                </h2>
-                <div className="relative w-full flex justify-center mr-3">
-                  {gameState.andarCards.length > 0 ? (
-                    <>
-                      {/* Mobile layout: 5 cards per row */}
-                      <div className="relative w-full h-auto sm:hidden">
-                        {gameState.andarCards.map((card, index) => (
-                          <div
-                            key={`andar-mobile-${index}`}
-                            className="absolute"
-                            style={{
-                              left: `${(index % 5) * 16}px`,
-                              top: `${Math.floor(index / 5) * 32}px`,
-                              zIndex: index,
-                            }}
-                          >
-                            <Card
-                              card={card}
-                              flipped={true}
-                              highlighted={
-                                gameState.status === "result" &&
-                                gameState.winningSide === "andar" &&
-                                index === gameState.winningCardIndex
-                              }
-                            />
-                          </div>
-                        ))}
-                      </div>
-
-                      {/* Desktop layout: 10 cards per row */}
-                      <div className="relative w-full h-auto hidden sm:block">
-                        {gameState.andarCards.map((card, index) => (
-                          <div
-                            key={`andar-desktop-${index}`}
-                            className="absolute"
-                            style={{
-                              left: `${(index % 10) * 20}px`,
-                              top: `${Math.floor(index / 10) * 40}px`,
-                              zIndex: index,
-                            }}
-                          >
-                            <Card
-                              card={card}
-                              flipped={true}
-                              highlighted={
-                                gameState.status === "result" &&
-                                gameState.winningSide === "andar" &&
-                                index === gameState.winningCardIndex
-                              }
-                            />
-                          </div>
-                        ))}
-                      </div>
-                    </>
-                  ) : (
-                    <div className="w-14 h-20 md:w-28 md:h-36 rounded-lg border-2 border-dashed flex items-center justify-center mt-6 bg-black/20 backdrop-blur-sm">
-                      <span className="text-yellow-300/70 text-sm text-center text-wrap md:text-base">
-                        No cards yet
-                      </span>
-                    </div>
-                  )}
-                </div>
-              </div>
 
         
             </div>
           </div>
         </div>
+
+ <Box
+      sx={{
+        maxWidth: 400,
+        margin: 'auto',
+        mt: 4,
+        p: 2,
+        boxShadow: 3,
+        borderRadius: 2,
+        backgroundColor: '#f9f9f9'
+      }}
+    >
+      <Typography variant="h6" align="center" gutterBottom>
+        Previous Game Winners
+      </Typography>
+      <Divider sx={{ mb: 2 }} />
+
+      
+        <List>
+          {previousWinnings.map((game, index) => (
+            <ListItem key={index} divider>
+              <ListItemText
+                primary={`Winner: ${game.winner}`}
+                secondary={new Date(game.playedAt).toLocaleString()}
+              />
+            </ListItem>
+          ))}
+        </List>
+      
+    </Box>
+
 
         {/* Result */}
         {gameState.status === "result" && currentBet && (
