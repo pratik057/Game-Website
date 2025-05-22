@@ -9,22 +9,22 @@ import GameResult from "../components/GameResult"
 import Navbar from "../components/Navbar"
 import { Dialog, DialogTitle, DialogContent, DialogActions, Button } from "@mui/material";
 import axios from "axios";
-import {
-  Box,
-  Typography,
- 
-  CircularProgress,
-  Divider,
-  List,
-  ListItem,
-  ListItemText
-} from '@mui/material';
+import { Box, Typography, Divider, Chip, Grid, Tooltip } from "@mui/material";
+import BettingTimer from "../components/BettingTimer"
+
+
+
+
+
 const Game = () => {
+  
+    // 
   const { user, balance } = useContext(UserContext)
   const { connected, gameState, currentBet, placeBet } = useContext(SocketContext)
 const [previousWinnings, setPreviousWinnings] = useState([]);
   const userWon = gameState.status === "result" && currentBet && currentBet.side === gameState.winningSide
-
+  const showQuestionMark =
+    gameState.status === "betting" || gameState.status === "jokerRevealed";
   const calculateWinAmount = () => {
     if (!userWon || !currentBet) return 0
     const multiplier = currentBet.side === "andar" ? 2.0 : 2.0
@@ -38,11 +38,12 @@ const [previousWinnings, setPreviousWinnings] = useState([]);
   const winAmount = calculateWinAmount()
 
   const fetchPreviousWinning = async () => {
+    const token = localStorage.getItem("token");
   try {
-    const response = await axios.get("http://localhost:5000/api/game/previous-winning", {
+    const response = await axios.get("https://game-website-yyuo.onrender.com/api/games/previous-history", {
       headers: {
         "Content-Type": "application/json",
-        Authorization: `Bearer ${user.token}`,
+        Authorization: `Bearer ${token}`,
       },
     });
 
@@ -62,7 +63,7 @@ const [previousWinnings, setPreviousWinnings] = useState([]);
 
 useEffect(() => {
 fetchPreviousWinning();
-},[])
+},[previousWinnings]);
 
   return (
     <> 
@@ -72,6 +73,51 @@ fetchPreviousWinning();
  
       <div className=" w-full h-[100%] flex flex-col justify-between bg-gradient-to-b mt-4 from-gray-900 via-gray-900 to-gray-800 text-white px-4 md:px-8 lg:px-16 overflow-hidden">
         {/* Bet Controls */}
+           {/* Header: Connection + Game Status */}
+      <div className="flex flex-col sm:flex-row justify-between items-center rounded-lg shadow-inner gap-4 relative z-10">
+        {/* Connection + Timer */}
+        <div className="flex items-center space-x-4 text-sm">
+          <div className="flex items-center bg-black/30 px-3 py-1 rounded-full">
+            <div className={`w-2 h-2 rounded-full mr-2 ${connected ? "bg-green-500 animate-pulse" : "bg-red-500"}`} />
+            {connected ? "Connected" : "Disconnected"}
+          </div>
+          {gameState.status === "betting" && gameState.bettingTimeLeft > 0 && (
+            <div className="ml-4 bg-black/30 px-3 py-1 rounded-full">
+              <BettingTimer timeLeft={gameState.bettingTimeLeft} />
+            </div>
+          )}
+        </div>
+
+        {/* Game Status */}
+        <div className="text-sm font-semibold bg-black/30 px-4 py-1 rounded-full">
+          <span className="text-gray-300 mr-2">Game Status:</span>
+          <span
+            className={`font-bold ${
+              gameState.status === "betting"
+                ? "text-yellow-400"
+                : gameState.status === "dealing"
+                  ? "text-blue-400"
+                  : gameState.status === "result"
+                    ? "text-green-500"
+                    : "text-gray-400"
+            }`}
+          >
+            {gameState.status === "betting" ? (
+              gameState.bettingTimeLeft === 0 ? (
+                <span className="text-red-500">Bets off. Wait for round.</span>
+              ) : (
+                <span>Betting Open</span>
+              )
+            ) : gameState.status === "dealing" ? (
+              <span>Dealing Cards</span>
+            ) : gameState.status === "result" ? (
+              <span>Round Complete</span>
+            ) : (
+              <span>Waiting</span>
+            )}
+          </span>
+        </div>
+      </div>
       <Dialog open={betDialogOpen} onClose={handleClose} maxWidth="sm" fullWidth>
         <DialogTitle>Place Your Bet</DialogTitle>
         <DialogContent>
@@ -251,36 +297,78 @@ fetchPreviousWinning();
             </div>
           </div>
         </div>
-
- <Box
+   <Box
       sx={{
-        maxWidth: 400,
-        margin: 'auto',
-        mt: 4,
+        width: "100%",
+        margin: "auto",
         p: 2,
         boxShadow: 3,
         borderRadius: 2,
-        backgroundColor: '#f9f9f9'
+        backgroundColor: "#f9f9f9",
       }}
     >
       <Typography variant="h6" align="center" gutterBottom>
-        Previous Game Winners
+        AndharBahar Record(s)
       </Typography>
       <Divider sx={{ mb: 2 }} />
 
-      
-        <List>
-          {previousWinnings.map((game, index) => (
-            <ListItem key={index} divider>
-              <ListItemText
-                primary={`Winner: ${game.winner}`}
-                secondary={new Date(game.playedAt).toLocaleString()}
+      <Grid container spacing={1} justifyContent="center" flexWrap="wrap">
+        {/* Render declared results */}
+         {/* Conditionally render the "?" chip for current betting game */}
+        {showQuestionMark && (
+          <Grid item>
+            <Tooltip title="Current betting game">
+              <Chip
+                label="?"
+                sx={{
+                  width: 40,
+                  height: 40,
+                  fontWeight: "bold",
+                  color: "#fff",
+                  backgroundColor: "#ffa726", // distinct orange
+                  borderRadius: "50%",
+                  fontSize: "1.1rem",
+                  border: "2px dashed #ffb74d",
+                }}
               />
-            </ListItem>
-          ))}
-        </List>
-      
+            </Tooltip>
+          </Grid>
+        )}
+        {previousWinnings.map((game, index) => {
+          let label = "?";
+          let bgColor = "#FF9800"; // unknown orange
+          if (game.winningSide === "andar") {
+            label = "A";
+            bgColor = "#1976d2"; // blue
+          } else if (game.winningSide === "bahar") {
+            label = "B";
+            bgColor = "#d32f2f"; // red
+          }
+
+          return (
+            <Grid item key={index}>
+              <Tooltip title={new Date(game.playedAt).toLocaleString()}>
+                <Chip
+                  label={label}
+                  sx={{
+                    width: 40,
+                    height: 40,
+                    fontWeight: "bold",
+                    color: "#fff",
+                    backgroundColor: bgColor,
+                    borderRadius: "50%",
+                    fontSize: "1.1rem",
+                  }}
+                />
+              </Tooltip>
+            </Grid>
+          );
+        })}
+
+       
+      </Grid>
     </Box>
+
 
 
         {/* Result */}

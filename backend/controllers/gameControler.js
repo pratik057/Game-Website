@@ -153,19 +153,33 @@ export const getTransactionHistory = async (req, res) => {
     res.status(500).json({ success: false, message: "Server error" });
   }
 };
-
-export const getPriviousGameHistory   = async () => {
+export const getPriviousGameHistory = async (req, res) => {
   try {
-    const PreviousGamesWiningSide = await PreviousGameWinner.find().sort({ createdAt: -1 }).limit(10);
-    if (!PreviousGamesWiningSide || PreviousGamesWiningSide.length === 0) {
-      return { success: false, message: "No previous game history found." };
-    }
-    return { success: true, PreviousGamesWiningSide };
-    } catch (error) {
+    const latestGames = await PreviousGameWinner.find()
+      .sort({ playedAt: -1 }) // newest first
+      .limit(20)
+      .lean();
+
+    // Format date with seconds
+    const formattedGames = latestGames.map(game => ({
+      ...game,
+      playedAtFormatted: new Date(game.playedAt).toLocaleString("en-IN", {
+        day: "2-digit",
+        month: "2-digit",
+        year: "numeric",
+        hour: "numeric",
+        minute: "2-digit",
+        second: "2-digit",
+        hour12: true,
+      }),
+    }));
+
+    return res.status(200).json({
+      success: true,
+      previousWinning: formattedGames
+    });
+  } catch (error) {
     console.error("Get previous game history error:", error);
-    return { success: false, message: "Server error" };
-    }
-
-}
-
-
+    return res.status(500).json({ success: false, message: "Server error" });
+  }
+};
