@@ -1252,6 +1252,13 @@ const startGameLoop = (io) => {
         baharCards,
         timestamp: new Date(),
       };
+      
+  await PreviousGameWinner.insertOne({
+    winningSide: gameState.winningSide,
+   
+    playedAt: new Date(), // optional but good to include
+  })
+
   
       const winners = [];
       const losers = [];
@@ -1332,20 +1339,15 @@ const startGameLoop = (io) => {
   
       try {
         io.emit("gameResult", {
-
           winningSide: gameState.winningSide,
           winningCardIndex: gameState.winningCardIndex,
           winners,
           losers,
         });
-
       } catch (error) {
         console.error("Error emitting game result:", error);
       }
-      await PreviousGameWinner.insertOne({
-        winningSide: gameState.winningSide,
-      });
-   
+  
       await new Promise((resolve) => setTimeout(resolve, 10000));
       resetGame();
     } catch (error) {

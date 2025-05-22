@@ -40,7 +40,7 @@ const [previousWinnings, setPreviousWinnings] = useState([]);
   const fetchPreviousWinning = async () => {
     const token = localStorage.getItem("token");
   try {
-    const response = await axios.get("https://game-website-yyuo.onrender.com/api/games/previous-history", {
+    const response = await axios.get("http://localhost:5000/api/games/previous-history", {
       headers: {
         "Content-Type": "application/json",
         Authorization: `Bearer ${token}`,
@@ -335,35 +335,42 @@ fetchPreviousWinning();
           </Grid>
         )}
         {previousWinnings.map((game, index) => {
-          let label = "?";
-          let bgColor = "#FF9800"; // unknown orange
-          if (game.winningSide === "andar") {
-            label = "A";
-            bgColor = "#1976d2"; // blue
-          } else if (game.winningSide === "bahar") {
-            label = "B";
-            bgColor = "#d32f2f"; // red
-          }
+  let label = "?";
+  let bgColor = "#FF9800"; // unknown orange
+  if (game.winningSide === "andar") {
+    label = "A";
+    bgColor = "#1976d2"; // blue
+  } else if (game.winningSide === "bahar") {
+    label = "B";
+    bgColor = "#d32f2f"; // red
+  }
+  {console.log("game",game.winningSide)}
 
-          return (
-            <Grid item key={index}>
-              <Tooltip title={new Date(game.playedAt).toLocaleString()}>
-                <Chip
-                  label={label}
-                  sx={{
-                    width: 40,
-                    height: 40,
-                    fontWeight: "bold",
-                    color: "#fff",
-                    backgroundColor: bgColor,
-                    borderRadius: "50%",
-                    fontSize: "1.1rem",
-                  }}
-                />
-              </Tooltip>
-            </Grid>
-          );
-        })}
+  return (
+    <Grid item key={index}>
+      <Box display="flex" flexDirection="column" alignItems="center">
+        <Tooltip title={new Date(game.playedAt).toLocaleString()}>
+          <Chip
+            label={label}
+            sx={{
+              width: 40,
+              height: 40,
+              fontWeight: "bold",
+              color: "#fff",
+              backgroundColor: bgColor,
+              borderRadius: "50%",
+              fontSize: "1.1rem",
+            }}
+          />
+        </Tooltip>
+        <Typography variant="caption" sx={{ mt: 0.5 , color: "#000" }}>
+          {index + 1}
+        </Typography>
+      </Box>
+    </Grid>
+  );
+})}
+
 
        
       </Grid>

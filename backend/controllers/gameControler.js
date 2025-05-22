@@ -155,9 +155,8 @@ export const getTransactionHistory = async (req, res) => {
 };
 export const getPriviousGameHistory = async (req, res) => {
   try {
-    const latestGames = await PreviousGameWinner.find()
+    const latestGames = await PreviousGameWinner.find( )
       .sort({ playedAt: -1 }) // newest first
-      .limit(20)
       .lean();
 
     // Format date with seconds
