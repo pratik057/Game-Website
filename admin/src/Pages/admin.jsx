@@ -653,97 +653,17 @@ const totalProfit = creditBalance - debitBalance;
   return (
     <div className="container mx-auto p-4 md:p-6 bg-gray-50 min-h-screen">
       <style>{styles}</style>
-      <Card elevation={3} className="mb-6 overflow-hidden">
+      <Card elevation={3} className="mb-6 overflow-hidden justify-center items-center">
         <div className="bg-gradient-to-r from-blue-600 to-blue-800 p-4 md:p-6">
-          <Typography variant="h4" className="text-white font-bold">
+          <Typography variant="h4" className="text-white font-bold justify-center items-center">
             Admin Dashboard
           </Typography>
-          <Typography variant="body1" className="text-blue-100 mt-1">
-            View and manage all user accounts
-          </Typography>
+        
         </div>
       </Card>
 
       {/* Stats Cards */}
-      <div className="grid grid-cols-5 md:grid-cols-5 gap-4 mb-6">
-        <Card elevation={2} className="transition-all duration-300 hover:shadow-lg">
-          <CardContent className="flex items-center">
-            <div className="bg-blue-100 p-3 rounded-full mr-4">
-              <PersonIcon className="text-blue-600" fontSize="large" />
-            </div>
-            <div>
-              <Typography variant="h6" color="textSecondary" className="text-sm">
-                Total Users
-              </Typography>
-              <Typography variant="h4" className="font-bold">
-                {userCount}
-              </Typography>
-            </div>
-          </CardContent>
-        </Card>
-
-        <Card elevation={2} className="transition-all duration-300 hover:shadow-lg">
-          <CardContent className="flex items-center">
-            <div className="bg-green-100 p-3 rounded-full mr-4">
-              {/* <MoneyIcon className="text-green-600" fontSize="large" /> */}
-            </div>
-            <div>
-              <Typography variant="h6" color="textSecondary" className="text-sm">
-                Credit Coins
-              </Typography>
-              <Typography variant="h4" className="font-bold">
-                {creditBalance.toLocaleString()}
-              </Typography>
-            </div>
-          </CardContent>
-        </Card>
-        <Card elevation={2} className="transition-all duration-300 hover:shadow-lg">
-          <CardContent className="flex items-center">
-            <div className="bg-green-100 p-3 rounded-full mr-4">
-              {/* <MoneyIcon className="text-green-600" fontSize="large" /> */}
-            </div>
-            <div>
-              <Typography variant="h6" color="textSecondary" className="text-sm">
-                Debit Coins
-              </Typography>
-              <Typography variant="h4" className="font-bold">
-                {debitBalance.toLocaleString()}
-              </Typography>
-            </div>
-          </CardContent>
-        </Card>
-        <Card elevation={2} className="transition-all duration-300 hover:shadow-lg">
-          <CardContent className="flex items-center">
-            <div className="bg-green-100 p-3 rounded-full mr-4">
-              {/* <MoneyIcon className="text-green-600" fontSize="large" /> */}
-            </div>
-            <div>
-              <Typography variant="h6" color="textSecondary" className="text-sm">
-                Total Coins
-              </Typography>
-              <Typography variant="h4" className="font-bold">
-                {totalBalance.toLocaleString()}
-              </Typography>
-            </div>
-          </CardContent>
-        </Card>
-        <Card elevation={2} className="transition-all duration-300 hover:shadow-lg">
-          <CardContent className="flex items-center">
-            <div className="bg-green-100 p-3 rounded-full mr-4">
-              {/* <MoneyIcon className="text-green-600" fontSize="" /> */}
-            </div>
-            <div>
-              <Typography variant="h6" color="textSecondary" className="text-sm">
-                Total Profit
-              </Typography>
-              <Typography variant="h4" className="font-bold">
-                {totalProfit.toLocaleString()}
-              </Typography>
-            </div>
-          </CardContent>
-        </Card>
-       
-      </div>
+    
 
       {/* Search and Filters */}
       <Card elevation={2} className="mb-6 p-4">
@@ -831,7 +751,85 @@ const totalProfit = creditBalance - debitBalance;
           </div>
         </div>
       </Card>
+  <div className="grid grid-cols-5 md:grid-cols-5 gap-4 mb-6">
+        <Card elevation={2} className="transition-all duration-300 hover:shadow-lg">
+          <CardContent className="flex items-center">
+            <div className="bg-blue-100 p-3 rounded-full mr-4">
+              <PersonIcon className="text-blue-600" fontSize="large" />
+            </div>
+            <div>
+              <Typography variant="h6" color="textSecondary" className="text-sm">
+                Total Users
+              </Typography>
+              <Typography variant="h4" className="font-bold">
+                {userCount}
+              </Typography>
+            </div>
+          </CardContent>
+        </Card>
 
+        <Card elevation={2} className="transition-all duration-300 hover:shadow-lg">
+          <CardContent className="flex items-center">
+            <div className="bg-green-100 p-3 rounded-full mr-4">
+              {/* <MoneyIcon className="text-green-600" fontSize="large" /> */}
+            </div>
+            <div>
+              <Typography variant="h6" color="textSecondary" className="text-sm">
+                Credit Coins
+              </Typography>
+              <Typography variant="h4" className="font-bold">
+                {creditBalance.toLocaleString()}
+              </Typography>
+            </div>
+          </CardContent>
+        </Card>
+        <Card elevation={2} className="transition-all duration-300 hover:shadow-lg">
+          <CardContent className="flex items-center">
+            <div className="bg-green-100 p-3 rounded-full mr-4">
+              {/* <MoneyIcon className="text-green-600" fontSize="large" /> */}
+            </div>
+            <div>
+              <Typography variant="h6" color="textSecondary" className="text-sm">
+                Debit Coins
+              </Typography>
+              <Typography variant="h4" className="font-bold">
+                {debitBalance.toLocaleString()}
+              </Typography>
+            </div>
+          </CardContent>
+        </Card>
+        <Card elevation={2} className="transition-all duration-300 hover:shadow-lg">
+          <CardContent className="flex items-center">
+            <div className="bg-green-100 p-3 rounded-full mr-4">
+              {/* <MoneyIcon className="text-green-600" fontSize="large" /> */}
+            </div>
+            <div>
+              <Typography variant="h6" color="textSecondary" className="text-sm">
+                Total Coins
+              </Typography>
+              <Typography variant="h4" className="font-bold">
+                {totalBalance.toLocaleString()}
+              </Typography>
+            </div>
+          </CardContent>
+        </Card>
+        <Card elevation={2} className="transition-all duration-300 hover:shadow-lg">
+          <CardContent className="flex items-center">
+            <div className="bg-green-100 p-3 rounded-full mr-4">
+              {/* <MoneyIcon className="text-green-600" fontSize="" /> */}
+            </div>
+            <div>
+              <Typography variant="h6" color="textSecondary" className="text-sm">
+                Total Profit
+              </Typography>
+              <Typography variant="h4" className="font-bold">
+                {totalProfit.toLocaleString()}
+              </Typography>
+            </div>
+          </CardContent>
+        </Card>
+       
+      </div>
       {/* Users Table */}
       <Card elevation={3}>
         <CardContent className="p-0">
@@ -1205,7 +1203,7 @@ const totalProfit = creditBalance - debitBalance;
             <div className="space-y-5 animate-fadeIn">
               <div className="bg-amber-50 p-4 rounded-lg border border-amber-100">
                 <Typography variant="subtitle2" className="text-amber-700 mb-2 font-medium flex items-center">
-                  <MoneyIcon fontSize="small" className="mr-1" />
+                  
                   Balance Management
                 </Typography>
 
@@ -1402,7 +1400,9 @@ const totalProfit = creditBalance - debitBalance;
                 </tr>
               </thead>
               <tbody>
-                {games.map((game) => (
+                {[...games]
+  .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt)) // latest first
+  .map((game) => (
                   <tr
                     key={game._id}
                     className="border-t border-gray-200 hover:bg-gray-50 transition-colors"

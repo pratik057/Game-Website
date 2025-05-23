@@ -172,7 +172,7 @@ export const getPriviousGameHistory = async (req, res) => {
         hour12: true,
       }),
     }));
-console.log("Formatted games:", formattedGames);
+
     return res.status(200).json({
       success: true,
       previousWinning: formattedGames

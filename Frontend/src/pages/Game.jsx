@@ -169,22 +169,29 @@ fetchPreviousWinning();
   }}
 >
   <DialogTitle
+  sx={{
+    backgroundColor: "#111827",
+    color: "#facc15",
+    fontWeight: "bold",
+    fontSize: "1.2rem",
+    textAlign: "center",
+    py: 2,
+    borderBottom: "1px solid #374151",
+  }}
+>
+  <Box
     sx={{
-      backgroundColor: "#111827", // darker background
-      color: "#facc15", // yellow-400
-      fontWeight: "bold",
-      fontSize: "1.2rem",
-      textAlign: "center",
-      py: 2,
-      borderBottom: "1px solid #374151"
+      display: "flex",
+      justifyContent: "space-between",
+      alignItems: "center",
     }}
   >
-    PLACE YOUR BET
-     <IconButton onClick={handleClose} sx={{ color: "#f87171" }}>
+    <span>PLACE YOUR BET</span>
+    <IconButton onClick={handleClose} sx={{ color: "#f87171" }}>
       <CloseIcon />
     </IconButton>
-  </DialogTitle>
- 
+  </Box>
+</DialogTitle>
   
 
   <DialogContent sx={{ py: 2 }}>
@@ -375,87 +382,89 @@ fetchPreviousWinning();
             </div>
           </div>
         </div>
-   <Box
-      sx={{
-        width: "100%",
-        margin: "auto",
-        p: 2,
-        mb: 5,
-        boxShadow: 3,
-        borderRadius: 2,
-        backgroundColor:  "bg-gray-800",
-      }}
-    >
-      <Typography variant="h6" align="center" gutterBottom>
-        AndharBahar Record(s)
-      </Typography>
-      <Divider sx={{ mb: 2 }} />
+ <Box
+  sx={{
+   
+    margin: "auto",
+    p: 2,
+    mb: 5,
+    boxShadow: 3,
+    borderRadius: 2,
+    backgroundColor: "#1f2937", // Tailwind's bg-gray-800 in hex
+    color: "#f3f4f6", // Tailwind's gray-100 for text
+  }}
+>
+  <Typography variant="h6" align="center" gutterBottom sx={{ color: "#facc15" }}>
+    AndharBahar Record(s)
+  </Typography>
 
-      <Grid container spacing={1} justifyContent="center" flexWrap="wrap">
-        {/* Render declared results */}
-         {/* Conditionally render the "?" chip for current betting game */}
-            {showQuestionMark && (
-          <Grid item>
-            <Tooltip title="Current betting game">
-              <Chip
-                label="?"
-                sx={{
-                  width: 40,
-                  height: 40,
-                  fontWeight: "bold",
-                  color: "#fff",
-                  backgroundColor: "#ffa726", // distinct orange
-                  borderRadius: "50%",
-                  fontSize: "1.1rem",
-                  border: "2px dashed #ffb74d",
-                }}
-              />
-            </Tooltip>
-          </Grid>
-        )}
-     
-{[...previousWinnings]
-  .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt)) // Sort by latest
-  .slice(0, 20) // Get only the latest 20
-  .map((game, index) => {
-    let label = "?";
-    let bgColor = "#FF9800"; // unknown orange
+  <Divider sx={{ mb: 2, backgroundColor: "#374151" }} />
 
-    if (game.winningSide === "andar") {
-      label = "A";
-      bgColor = "#1976d2"; // blue
-    } else if (game.winningSide === "bahar") {
-      label = "B";
-      bgColor = "#d32f2f"; // red
-    }
-
-  return (
-    <Grid item key={index}>
-      <Box display="flex" flexDirection="column" alignItems="center">
-        <Tooltip title={new Date(game.playedAt).toLocaleString()}>
+  <Grid container spacing={1} justifyContent="center" flexWrap="wrap">
+    {/* Render current betting game indicator */}
+    {showQuestionMark && (
+      <Grid item>
+        <Tooltip title="Current betting game">
           <Chip
-            label={label}
-            sx={{
-              width: 40,
-              height: 40,
-              fontWeight: "bold",
-              color: "#fff",
-              backgroundColor: bgColor,
-              borderRadius: "50%",
-              fontSize: "1.1rem",
-            }}
-          />
+  label="?"
+  sx={{
+    width: 30,
+    height: 30,
+    fontWeight: "bold",
+    color: "#fff",
+    backgroundColor: "#f59e0b", // Tailwind orange-500
+    borderRadius: "50%",
+    fontSize: "0.8rem",
+    border: "2px  #fbbf24", // orange-300
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
+    padding: 0,
+  }}
+/>
+
         </Tooltip>
-      
-      </Box>
-    </Grid>
-  );
-})}
-
-
-       
       </Grid>
-    </Box>
+    )}
+
+    {[...previousWinnings]
+      .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
+      .slice(0, 20)
+      .map((game, index) => {
+        let label = "?";
+        let bgColor = "#f59e0b"; // default orange
+
+        if (game.winningSide === "andar") {
+          label = "A";
+          bgColor = "#2563eb"; // Tailwind blue-600
+        } else if (game.winningSide === "bahar") {
+          label = "B";
+          bgColor = "#dc2626"; // Tailwind red-600
+        }
+
+        return (
+          <Grid item key={index}>
+            <Box display="flex" flexDirection="column" alignItems="center">
+              <Tooltip title={new Date(game.playedAt).toLocaleString()}>
+                <Chip
+                  label={label}
+                  sx={{
+                    width: 30,
+                    height: 30,
+                    fontWeight: "bold",
+                    color: "#fff",
+                    backgroundColor: bgColor,
+                    borderRadius: "50%",
+                    fontSize: "0.5rem",
+                  }}
+                />
+              </Tooltip>
+            </Box>
+          </Grid>
+        );
+      })}
+  </Grid>
+</Box>
 
 
 
