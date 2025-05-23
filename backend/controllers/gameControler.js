@@ -172,11 +172,12 @@ export const getPriviousGameHistory = async (req, res) => {
         hour12: true,
       }),
     }));
-
+console.log("Formatted games:", formattedGames);
     return res.status(200).json({
       success: true,
       previousWinning: formattedGames
     });
+    
   } catch (error) {
     console.error("Get previous game history error:", error);
     return res.status(500).json({ success: false, message: "Server error" });

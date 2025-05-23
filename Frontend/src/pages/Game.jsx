@@ -12,6 +12,8 @@ import axios from "axios";
 import { Box, Typography, Divider, Chip, Grid, Tooltip } from "@mui/material";
 import BettingTimer from "../components/BettingTimer"
 
+import IconButton from "@mui/material/IconButton";
+import CloseIcon from "@mui/icons-material/Close";
 
 
 
@@ -22,6 +24,7 @@ const Game = () => {
   const { user, balance } = useContext(UserContext)
   const { connected, gameState, currentBet, placeBet } = useContext(SocketContext)
 const [previousWinnings, setPreviousWinnings] = useState([]);
+const [selectedSide, setSelectedSide] = useState(" ");
   const userWon = gameState.status === "result" && currentBet && currentBet.side === gameState.winningSide
   const showQuestionMark =
     gameState.status === "betting" || gameState.status === "jokerRevealed";
@@ -33,14 +36,16 @@ const [previousWinnings, setPreviousWinnings] = useState([]);
 
   const [betDialogOpen, setBetDialogOpen] = useState(false);
 
-  const handleOpen = () => setBetDialogOpen(true);
+  const handleOpen = (side) => {
+    setSelectedSide(side);
+    setBetDialogOpen(true)};
   const handleClose = () => setBetDialogOpen(false);
   const winAmount = calculateWinAmount()
 
   const fetchPreviousWinning = async () => {
     const token = localStorage.getItem("token");
   try {
-    const response = await axios.get("http://localhost:5000/api/games/previous-history", {
+    const response = await axios.get("https://game-website-yyuo.onrender.com/api/games/previous-history", {
       headers: {
         "Content-Type": "application/json",
         Authorization: `Bearer ${token}`,
@@ -73,12 +78,22 @@ fetchPreviousWinning();
  
       <div className=" w-full h-[100%] flex flex-col justify-between bg-gradient-to-b mt-4 from-gray-900 via-gray-900 to-gray-800 text-white px-4 md:px-8 lg:px-16 overflow-hidden">
         {/* Bet Controls */}
-           {/* Header: Connection + Game Status */}
+        <div className="w-full h-full bg-gray-800 border-gray-700 rounded-xl shadow-2xl p-4 mb-4 max-w-5xl mx-auto text-white relative overflow-hidden">
+      {/* Decorative pattern overlay */}
+      <div className="absolute inset-0 opacity-5 pointer-events-none">
+        <div className="absolute inset-0 bg-[radial-gradient(#ffffff33_1px,transparent_1px)] bg-[length:20px_20px]"></div>
+      </div>
+
+      {/* Header: Connection + Game Status */}
       <div className="flex flex-col sm:flex-row justify-between items-center rounded-lg shadow-inner gap-4 relative z-10">
         {/* Connection + Timer */}
         <div className="flex items-center space-x-4 text-sm">
           <div className="flex items-center bg-black/30 px-3 py-1 rounded-full">
-            <div className={`w-2 h-2 rounded-full mr-2 ${connected ? "bg-green-500 animate-pulse" : "bg-red-500"}`} />
+            <div
+              className={`w-2 h-2 rounded-full mr-2 ${
+                connected ? "bg-green-500 animate-pulse" : "bg-red-500"
+              }`}
+            />
             {connected ? "Connected" : "Disconnected"}
           </div>
           {gameState.status === "betting" && gameState.bettingTimeLeft > 0 && (
@@ -88,18 +103,34 @@ fetchPreviousWinning();
           )}
         </div>
 
+          {currentBet && (
+        <div className="text-center text-white font-semibold text-sm  bg-black/40 p-2 rounded-lg backdrop-blur-sm">
+          You bet <span className="text-yellow-400">{currentBet.amount}</span>{" "}
+          on{" "}
+          <span
+            className={
+              currentBet.side === "andar" ? "text-red-400" : "text-blue-400"
+            }
+          >
+            {currentBet.side.toUpperCase()}
+          </span>
+        </div>
+      )}
+
         {/* Game Status */}
         <div className="text-sm font-semibold bg-black/30 px-4 py-1 rounded-full">
+
+      
           <span className="text-gray-300 mr-2">Game Status:</span>
           <span
             className={`font-bold ${
               gameState.status === "betting"
                 ? "text-yellow-400"
                 : gameState.status === "dealing"
-                  ? "text-blue-400"
-                  : gameState.status === "result"
-                    ? "text-green-500"
-                    : "text-gray-400"
+                ? "text-blue-400"
+                : gameState.status === "result"
+                ? "text-green-500"
+                : "text-gray-400"
             }`}
           >
             {gameState.status === "betting" ? (
@@ -117,22 +148,69 @@ fetchPreviousWinning();
             )}
           </span>
         </div>
+          
       </div>
-      <Dialog open={betDialogOpen} onClose={handleClose} maxWidth="sm" fullWidth>
-        <DialogTitle>Place Your Bet</DialogTitle>
-        <DialogContent>
-          <BetControls
-            onPlaceBet={placeBet}
-            disabled={gameState.status !== "betting" || currentBet !== null}
-            currentBet={currentBet}
-            connected={connected}
-            gameState={gameState}
-          />
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={handleClose}>Cancel</Button>
-        </DialogActions>
-      </Dialog>
+      </div>
+  
+    <Dialog
+  open={betDialogOpen}
+  onClose={handleClose}
+  maxWidth="sm"
+  fullWidth
+  PaperProps={{
+    sx: {
+      backgroundColor: "#1f2937", // bg-gray-800
+      borderRadius: 3,
+      color: "white",
+      boxShadow: "0 0 20px rgba(255,255,255,0.1)",
+      overflow: "hidden",
+      border: "1px solid #374151" // border-gray-700
+    }
+  }}
+>
+  <DialogTitle
+    sx={{
+      backgroundColor: "#111827", // darker background
+      color: "#facc15", // yellow-400
+      fontWeight: "bold",
+      fontSize: "1.2rem",
+      textAlign: "center",
+      py: 2,
+      borderBottom: "1px solid #374151"
+    }}
+  >
+    PLACE YOUR BET
+     <IconButton onClick={handleClose} sx={{ color: "#f87171" }}>
+      <CloseIcon />
+    </IconButton>
+  </DialogTitle>
+ 
+  
+
+  <DialogContent sx={{ py: 2 }}>
+    <BetControls
+      onPlaceBet={placeBet}
+      disabled={gameState.status !== "betting" || currentBet !== null}
+      currentBet={currentBet}
+      connected={connected}
+      gameState={gameState}
+      selectedSide={selectedSide}
+      onCloseBetDialog={() => setBetDialogOpen(false)}
+    />
+  </DialogContent>
+
+  <DialogActions
+    sx={{
+      justifyContent: "center",
+      backgroundColor: "#111827",
+      py: 2,
+      borderTop: "1px solid #374151"
+    }}
+  >
+   
+  </DialogActions>
+</Dialog>
+
 
         {/* Main Game Section */}
         <div className="flex flex-col flex-grow w-full h-full items-center ">
@@ -159,8 +237,8 @@ fetchPreviousWinning();
                     {/* BAHAR Section */}
                 
               {/* ANDAR Section */}
-              <div className="flex flex-col items-center w-full relative" onClick={handleOpen}>
-              <h2 className="text-sm md:text-lg font-bold text-blue-400 mb-5 uppercase bg-blue-950/50 px-6 py-1 rounded-full shadow-lg">
+              <div className="flex flex-col items-center w-full relative" onClick={()=> handleOpen("andar")}>
+              <h2 className="text-sm md:text-lg font-bold text-blue-400 mb-5 uppercase bg-blue-950/50 px-6 py-1 rounded-full shadow-lg cursor-pointer">
                   Andar
                 </h2>
                 <div className="relative w-full flex justify-center mr-3">
@@ -225,9 +303,9 @@ fetchPreviousWinning();
                   )}
                 </div>
               </div>
-                  <div className="flex flex-col items-center w-full relative" onClick={handleOpen}>
+                  <div className="flex flex-col items-center w-full relative" onClick={()=> handleOpen("bahar")}>
                 
-                <h2 className="text-sm md:text-lg font-bold text-red-400 mb-5 uppercase bg-red-950/50 px-6 py-1 rounded-full shadow-lg">
+                <h2 className="text-sm md:text-lg font-bold text-red-400 mb-5 uppercase bg-red-950/50 px-6 py-1 rounded-full shadow-lg cursor-pointer">
                   Bahar
                 </h2>
                 <div className="relative w-full flex justify-center min-h-[200px]">
@@ -302,9 +380,10 @@ fetchPreviousWinning();
         width: "100%",
         margin: "auto",
         p: 2,
+        mb: 5,
         boxShadow: 3,
         borderRadius: 2,
-        backgroundColor: "#f9f9f9",
+        backgroundColor:  "bg-gray-800",
       }}
     >
       <Typography variant="h6" align="center" gutterBottom>
@@ -315,7 +394,7 @@ fetchPreviousWinning();
       <Grid container spacing={1} justifyContent="center" flexWrap="wrap">
         {/* Render declared results */}
          {/* Conditionally render the "?" chip for current betting game */}
-        {showQuestionMark && (
+            {showQuestionMark && (
           <Grid item>
             <Tooltip title="Current betting game">
               <Chip
@@ -334,17 +413,21 @@ fetchPreviousWinning();
             </Tooltip>
           </Grid>
         )}
-        {previousWinnings.map((game, index) => {
-  let label = "?";
-  let bgColor = "#FF9800"; // unknown orange
-  if (game.winningSide === "andar") {
-    label = "A";
-    bgColor = "#1976d2"; // blue
-  } else if (game.winningSide === "bahar") {
-    label = "B";
-    bgColor = "#d32f2f"; // red
-  }
-  {console.log("game",game.winningSide)}
+     
+{[...previousWinnings]
+  .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt)) // Sort by latest
+  .slice(0, 20) // Get only the latest 20
+  .map((game, index) => {
+    let label = "?";
+    let bgColor = "#FF9800"; // unknown orange
+
+    if (game.winningSide === "andar") {
+      label = "A";
+      bgColor = "#1976d2"; // blue
+    } else if (game.winningSide === "bahar") {
+      label = "B";
+      bgColor = "#d32f2f"; // red
+    }
 
   return (
     <Grid item key={index}>
@@ -363,9 +446,7 @@ fetchPreviousWinning();
             }}
           />
         </Tooltip>
-        <Typography variant="caption" sx={{ mt: 0.5 , color: "#000" }}>
-          {index + 1}
-        </Typography>
+      
       </Box>
     </Grid>
   );
