@@ -415,7 +415,7 @@ const handleDetails = async (user) => {
       )
 
       setGames(res.data.games)
-      console.log("Games data:", res.data.games)
+      
     } catch (err) {
       console.error("Error fetching games:", err)
       showSnackbar("Failed to fetch games. Please try again.", "error")
@@ -1010,7 +1010,7 @@ const totalProfit = creditBalance - debitBalance;
           >
             <Tab icon={<PersonIcon />} label="Profile" iconPosition="start" />
             <Tab icon={<LockIcon />} label="Password" iconPosition="start" />
-            <Tab icon={<MoneyIcon />} label="Balance" iconPosition="start" />
+            <Tab icon={""} label="Balance" iconPosition="start" />
           </Tabs>
         </Box>
 
@@ -1210,7 +1210,7 @@ const totalProfit = creditBalance - debitBalance;
                 <div className="flex items-center justify-center bg-white rounded-lg p-3 mb-4 border border-amber-200">
                   <div className="text-center">
                     <Typography variant="caption" className="text-gray-500 block">
-                      Current Balance
+                      Current Balance 
                     </Typography>
                     <Typography variant="h4" className="font-bold text-amber-600">
                       {formData.balance} <span className="text-sm font-normal">COINS</span>

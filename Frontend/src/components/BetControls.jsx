@@ -88,7 +88,7 @@ const BetControls = ({
       disabled = {disabled}
       onClick={() => handlePlaceBet("andar")}
     >
-      ANDAR
+      PLACE BET
     </button>
   )}
 
@@ -98,7 +98,7 @@ const BetControls = ({
       disabled = {disabled}
       onClick={() => handlePlaceBet("bahar")}
     >
-      BAHAR
+      PLACE BET
     </button>
   )}
       </div>

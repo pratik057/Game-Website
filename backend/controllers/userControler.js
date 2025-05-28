@@ -18,12 +18,14 @@ export const registerUser = async (req, res) => {
     if (!username || !email || !password || !mobileNo) {
       return res.status(400).json({ success: false, message: "Please fill in all fields" });
     }
-
+if(mobileNo.length !== 10){
+  return res.status(400).json({ success: false, message: "Mobile number must be 10 digits" });
+}
     // Check if the user already exists based on email, username, or mobile number
     const userExists = await User.findOne({ 
       $or: [{ email }, { username }, { mobileNo }] 
     });
-
+   
     if (userExists) {
       // Check for specific duplicate field and provide a detailed message
       if (userExists.email === email) {

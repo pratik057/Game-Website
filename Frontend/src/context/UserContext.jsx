@@ -51,7 +51,7 @@ export const UserProvider = ({ children }) => {
       setUser(response.data.user);
 
       setBalance(response.data.user.balance || 0);
-      console.log("Login successful:", response.data.user);
+   
       // toast.success("Login successful!");
       return true;
     } catch (err) {

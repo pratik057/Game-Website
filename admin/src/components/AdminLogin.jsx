@@ -36,7 +36,7 @@ const AdminLogin = () => {
             onChange={(e) => setPassword(e.target.value)}
             required
           />
-          <button type="submit" className="w-full bg-blue-500 text-white p-2 rounded">Login</button>
+          <button type="submit" className="w-full bg-blue-500 text-white p-2 rounded cursor-pointer">Login</button>
         </form>
       </div>
     </div>

@@ -64,16 +64,20 @@ const WalletControls = ({ onClose }) => {
     setTimeout(() => setNotification({ show: false, message: "", type: "" }), 3000);
   };
 
-  const handleDeposit = () => {
-    const whatsappMessage = `UserId:${user.id} %0AName: ${user.username}%0AEmail: ${user.email}%0AAmount to deposit: ${amount}`;
-    const whatsappLink = `https://wa.me/919713383890?text=${whatsappMessage}`;
-    window.open(whatsappLink, "_blank");
-  };
-  const handleWithdraw = () => {
-    const whatsappMessage = `UserId:${user.id} %0AName: ${user.username}%0AEmail: ${user.email}%0AAmount to Withdraw: ${amount}`;
-    const whatsappLink = `https://wa.me/919713383890?text=${whatsappMessage}`;
-    window.open(whatsappLink, "_blank");
-  };
+ const handleDeposit = () => {
+  const message = `UserId: ${user.id}\nName: ${user.username}\nEmail: ${user.email}\nAmount to deposit: ${amount}`;
+  const encodedMessage = encodeURIComponent(message);
+  const whatsappLink = `https://wa.me/919713383890?text=${encodedMessage}`;
+  window.open(whatsappLink, "_blank");
+};
+
+const handleWithdraw = () => {
+  const message = `UserId: ${user.id}\nName: ${user.username}\nEmail: ${user.email}\nAmount to withdraw: ${amount}`;
+  const encodedMessage = encodeURIComponent(message);
+  const whatsappLink = `https://wa.me/919713383890?text=${encodedMessage}`;
+  window.open(whatsappLink, "_blank");
+};
+
 
   return (
 
