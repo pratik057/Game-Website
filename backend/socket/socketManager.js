@@ -141,11 +141,12 @@ export const initializeSocketIO = (io) => {
       
         if (player.userId) {
           const dbUser = await User.findById(player.userId).select("isBlocked")
-          const betLimit =dbUser?.betLimit || 100000 // Default bet limit if not set
+          const betLimit =dbUser?.betLimit // Default bet limit if not set
           if (amount > betLimit) {
             socket.emit("betError", { message: `Bet amount exceeds your limit of ${betLimit}` })
             return
           }
+          console.log("User found:", betLimit)
           if (dbUser?.isBlocked) {
             socket.emit("betError", { message: "You are blocked from playing." })
             return

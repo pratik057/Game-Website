@@ -339,7 +339,7 @@ const Users = () => {
 const [showDialog, setShowDialog] = useState(false)
   const [games, setGames] = useState([])
 
-const [betLimit, setBetLimit] = useState(10000) // Default bet limit
+ // Default bet limit
   const [addBalance, setAddBalance] = useState("")
   const [removeBalance, setRemoveBalance] = useState("")
   const [loading, setLoading] = useState(true)
@@ -357,7 +357,7 @@ const [betLimit, setBetLimit] = useState(10000) // Default bet limit
     balance: 0,
     password: "",
     confirmPassword: "",
-    betLimit: 10000, // Default bet limit
+    betLimit: 0, // Default bet limit
   })
   const [showPassword, setShowPassword] = useState(false)
   const [showConfirmPassword, setShowConfirmPassword] = useState(false)
@@ -473,7 +473,7 @@ const handleDetails = async (user) => {
       balance: user.balance || 0,
       password: "",
       confirmPassword: "",
-      betLimit: user.betLimit || 10000, // Default bet limit
+      betLimit: user.betLimit , // Default bet limit
     })
     setAddBalance("")
     setRemoveBalance("")
@@ -503,6 +503,10 @@ const handleDetails = async (user) => {
     const value = e.target.value
     if (/^\d*\.?\d*$/.test(value)) setRemoveBalance(value)
   }
+const handleBetLimitChange = (e) => {
+    const value = e.target.value
+    setFormData({ ...formData, betLimit: value })
+  } 
 
   const validatePassword = () => {
     // If both password fields are empty, assume no password change
@@ -1247,14 +1251,14 @@ const totalProfit = creditBalance - debitBalance;
                      <div className="transition-all duration-200 hover:scale-[1.02]">
                     <TextField
                       fullWidth
-                      label="Add Balance"
-                      value={betLimit}
-                      onChange={handleLimitChange}
+                      label="Bet Limit"
+                      value={formData.betLimit}
+                      onChange={handleBetLimitChange}
                       variant="outlined"
                       size="small"
                       className="bg-green-50 rounded-lg shadow-sm"
                      
-                      helperText="Amount to add to user's balance"
+                    
                     />
                   </div>
 
