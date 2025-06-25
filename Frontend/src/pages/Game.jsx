@@ -1,6 +1,7 @@
 "use client";
 
 import { useContext, useState, useEffect } from "react";
+import { Link } from "react-router-dom";
 import { UserContext } from "../context/UserContext";
 import { SocketContext } from "../context/SocketContext";
 import Card from "../components/Card";
@@ -103,6 +104,11 @@ const Game = () => {
                   />
                   {connected ? "Connected" : "Disconnected"}
                 </div>
+
+                 <div className="text-gray-300 ">
+               
+                </div>  
+             
                 {gameState.status === "betting" &&
                   gameState.bettingTimeLeft > 0 && (
                     <div className="ml-4 bg-black/30 px-3 py-1 rounded-full">
@@ -110,7 +116,14 @@ const Game = () => {
                     </div>
                   )}
               </div>
+              <Link
+  to="/wallet"
+  className="text-sm font-semibold bg-black/30 px-4 py-1 new rounded-full hover:bg-black/40 transition-colors duration-200 block md:hidden"
+>
+  Add Amount
+</Link>
 
+  
               {currentBet && (
                 <div className="text-center text-white font-semibold text-sm  bg-black/40 p-2 rounded-lg backdrop-blur-sm">
                   You bet{" "}
@@ -260,6 +273,7 @@ const Game = () => {
                   className="flex flex-col items-center w-full relative"
                   onClick={() => handleOpen("andar")}
                 >
+                <span className="absolute top-[-20px] text-xs text-gray-200"> Click To Place Bet</span>
                   <h2 className="text-sm md:text-lg font-bold text-blue-400 mb-5 uppercase bg-blue-950/50 px-6 py-1 rounded-full shadow-lg cursor-pointer">
                     Andar
                   </h2>
@@ -329,6 +343,7 @@ const Game = () => {
                   className="flex flex-col items-center w-full relative"
                   onClick={() => handleOpen("bahar")}
                 >
+                   <span className="absolute top-[-20px] text-xs text-gray-200"> Click To Place Bet</span>
                   <h2 className="text-sm md:text-lg font-bold text-red-400 mb-5 uppercase bg-red-950/50 px-6 py-1 rounded-full shadow-lg cursor-pointer">
                     Bahar
                   </h2>

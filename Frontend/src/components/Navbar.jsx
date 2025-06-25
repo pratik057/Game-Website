@@ -60,6 +60,12 @@ const Navbar = () => {
                 >
                   Rules
                 </Link>
+                  <Link
+                  to="/wallet"
+                  className="text-gray-300 tabview hover:text-yellow-400 px-3 py-2 rounded-md transition-colors duration-200 hover:bg-black/20"
+                >
+             Add Amount
+                </Link>
               </div>
             </div>
           </div>
@@ -73,6 +79,17 @@ const Navbar = () => {
               Bahar
             </span>
           </h1>
+
+
+          <div className="block md:hidden mr-4 px-4 py-1">
+  <span className="text-gray-400 text-sm">COINS:</span>
+  <span className="ml-1 text-yellow-300 font-bold text-sm">
+    {balance.toFixed(2)}
+  </span>
+</div>
+
+
+          
 
           <div className="hidden md:block">
             <div className="flex items-center">
@@ -150,6 +167,7 @@ const Navbar = () => {
       {/* Mobile menu */}
       {mobileMenuOpen && (
         <div className="md:hidden bg-gradient-to-b from-gray-900 to-emerald-950 pb-3 px-4 border-t border-yellow-600/30">
+          
           <div className="flex flex-col space-y-2">
             <Link
               to="/dashboard"
@@ -168,6 +186,12 @@ const Navbar = () => {
               className="text-gray-300 hover:text-yellow-400 px-3 py-2 rounded-md transition-colors duration-200"
             >
               Rules
+            </Link>
+             <Link
+              to="/wallet"
+              className="text-gray-300 hover:text-yellow-400 px-3 py-2 rounded-md transition-colors duration-200"
+            >
+              Add balance
             </Link>
 
             {user ? (

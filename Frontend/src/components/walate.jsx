@@ -4,12 +4,13 @@ import { useState, useContext, useEffect } from "react";
 import { UserContext } from "../context/UserContext";
 import { motion } from "framer-motion";
 import { ArrowDownCircle, ArrowUpCircle, Loader2 } from "lucide-react";
-import { Link } from "react-router-dom";
+import { Link ,useNavigate} from "react-router-dom";
 import Logo from "../assets/logo.png"; // Import your logo
 const WalletControls = ({ onClose }) => {
   const { user, balance, updateBalance } = useContext(UserContext);
   const [amount, setAmount] = useState("");
   const [loading, setLoading] = useState(false);
+  const navigate = useNavigate();
   const [displayBalance, setDisplayBalance] = useState(balance);
   const [notification, setNotification] = useState({ show: false, message: "", type: "" });
   const [activeTab, setActiveTab] = useState("deposit");
@@ -92,13 +93,13 @@ const handleWithdraw = () => {
               aria-label="Close"
             >
               </img>
-              <Link
-        to="/"
+              <button
+       onClick={() => navigate(-1)}
         className="absolute top-4 right-4 text-red-700 hover:text-white transition-colors duration-200 text-5xl font-bold z-50 "
         aria-label="Close"
       >
         &times;
-      </Link>
+      </button>
       </div>
 
 
