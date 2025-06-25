@@ -141,9 +141,9 @@ export const initializeSocketIO = (io) => {
       
         if (player.userId) {
           const dbUser = await User.findById(player.userId).select("isBlocked")
-          const betLimit = await User.findById(player.userId).select("betLimit")
-          console.log("Bet limit:", betLimit)
-          if (amount > betLimit) {
+          const betLimit = await User.findById(player.userId)
+          console.log("Bet limit:", betLimit.betLimit)
+          if (amount > betLimit.betLimit) {
             socket.emit("betError", { message: `Bet amount exceeds your limit of ${betLimit}` })
             return
           }
