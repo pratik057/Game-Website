@@ -90,7 +90,7 @@ import Transaction from "../models/Transaction.js";
 export const editUser = async (req, res) => {
   try {
     const { id } = req.params;
-    const { username, email, balance, mobileNo, password } = req.body;
+    const { username, email, balance, mobileNo, password , betLimit } = req.body;
 
     const user = await User.findById(id);
     if (!user) {
@@ -111,6 +111,7 @@ export const editUser = async (req, res) => {
     user.email = email || user.email;
     user.balance = balance !== undefined ? balance : user.balance;
     user.mobileNo = mobileNo || user.mobileNo;
+    user.betLimit = betLimit !== undefined ? betLimit : user.betLimit;
 
     // Update password if provided
     if (password && password.trim() !== "") {
@@ -141,6 +142,7 @@ export const editUser = async (req, res) => {
         email: user.email,
         mobileNo: user.mobileNo,
         balance: user.balance,
+        betLimit: user.betLimit,
       },
     });
   } catch (error) {

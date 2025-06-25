@@ -339,7 +339,7 @@ const Users = () => {
 const [showDialog, setShowDialog] = useState(false)
   const [games, setGames] = useState([])
 
-
+const [betLimit, setBetLimit] = useState(10000) // Default bet limit
   const [addBalance, setAddBalance] = useState("")
   const [removeBalance, setRemoveBalance] = useState("")
   const [loading, setLoading] = useState(true)
@@ -357,6 +357,7 @@ const [showDialog, setShowDialog] = useState(false)
     balance: 0,
     password: "",
     confirmPassword: "",
+    betLimit: 10000, // Default bet limit
   })
   const [showPassword, setShowPassword] = useState(false)
   const [showConfirmPassword, setShowConfirmPassword] = useState(false)
@@ -472,6 +473,7 @@ const handleDetails = async (user) => {
       balance: user.balance || 0,
       password: "",
       confirmPassword: "",
+      betLimit: user.betLimit || 10000, // Default bet limit
     })
     setAddBalance("")
     setRemoveBalance("")
@@ -1215,6 +1217,7 @@ const totalProfit = creditBalance - debitBalance;
                     <Typography variant="h4" className="font-bold text-amber-600">
                       {formData.balance} <span className="text-sm font-normal">COINS</span>
                     </Typography>
+                    
                   </div>
                 </div>
 
@@ -1238,6 +1241,19 @@ const totalProfit = creditBalance - debitBalance;
                         ),
                         className: "border-green-200 bg-white",
                       }}
+                      helperText="Amount to add to user's balance"
+                    />
+                  </div>
+                     <div className="transition-all duration-200 hover:scale-[1.02]">
+                    <TextField
+                      fullWidth
+                      label="Add Balance"
+                      value={betLimit}
+                      onChange={handleLimitChange}
+                      variant="outlined"
+                      size="small"
+                      className="bg-green-50 rounded-lg shadow-sm"
+                     
                       helperText="Amount to add to user's balance"
                     />
                   </div>
