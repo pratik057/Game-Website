@@ -138,12 +138,14 @@ export const initializeSocketIO = (io) => {
           socket.emit("betError", { message: "Insufficient balance" })
           return
         }
-        if(amount < 10) {
-          socket.emit("betError", { message: "Minimum bet amount is 10" })
-          return
-        }
+      
         if (player.userId) {
           const dbUser = await User.findById(player.userId).select("isBlocked")
+          const betLimit =dbUser?.betLimit || 100000 // Default bet limit if not set
+          if (amount > betLimit) {
+            socket.emit("betError", { message: `Bet amount exceeds your limit of ${betLimit}` })
+            return
+          }
           if (dbUser?.isBlocked) {
             socket.emit("betError", { message: "You are blocked from playing." })
             return

@@ -48,7 +48,11 @@ const userSchema = new mongoose.Schema({
     type: Boolean,
     default: false,
   }
-,  
+,
+  betLimit: {
+    type: Number,
+    default: 10000, // Default bet limit
+  },  
 resetPasswordToken: String,
 resetPasswordExpires: Date,
 
