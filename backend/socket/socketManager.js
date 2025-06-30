@@ -316,7 +316,7 @@ const startGameLoop = (io) => {
       let matchFound = false
 
       // Start with andar side for the first card
-      let currentSide = "andar"
+      let currentSide = "bahar"
 
       // Deal cards until we find a match with the joker card
       while (!matchFound && deck.length > 0) {
