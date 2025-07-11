@@ -53,7 +53,7 @@ export const placeBet = async (req, res) => {
     }
 
     // Simulate game result (Win/Loss)
-    const winAmount = Math.random() < 0.3 ? amount * 2 : 0;
+    const winAmount = Math.random() < 0.3 ? amount * 1.96: 0;
 
     // Update user balance
     user.balance = Math.max(0, user.balance - amount + winAmount);

@@ -1,20 +1,26 @@
 "use client"
 
-import { useEffect} from "react"
+import { useEffect, useState } from "react"
 import { motion, AnimatePresence } from "framer-motion"
 import confetti from "canvas-confetti"
+import Sound from "react-sound"
 
 const GameResult = ({ result, winAmount, onPlayAgain, autoClose = false }) => {
-  // const winAudioRef = useRef(null)
-  // const lossAudioRef = useRef(null)
+  const [playWinSound, setPlayWinSound] = useState(false)
+  const [playLossSound, setPlayLossSound] = useState(false)
 
   useEffect(() => {
     if (result === "win") {
-      // winAudioRef.current?.play().catch(e => console.warn("Audio error:", e))
+      setPlayWinSound(true)
 
       const duration = 3000
       const animationEnd = Date.now() + duration
-      const defaults = { startVelocity: 30, spread: 360, ticks: 60, zIndex: 0 }
+      const defaults = {
+        startVelocity: 30,
+        spread: 360,
+        ticks: 60,
+        zIndex: 0,
+      }
 
       const randomInRange = (min, max) => Math.random() * (max - min) + min
 
@@ -29,6 +35,7 @@ const GameResult = ({ result, winAmount, onPlayAgain, autoClose = false }) => {
           particleCount,
           origin: { x: randomInRange(0.1, 0.3), y: Math.random() - 0.2 },
         })
+
         confetti({
           ...defaults,
           particleCount,
@@ -37,8 +44,8 @@ const GameResult = ({ result, winAmount, onPlayAgain, autoClose = false }) => {
       }, 250)
 
       return () => clearInterval(interval)
-    } else if (result === "loss") {
-      // lossAudioRef.current?.play().catch(e => console.warn("Audio error:", e))
+    } else  {
+      setPlayLossSound(true)
     }
   }, [result])
 
@@ -55,9 +62,21 @@ const GameResult = ({ result, winAmount, onPlayAgain, autoClose = false }) => {
 
   return (
     <>
-      {/* Preload audio (hidden) */}
-      {/* <audio ref={winAudioRef} src="/Sounds/YouWin.mp3" preload="auto" />
-      <audio ref={lossAudioRef} src="/Sounds/Loss.mp3" preload="auto" /> */}
+      {/* Play sounds using react-sound */}
+      {playWinSound && (
+        <Sound
+          url="/Sounds/YouWin.mp3"
+          playStatus={Sound.status.PLAYING}
+          onFinishedPlaying={() => setPlayWinSound(false)}
+        />
+      )}
+      {playLossSound && (
+        <Sound
+          url="/Sounds/Loss.mp3"
+          playStatus={Sound.status.PLAYING}
+          onFinishedPlaying={() => setPlayLossSound(false)}
+        />
+      )}
 
       <AnimatePresence>
         <motion.div
@@ -98,7 +117,9 @@ const GameResult = ({ result, winAmount, onPlayAgain, autoClose = false }) => {
                 🔄 Play Again
               </button>
             ) : (
-              <div className="text-gray-400 mt-4 animate-pulse">⏳ Next round starting soon...</div>
+              <div className="text-gray-400 mt-4 animate-pulse">
+                ⏳ Next round starting soon...
+              </div>
             )}
           </motion.div>
         </motion.div>
