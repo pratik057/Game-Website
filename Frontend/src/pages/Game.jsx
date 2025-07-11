@@ -37,8 +37,8 @@ const Game = () => {
     gameState.status === "betting" || gameState.status === "jokerRevealed";
   const calculateWinAmount = () => {
     if (!userWon || !currentBet) return 0;
-    const multiplier = currentBet.side === "andar" ? 2.0 : 2.0;
-    return Math.floor(currentBet.amount * multiplier);
+    const multiplier = currentBet.side === "andar" ? 1.96 : 1.96;
+    return currentBet.amount * multiplier;
   };
 
   const [betDialogOpen, setBetDialogOpen] = useState(false);

@@ -70,14 +70,7 @@ const GameResult = ({ result, winAmount, onPlayAgain, autoClose = false }) => {
           onFinishedPlaying={() => setPlayWinSound(false)}
         />
       )}
-      {playLossSound && (
-        <Sound
-          url="/Sounds/Loss.mp3"
-          playStatus={Sound.status.PLAYING}
-          onFinishedPlaying={() => setPlayLossSound(false)}
-        />
-      )}
-
+     
       <AnimatePresence>
         <motion.div
           className="fixed inset-0 flex items-center justify-center z-50 backdrop-blur-sm bg-black/60 p-4"
