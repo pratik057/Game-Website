@@ -402,7 +402,7 @@ const startGameLoop = (io) => {
         if (player.bet) {
           if (player.bet.side === gameState.winningSide) {
             // Player wins, gets 2x the bet amount back (1x bet + 1x winnings)
-            const winnings = player.bet.amount * 2
+            const winnings = player.bet.amount * 1.96
             player.balance += winnings
 
             winners.push({
@@ -470,7 +470,7 @@ const startGameLoop = (io) => {
               winningSide: gameState.winningSide,
               winningCardIndex: gameState.winningCardIndex,
               result: player.bet.side === gameState.winningSide ? "win" : "lose",
-              winAmount: player.bet.side === gameState.winningSide ? player.bet.amount * 2 : 0, // Double the bet if won
+              winAmount: player.bet.side === gameState.winningSide ? player.bet.amount * 1.96 : 0, // Double the bet if won
             }
           })
           .filter((record) => record !== null) // Remove null entries
